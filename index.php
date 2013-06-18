@@ -2,8 +2,10 @@
 	<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="el" xml:lang="el">
 	<head>
 		<script type="text/javascript" src="clientincludes/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="jquery.xcolor.js"></script>
-		<script type="text/javascript" src="test.js"></script>
+		<script type="text/javascript" src="clientincludes/jquery.xcolor.js"></script>
+		<script type="text/javascript" src="clientincludes/common.js"></script>
+		<script type="text/javascript" src="clientincludes/bplus.js"></script>
+		<script type="text/javascript" src="clientincludes/visual.js"></script>
 	</head>
 	<body>
 	</body>

@@ -16,10 +16,6 @@ $(function() {
 		return tile;
 	}
 
-
-
-
-
 	function tile_addsample(tile,sample_list,sample_spacing,sample_offset){
 		var counter = 0;
 		var position = 0;
@@ -118,6 +114,19 @@ $(function() {
 			tile = tile_addsample(tile,sample,6,5);
 			render(tile);
 			console.log("max:"+Math.ceil(7*7 / 6));
+
+
+
+			var bplusTree = new com.anvesaka.bplus.BPlusTree({
+				order:6,
+				mergeThreshold:2
+			});
+
+			bplusTree.insert(0.12,tile);
+			var tile = bplusTree.range(0,1);
+			console.log(tile);
+
+
 			//MAXIMUM sample needed is Math.up(width_pix*height_pix / sample_spacing)
 			//
 			//console.log(tile);
