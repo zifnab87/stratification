@@ -1,5 +1,28 @@
 $(function() {
 
+	function initialize_tile(config){
+		var x = config["x"];
+		var y = config["y"];
+		var width = config["width"];
+		var height = config["height"];
+		var default_color = config["default_color"];
+		var zoom_level = config["zoom_level"];
+		var rgbData = initialize_rgbData({width: width,height: height,default_color: default_color});
+		var tile = new Object();
+		tile.width = rgbData.width;
+		tile.height = rgbData.height;
+		tile.rgbData = rgbData;
+		tile.render = function(){
+			this.rgbData.render();
+		}
+		tile.addSample = function(sample_list,sample_spacing,sample_offset){
+			this.rgbData.addSample(sample_list,sample_spacing,sample_offset);
+		}
+		return tile;
+		//var likelihood = config["likelihood"];
+	}
+
+
 	function initialize_rgbData(config){ //if num_of_samples is 1 then there is no sampling
 		var width = config["width"];
 		var height = config["height"];
@@ -16,6 +39,8 @@ $(function() {
 				rgbData.pixelsarray[i] = default_color;
 			}
 		}
+
+
 		rgbData.addSample = function(sample_list,sample_spacing,sample_offset){
 			var counter = 0;
 			var position = 0;
@@ -80,20 +105,23 @@ $(function() {
 			//console.log(flat_pixel_array);
 			//console.log($.xcolor.average('#ff7f00','#007fff'));
 			//mInit();
-			var rgbData = initialize_rgbData({width: 7,height: 7,default_color: [0xff,0x00,0x00]});
+			//var rgbData = initialize_rgbData({width: 7,height: 7,default_color: [0xff,0x00,0x00]});
 			var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
-			rgbData.addSample(sample,6,0);
-			rgbData.render();
-			rgbData.addSample(sample,6,1);
-			rgbData.render();
-			rgbData.addSample(sample,6,2);
-			rgbData.render();
-			rgbData.addSample(sample,6,3);
-			rgbData.render();
-			rgbData.addSample(sample,6,4);
-			rgbData.render();
-			rgbData.addSample(sample,6,5);
-			rgbData.render();
+			
+			var tile = initialize_tile({width: 7,height: 7,default_color: [0xff,0x00,0x00], x: 1, y: 2});
+			tile.render();
+			tile.addSample(sample,6,0);
+			tile.render();
+			tile.addSample(sample,6,1);
+			tile.render();
+			tile.addSample(sample,6,2);
+			tile.render();
+			tile.addSample(sample,6,3);
+			tile.render();
+			tile.addSample(sample,6,4);
+			tile.render();
+			tile.addSample(sample,6,5);
+			tile.render();
 
 			console.log("max:"+Math.ceil(7*7 / 6));
 
