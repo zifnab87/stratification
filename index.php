@@ -9,6 +9,6 @@
 		<script type="text/javascript" src="clientincludes/visual.js"></script>
 	</head>
 	<body>
-		<div id="results"></div>
+		<div id="status"></div>
 	</body>
 	</html>
