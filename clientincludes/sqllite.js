@@ -30,7 +30,6 @@ function createDatabaseIfNotExists(dbname,dbsize){
 			tx.executeSql('UPDATE Tiles SET pixelsArray = "'+tileSerializedPixelData+'" WHERE id='+id);
 			msg = '<p>Log message: updated row with id='+id+'.</p>';
 			document.querySelector('#status').innerHTML +=  msg;
-			console.log("4:"+tileSerializedPixelData);
 		});
 	}
 
