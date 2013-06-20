@@ -76,7 +76,6 @@ $(function() {
 			}
 		}
 		tile.serializePixels = function(){
-			console.log(JSON.stringify(this.pixelsArray));
 			return JSON.stringify(this.pixelsArray);
 		}
 		tile.insert = function(db){
@@ -137,20 +136,6 @@ $(function() {
 		tile.insert(db);
 
 		console.log("max:"+Math.ceil(7*7 / 6));
-		db.transaction(function (tx) {
-		  tx.executeSql('SELECT * FROM Tiles', [], function (tx, results) {
-		   var len = results.rows.length, i;
-		   msg = "<p>Found rows: " + len + "</p>";
-		   document.querySelector('#status').innerHTML +=  msg;
-		   for (i = 0; i < len; i++){
-		   	 row = results.rows.item(i);
-		   	 var tile = extractTile(row);
-		   	 tile.render();
-		   	 //var array = JSON.parse(msg)
-		     msg = "<p><b>" + row.pixelsArray + "</b></p>";
-		     document.querySelector('#status').innerHTML +=  msg;
-		   }
-		 }, null);
-		});
+		db.fetchAllTiles(extractTile);
 	});
 });

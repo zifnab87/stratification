@@ -24,5 +24,23 @@ function createDatabaseIfNotExists(dbname,dbsize){
           document.querySelector('#status').innerHTML +=  msg;
       });
   }
+
+  db.fetchAllTiles = function(extractTile){
+    db.transaction(function (tx) {
+      tx.executeSql('SELECT * FROM Tiles', [], function (tx, results) {
+       var len = results.rows.length, i;
+       msg = "<p>Found rows: " + len + "</p>";
+       document.querySelector('#status').innerHTML +=  msg;
+       for (i = 0; i < len; i++){
+         row = results.rows.item(i);
+         var tile = extractTile(row);
+         tile.render();
+         //var array = JSON.parse(msg)
+         //msg = "<p><b>" + row.pixelsArray + "</b></p>";
+         //document.querySelector('#status').innerHTML +=  msg;
+       }
+     }, null);
+    });
+  }
   return db;
 }
