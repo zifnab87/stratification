@@ -1,5 +1,6 @@
 $(function() {
 
+
 	function initialize_tile(config){
 		var x = config["x"];
 		var y = config["y"];
@@ -34,7 +35,9 @@ $(function() {
 				return document.createElement(tag);
 			}
 
-			function createImageFromRGBdata(pixelsArray, width, height){
+
+
+			function convertPixelsArrayToCanvas(pixelsArray, width, height){
 				var mCanvas = newEl('canvas');
 				mCanvas.width = width;
 				mCanvas.height = height;
@@ -54,19 +57,24 @@ $(function() {
 					dstIndex += 4;
 				}
 				mContext.putImageData(mImgData, 0, 0);
+
+				mCanvas.convertToBase64 = function(){
+					return (String)(this.toDataURL());
+				}
 				return mCanvas;
 			}
+
+			
+
 			// 1. - append data as a canvas element
-			var mCanvas = createImageFromRGBdata(this.pixelsArray, this.width, this.height);
+			var mCanvas = convertPixelsArrayToCanvas(this.pixelsArray, this.width, this.height);
 			mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
 			document.body.appendChild( mCanvas );
-			/*// 2 - append data as a (saveable) image
-			var mImg = newEl("img");
-			var imgDataUrl = mCanvas.toDataURL();	// make a base64 string of the image data (the array above)
-			mImg.src = imgDataUrl;
-			mImg.setAttribute('style', "width:4px; height:4px;"); // make it large enough to be visible
-			document.body.appendChild(mIpixelsarraymg);*/
+			console.log("edw"+mCanvas.convertToBase64().length*4+"bytes");
+
+			return mCanvas;
 		}
+
 		tile.addSample = function(sample_list,samples_available,which_sample){
 			var counter = 0;
 			var position = 0;
@@ -83,9 +91,12 @@ $(function() {
 			}
 			
 		}
+
 		tile.serializePixels = function(){
+			console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
 			return JSON.stringify(this.pixelsArray);
 		}
+		
 		tile.insert = function(db){
 			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.serializePixels());
 		}
@@ -180,5 +191,6 @@ $(function() {
 
 		console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);
+
 	});
 });
