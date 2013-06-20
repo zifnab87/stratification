@@ -8,6 +8,7 @@ $(function() {
 		
 		var zoomLevel = config["zoomLevel"];
 		var pixelsArray;
+		var tile = new Object();
 		if (config["pixelsArray"]){
 			pixelsArray = config["pixelsArray"];
 		}
@@ -15,7 +16,12 @@ $(function() {
 			var defaultColor = config["defaultColor"];
 			pixelsArray = initialize_pixelsArray({width: width,height: height,defaultColor: defaultColor});
 		}
-		var tile = new Object();
+		if (config["id"]){
+			id = config["id"];
+			tile.id = id;
+		}
+		
+		
 		tile.width = width;
 		tile.height = height;
 		tile.posX = x;
@@ -61,25 +67,36 @@ $(function() {
 			mImg.setAttribute('style', "width:4px; height:4px;"); // make it large enough to be visible
 			document.body.appendChild(mIpixelsarraymg);*/
 		}
-		tile.addSample = function(sample_list,sample_spacing,sample_offset){
+		tile.addSample = function(sample_list,samples_available,which_sample){
 			var counter = 0;
 			var position = 0;
-			var num_of_pixels = this.width*this.height;
-			var num_of_samples = sample_list.length;
-			for (var i = 0; i<num_of_samples; i++){
-				if (position+sample_offset>num_of_pixels){
-					return this;
+			var tile_pixels = this.width*this.height;
+			var sample_pixels = sample_list.length;
+			var sample_offset = which_sample - 1;
+			for (var i = 0; i<sample_pixels; i++){
+				if (position+sample_offset>tile_pixels){;
+					return;
 				}
-				this.pixelsArray[position+sample_offset]=sample_list[i];
-				position += sample_spacing;
+				this.pixelsArray[position+sample_offset] = sample_list[i];
+				position += samples_available;
 				counter++;
 			}
+			
 		}
 		tile.serializePixels = function(){
 			return JSON.stringify(this.pixelsArray);
 		}
 		tile.insert = function(db){
-			db.insertTileData(tile.posX, tile.posY, tile.zoomLevel,tile.serializePixels());
+			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.serializePixels());
+		}
+
+		tile.updatePixels = function(db){
+			console.log(tile["id"]);
+			db.updateTilePixelDataWithId(this["id"], this.serializePixels());
+		}
+
+		tile.setId = function(id){
+			tile.id = id;
 		}
 
 		
@@ -88,7 +105,7 @@ $(function() {
 	}
 
 	function extractTile(dbObj){
-			return initialize_tile({ x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, pixelsArray: JSON.parse(dbObj["pixelsArray"]) });
+			return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, pixelsArray: JSON.parse(dbObj["pixelsArray"]) });
 	}
 
 
@@ -124,19 +141,42 @@ $(function() {
 		//tile.insert(db);
 		//tile.addSample(sample,6,0);
 		//tile.insert(db);
+		tile.insert(db);
+
+
+
+		db.fetchTileWithId(1,extractTile,true);
+		tile.setId(1);
 		tile.addSample(sample,6,1);
-		tile.insert(db);
-		//tile.addSample(sample,6,2);
-		tile.insert(db);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
+		tile.addSample(sample,6,2);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
 		tile.addSample(sample,6,3);
-		//tile.insert(db);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
 		tile.addSample(sample,6,4);
-		tile.insert(db);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
+		tile.addSample(sample,6,5);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
+		tile.addSample(sample,6,6);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);
+		//tile.insert(db);
+		//tile.addSample(sample,6,2);
+		//tile.insert(db);
+		//tile.addSample(sample,6,3);
+		//tile.insert(db);
+		//tile.addSample(sample,6,4);
+		//tile.insert(db);
 		//tile.addSample(sample,6,5);
 		//tile.insert(db);
 
 		//db.fetchTileWithId(3,extractTile);
-		db.fetchTileWithPosition(1,2,extractTile);
+		//db.fetchTileWithPosition(1,2,extractTile);
 
 		console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);

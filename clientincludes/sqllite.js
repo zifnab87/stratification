@@ -18,44 +18,57 @@ function createDatabaseIfNotExists(dbname,dbsize){
 
   	db.insertTileData = function (tilePosX, tilePosY, tileZoomLevel,tileSerializedPixelData){
   		this.transaction(function (tx) {
-			tx.executeSql('INSERT INTO Tiles (zoomLevel, x,y,pixelsarray) VALUES ('+tileZoomLevel+','+tilePosX+','+tilePosY+',"'+tileSerializedPixelData+'")');
+			tx.executeSql('INSERT INTO Tiles (zoomLevel, x,y,pixelsArray) VALUES ('+tileZoomLevel+','+tilePosX+','+tilePosY+',"'+tileSerializedPixelData+'")');
 			msg = '<p>Log message: inserted row.</p>';
 			document.querySelector('#status').innerHTML +=  msg;
 		});
 	}
 
 
-
-
-	db.fetchTileWithId = function(id,extractTile){
+	db.updateTilePixelDataWithId = function(id,tileSerializedPixelData){
 		this.transaction(function (tx) {
-			tx.executeSql('SELECT * FROM Tiles WHERE id ='+id, [], function (tx, results) {
+			tx.executeSql('UPDATE Tiles SET pixelsArray = "'+tileSerializedPixelData+'" WHERE id='+id);
+			msg = '<p>Log message: updated row with id='+id+'.</p>';
+			document.querySelector('#status').innerHTML +=  msg;
+			console.log("4:"+tileSerializedPixelData);
+		});
+	}
+
+	db.fetchTileWithId = function(id,extractTile,renderFlag){
+		this.transaction(function (tx) {
+			tx.executeSql('SELECT * FROM Tiles WHERE id='+id, [], function (tx, results) {
 				var len = results.rows.length, i;
 				msg = "<p>Found tile with id: " + id + "</p>";
 				document.querySelector('#status').innerHTML +=  msg;
-				if (len>=1){
+				//if (len>=1){
 					row = results.rows.item(0);
-					var tile = extractTile(row);
-					tile.render();
-				}
+					tile = extractTile(row);
+					if (renderFlag){
+						tile.render();
+					}
+				//}
 			}, null);
 		});
 	}
 
-	db.fetchTileWithPosition = function(x,y,extractTile){
+	db.fetchTileWithPosition = function(x,y,extractTile,renderFlag){
 		this.transaction(function (tx) {
 			tx.executeSql('SELECT * FROM Tiles WHERE x ='+x+' AND y='+y, [], function (tx, results) {
 				var len = results.rows.length, i;
 				msg = "<p>Found tile with position: " + x + ","+ y + "</p>";
 				document.querySelector('#status').innerHTML +=  msg;
-				row = results.rows.item(0);
-				var tile = extractTile(row);
-				tile.render();
+				if (len==1){
+					row = results.rows.item(0);
+					var tile = extractTile(row);
+					if (renderFlag){
+						tile.render();
+					}
+				}
 			}, null);
 		});
 	}
 
-	db.fetchAllTiles = function(extractTile){
+	db.fetchAllTiles = function(extractTile,renderFlag){
 		this.transaction(function (tx) {
 			tx.executeSql('SELECT * FROM Tiles', [], function (tx, results) {
 				var len = results.rows.length, i;
@@ -64,7 +77,9 @@ function createDatabaseIfNotExists(dbname,dbsize){
 				for (i = 0; i < len; i++){
 					row = results.rows.item(i);
 					var tile = extractTile(row);
-					tile.render();
+					if (renderFlag){
+						tile.render();
+					}
 				}	
 			}, null);
 		});
