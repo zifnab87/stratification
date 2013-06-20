@@ -120,22 +120,25 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0xff,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
-		tile.insert(db);
-		tile.addSample(sample,6,0);
-		tile.insert(db);
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [], x: 1, y: 2, zoomLevel: 1});
+		//tile.insert(db);
+		//tile.addSample(sample,6,0);
+		//tile.insert(db);
 		tile.addSample(sample,6,1);
 		tile.insert(db);
-		tile.addSample(sample,6,2);
+		//tile.addSample(sample,6,2);
 		tile.insert(db);
 		tile.addSample(sample,6,3);
-		tile.insert(db);
+		//tile.insert(db);
 		tile.addSample(sample,6,4);
 		tile.insert(db);
-		tile.addSample(sample,6,5);
-		tile.insert(db);
+		//tile.addSample(sample,6,5);
+		//tile.insert(db);
+
+		//db.fetchTileWithId(3,extractTile);
+		db.fetchTileWithPosition(1,2,extractTile);
 
 		console.log("max:"+Math.ceil(7*7 / 6));
-		db.fetchAllTiles(extractTile);
+		//db.fetchAllTiles(extractTile);
 	});
 });
