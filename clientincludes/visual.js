@@ -100,7 +100,7 @@ $(function() {
 		
 		
 		
-		//tile.pixelsArray = pixelsArray;
+		tile.pixelsArray = pixelsArray;
 		
 
 		tile.render = function(){
@@ -120,11 +120,13 @@ $(function() {
 		tile.addSample = function(sample_list,samples_available,which_sample){
 			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			var base64DataUrl = this.base64DataUrl;
+
 			var myImage = new Image();
 			var tile = this;
 			myImage.setAttribute("src", this.base64DataUrl);
 			myImage.onload = function() {
 				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
+				//console.log(pixelsArray);
 				var counter = 0;
 				var position = 0;
 				var tile_pixels = tile.width*tile.height;
@@ -140,10 +142,10 @@ $(function() {
 						counter++;
 					}
 				}
+
 				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-
 				//$("body").append(canvas);
-
+				$(tile).trigger("sampleAdded");
 			}
 		}
 			/*var counter = 0;
@@ -203,7 +205,7 @@ $(function() {
 				pixelsArray[i] = []
 			}
 			else {
-				pixelsArray[i] = defaultColor;
+				pixelsArray[i] = [Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
 			}
 		}
 		return pixelsArray;
@@ -219,14 +221,102 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
-		tile.addSample(sample,6,1);
+		var tile = initialize_tile({width: 8,height: 8,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
+		tile.render(db);
+		console.log(tile.base64DataUrl);
+		//show(tile.base64DataUrl,8,8);
+		//tile.addSample(sample,6,1);
+
+		/*var callbacks = $.Callbacks();
+		callbacks.add(function(){tile.addSample(sample,6,1)});
+		callbacks.fire();
+		callbacks.add(function(){tile.insert(db)});
+		callbacks.fire();
+		callbacks.add(function(){tile.addSample(sample,6,2)});
+		callbacks.fire();
+		callbacks.add(function(){tile.insert(db)});
+		callbacks.fire();
+		callbacks.add(function(){ db.fetchTileWithId(1,extractTile,true); });
+		callbacks.fire();*/
+		var exp = new Array(8);
+		for (var i = 0; i < 8; i++) {
+            exp[i] = new Array(8);
+        }
+		String.prototype.padRight = function(c, n) {
+		    var txt = '';
+		    for (var i = 0; i < n - this.length; i++) txt += c;
+		    return txt + this;
+		};
+
+		function show(base64Data,width,height){
+		    var png = new PNG(base64Data); // data is the base64 encoded data
+			var line;
+			var y = 0;
+			var pixelCount = 0;
+			var pixelsArray = new Array();
+			while(line = png.readLine())
+			{
+			    //console.log(line);
+			    //pixelsArray[y] = new Array(line.length);
+			    for (var x = 0; x < line.length; x++){
+			    	
+
+			    	//var hexColor = '#' + line[x].toString(16).padRight('0',6);
+			    	//1var rgbColor = hexToRgb(hexColor);
+			    	
+			    	var pixel = doSomethingWithPixelData(x, y, '#' + line[x].toString(16).padRight('0', 6))
+			        //pixelsArray[pixelCount][0] = rgbColor.r.toString(16);
+			        //pixelsArray[pixelCount][1] = rgbColor.g.toString(16);
+			        //pixelsArray[pixelCount][2] = rgbColor.b.toString(16);
+			        //console.log("~~~"+pixelsArray[pixelCount]);
+			    	//pixelCount++;	
+			    }
+			    
+			    y++;
+			}
+			//console.log("~~~"+pixelsArray[pixelCount]);
+			/*function doSomethingWithPixelData(color) {
+			    // guess what? do something with pixel data here ;)
+			}*/
+			return pixelsArray;
+		}
+
+		function doSomethingWithPixelData(x, y, color) {
+		    exp[x][y] = color;
+		}
+
+		function hexToRgb(hex) {
+			console.log(hex);
+		    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		    return result ? {
+		        r: parseInt(result[1],16),
+		        g: parseInt(result[2],16),
+		        b: parseInt(result[3],16)
+		    } : null;
+		}
+		var pixelsArray = show("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
+		console.log(pixelsArray);
+
+		//console.log(exp);
+		//var pixelsArray2 = show(convertPixelsArrayToCanvas(pixelsArray,7,7).convertToBase64());
+		//console.log(convertPixelsArrayToCanvas(pixelsArray2,7,7).convertToBase64());
+
+		/*$.when(	tile.addSample(sample,6,1), tile.addSample(sample,6,1) )
+		.then(function(){console.log(tile.base64DataUrl)});
+		$.when(function(){tile.addSample(sample,6,1);}
+		).then(function(){console.log(tile.base64DataUrl)});
+		).then(function(){db.fetchTileWithId(1,extractTile,true);}
+		).then(function(){tile.addSample(sample,6,2);}
+		).then(function(){tile.insert(db);}
+		).then(function(){db.fetchTileWithId(2,extractTile,true);});*/
+
+		/*tile.addSample(sample,6,1);
 		tile.insert(db);
 		tile.addSample(sample,6,2);
 		tile.insert(db);
 		console.log(tile);
 		db.fetchTileWithId(1,extractTile,true);
-		db.fetchTileWithId(2,extractTile,true);
+		db.fetchTileWithId(2,extractTile,true);*/
 		//console.log(tile.base64DataUrl);
 		//console.log(tile);
 		//console.log(tile.base64DataUrl);
@@ -279,7 +369,7 @@ $(function() {
 		
 		//db.fetchTileWithPosition(1,2,extractTile);
 		
-			var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			/*var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			//var base64DataUrl = this.base64DataUrl;
 			var myImage = new Image();
 			myImage.setAttribute("src", base64DataUrl);
@@ -288,7 +378,7 @@ $(function() {
 				//console.log(pixelsArray);
 				//$("body").append(canvas);
 			}
-		
+		*/
 		
 
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";

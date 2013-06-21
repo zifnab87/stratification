@@ -3,8 +3,9 @@
 	<head>
 		<script type="text/javascript" src="clientincludes/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="clientincludes/jquery.xcolor.js"></script>
-		<script type="text/javascript" src="clientincludes/PNG.js"></script>
+		<script type="text/javascript" src="clientincludes/deflate.js"></script>
 		<script type="text/javascript" src="clientincludes/base64.js"></script>
+		<script type="text/javascript" src="clientincludes/PNG.js"></script>
 		<script type="text/javascript" src="clientincludes/sqllite.js"></script>
 		<script type="text/javascript" src="clientincludes/visual.js"></script>
 	</head>
