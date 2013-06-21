@@ -32,28 +32,23 @@ $(function() {
 		return mCanvas;
 	}
 
-	function convertBase64toCanvas(base64DataUrl,width,height){
+	function convertBase64toCanvas(myImage,width,height){
 		var start = new Date().getMilliseconds();
-		var myImage = new Image();	
-		myImage.src = base64DataUrl;
 		var mCanvas = newEl("canvas");
 		mCanvas.width = width;
 		mCanvas.height = height;
 		mCanvas.setAttribute('style', "width:"+10*width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*height+"px;"); // make it large enough to be visible
 		var mContext = mCanvas.getContext('2d');
-		myImage.onload = function() {
-          	mContext.drawImage(myImage, 0, 0);
-			console.log(convertCanvasToPixelsArray(mCanvas));
-        };
+      	mContext.drawImage(myImage, 0, 0);
         var end = new Date().getMilliseconds();
 		console.log((end-start)+"ms");
-		console.log(mCanvas);
+		//console.log(mCanvas);
 
 
 		//var canvas = newEl('canvas');
 		//var ctx = canvas.getContext('2d');
 		//ctx.drawImage(myImage, 0, 0);
-	
+		return mCanvas;
 	}
 
 	function convertCanvasToPixelsArray(mCanvas){
@@ -85,12 +80,18 @@ $(function() {
 		var zoomLevel = config["zoomLevel"];
 		var pixelsArray;
 		var tile = new Object();
-		if (config["pixelsArray"]){
-			pixelsArray = config["pixelsArray"];
+		tile.width = width;
+		tile.height = height;
+		tile.posX = x;
+		tile.posY = y;
+		tile.zoomLevel = zoomLevel;
+		if (config["base64DataUrl"]){
+			tile.base64DataUrl = config["base64DataUrl"];
 		}
 		else {
 			var defaultColor = config["defaultColor"];
 			pixelsArray = initialize_pixelsArray({width: width,height: height,defaultColor: defaultColor});
+			tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
 		}
 		if (config["id"]){
 			id = config["id"];
@@ -98,31 +99,54 @@ $(function() {
 		}
 		
 		
-		tile.width = width;
-		tile.height = height;
-		tile.posX = x;
-		tile.posY = y;
-		tile.zoomLevel = zoomLevel;
-		tile.pixelsArray = pixelsArray;
+		
+		//tile.pixelsArray = pixelsArray;
+		
 
 		tile.render = function(){
-
-			var start = new Date().getMilliseconds();
-			// 1. - append data as a canvas element
-			var mCanvas = convertPixelsArrayToCanvas(this.pixelsArray, this.width, this.height);
-			mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
-			document.body.appendChild( mCanvas );
-			var end = new Date().getMilliseconds();
-			//console.log((end-start)+" ms");
-			//console.log("edw"+mCanvas.convertToBase64().length*4+"bytes");
-			console.log(mCanvas.convertToBase64());
-			
-
-			return mCanvas;
+			var myImage = new Image();
+			var tile = this;
+			console.log(this.base64DataUrl);
+			myImage.setAttribute("src", this.base64DataUrl);
+			myImage.onload = function() {
+				var mCanvas = convertBase64toCanvas(myImage,tile.width,tile.height);
+				var start = new Date().getMilliseconds();
+				mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
+				document.body.appendChild( mCanvas );
+				var end = new Date().getMilliseconds();
+			}
 		}
 
 		tile.addSample = function(sample_list,samples_available,which_sample){
-			var counter = 0;
+			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			var base64DataUrl = this.base64DataUrl;
+			var myImage = new Image();
+			var tile = this;
+			myImage.setAttribute("src", this.base64DataUrl);
+			myImage.onload = function() {
+				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
+				var counter = 0;
+				var position = 0;
+				var tile_pixels = tile.width*tile.height;
+				var sample_pixels = sample_list.length;
+				var sample_offset = which_sample - 1;
+				for (var i = 0; i<sample_pixels; i++){
+					if (position+sample_offset>tile_pixels){
+						//TO INVERSE
+					}
+					else {
+						pixelsArray[position+sample_offset] = sample_list[i];
+						position += samples_available;
+						counter++;
+					}
+				}
+				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+
+				//$("body").append(canvas);
+
+			}
+		}
+			/*var counter = 0;
 			var position = 0;
 			var tile_pixels = this.width*this.height;
 			var sample_pixels = sample_list.length;
@@ -131,12 +155,12 @@ $(function() {
 				if (position+sample_offset>tile_pixels){;
 					return;
 				}
-				this.pixelsArray[position+sample_offset] = sample_list[i];
+				tile.pixelsArray[position+sample_offset] = sample_list[i];
 				position += samples_available;
 				counter++;
-			}
-			
-		}
+			}*/
+
+		
 
 		tile.serializePixels = function(){
 			//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
@@ -144,7 +168,7 @@ $(function() {
 		}
 
 		tile.insert = function(db){
-			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.serializePixels());
+			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.base64DataUrl);
 		}
 
 		tile.updatePixels = function(db){
@@ -162,7 +186,8 @@ $(function() {
 	}
 
 	function extractTile(dbObj){
-			return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, pixelsArray: JSON.parse(dbObj["pixelsArray"]) });
+			console.log(dbObj["base64DataUrl"]);
+			return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, base64DataUrl: dbObj["base64DataUrl"] });
 	}
 
 
@@ -194,11 +219,29 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [], x: 1, y: 2, zoomLevel: 1});
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
+		tile.addSample(sample,6,1);
+		tile.insert(db);
+		tile.addSample(sample,6,2);
+		tile.insert(db);
+		console.log(tile);
+		db.fetchTileWithId(1,extractTile,true);
+		db.fetchTileWithId(2,extractTile,true);
+		//console.log(tile.base64DataUrl);
+		//console.log(tile);
+		//console.log(tile.base64DataUrl);
+		//tile.base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
+		
+		//tile.addSample(sample,6,2);
+		//tile.addSample(sample,6,3);
+		//tile.addSample(sample,6,4);
+		//tile.addSample(sample,6,5);
+		//tile.addSample(sample,6,6);
+		//console.log(tile);
 		//tile.insert(db);
 		//tile.addSample(sample,6,0);
 		//tile.insert(db);
-		tile.insert(db);
+		/*tile.insert(db);
 
 
 
@@ -221,7 +264,7 @@ $(function() {
 		db.fetchTileWithId(1,extractTile,true);
 		tile.addSample(sample,6,6);
 		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
+		db.fetchTileWithId(1,extractTile,true);*/
 		//tile.insert(db);
 		//tile.addSample(sample,6,2);
 		//tile.insert(db);
@@ -233,9 +276,32 @@ $(function() {
 		//tile.insert(db);
 
 		//db.fetchTileWithId(3,extractTile);
+		
 		//db.fetchTileWithPosition(1,2,extractTile);
-		var canvas = convertBase64toCanvas("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg== ",7,7)
-		$("body").append(canvas);
+		
+			var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			//var base64DataUrl = this.base64DataUrl;
+			var myImage = new Image();
+			myImage.setAttribute("src", base64DataUrl);
+			myImage.onload = function() {
+				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,7,7));
+				//console.log(pixelsArray);
+				//$("body").append(canvas);
+			}
+		
+		
+
+		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
+		//convertBase64toCanvas()
+		/*var binaryImg = atob(base64Image);
+	    var length = binaryImg.length;
+	    var ab = new ArrayBuffer(length);
+	    console.log(length);
+	    var ua = new Uint8Array(ab);
+	    for (var i = 0; i < length; i++) {
+	        ua[i] = binaryImg.charCodeAt(i);
+	    }
+	     console.log(ua);*/
 		//var pix_array = convertCanvasToPixelsArray(canvas);
 		console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);

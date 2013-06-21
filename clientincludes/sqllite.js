@@ -2,7 +2,7 @@ function createDatabaseIfNotExists(dbname,dbsize){
 	var db = openDatabase(dbname, '1.0', 'Test DB2', dbsize);
 	db.createTilesTableIfNotExists = function() {
 		this.transaction(function (tx) {
-			tx.executeSql('CREATE TABLE IF NOT EXISTS Tiles (id INTEGER PRIMARY KEY,x,y,pixelsArray,zoomLevel,stratPercent)');
+			tx.executeSql('CREATE TABLE IF NOT EXISTS Tiles (id INTEGER PRIMARY KEY,x,y,base64DataUrl,zoomLevel,stratPercent)');
 			msg = '<p>Log message: created table.</p>';
 			document.querySelector('#status').innerHTML +=  msg;
 		});
@@ -16,18 +16,18 @@ function createDatabaseIfNotExists(dbname,dbsize){
 		});
 	}
 
-  	db.insertTileData = function (tilePosX, tilePosY, tileZoomLevel,tileSerializedPixelData){
+  	db.insertTileData = function (tilePosX, tilePosY, tileZoomLevel,base64DataUrl){
   		this.transaction(function (tx) {
-			tx.executeSql('INSERT INTO Tiles (zoomLevel, x,y,pixelsArray) VALUES ('+tileZoomLevel+','+tilePosX+','+tilePosY+',"'+tileSerializedPixelData+'")');
+			tx.executeSql('INSERT INTO Tiles (zoomLevel, x,y,base64DataUrl) VALUES ('+tileZoomLevel+','+tilePosX+','+tilePosY+',"'+base64DataUrl+'")');
 			msg = '<p>Log message: inserted row.</p>';
 			document.querySelector('#status').innerHTML +=  msg;
 		});
 	}
 
 
-	db.updateTilePixelDataWithId = function(id,tileSerializedPixelData){
+	db.updateTilePixelDataWithId = function(id,base64DataUrl){
 		this.transaction(function (tx) {
-			tx.executeSql('UPDATE Tiles SET pixelsArray = "'+tileSerializedPixelData+'" WHERE id='+id);
+			tx.executeSql('UPDATE Tiles SET base64DataUrl = "'+base64DataUrl+'" WHERE id='+id);
 			msg = '<p>Log message: updated row with id='+id+'.</p>';
 			document.querySelector('#status').innerHTML +=  msg;
 		});
