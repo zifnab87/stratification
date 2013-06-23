@@ -100,7 +100,7 @@ $(function() {
 		
 		
 		
-		tile.pixelsArray = pixelsArray;
+		//tile.pixelsArray = pixelsArray;
 		
 
 		tile.render = function(){
@@ -116,8 +116,41 @@ $(function() {
 				var end = new Date().getMilliseconds();
 			}
 		}
+<<<<<<< HEAD
 		z = 0;
 		
+=======
+
+		tile.addSample = function(sample_list,samples_available,which_sample){
+			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			var base64DataUrl = this.base64DataUrl;
+			var myImage = new Image();
+			var tile = this;
+			myImage.setAttribute("src", this.base64DataUrl);
+			myImage.onload = function() {
+				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
+				var counter = 0;
+				var position = 0;
+				var tile_pixels = tile.width*tile.height;
+				var sample_pixels = sample_list.length;
+				var sample_offset = which_sample - 1;
+				for (var i = 0; i<sample_pixels; i++){
+					if (position+sample_offset>tile_pixels){
+						//TO INVERSE
+					}
+					else {
+						pixelsArray[position+sample_offset] = sample_list[i];
+						position += samples_available;
+						counter++;
+					}
+				}
+				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+
+				//$("body").append(canvas);
+
+			}
+		}
+>>>>>>> parent of d214d13... trying to work with asynchronous code
 			/*var counter = 0;
 			var position = 0;
 			var tile_pixels = this.width*this.height;
@@ -175,7 +208,11 @@ $(function() {
 				pixelsArray[i] = []
 			}
 			else {
+<<<<<<< HEAD
 				pixelsArray[i] = defaultColor;//[Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
+=======
+				pixelsArray[i] = defaultColor;
+>>>>>>> parent of d214d13... trying to work with asynchronous code
 			}
 		}
 		return pixelsArray;
@@ -275,6 +312,7 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		
+<<<<<<< HEAD
 		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
 		//tile.render(db);
 		//console.log(tile.base64DataUrl);
@@ -396,12 +434,16 @@ $(function() {
 		).then(function(){db.fetchTileWithId(2,extractTile,true);});*/
 
 		/*tile.addSample(sample,6,1);
+=======
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
+		tile.addSample(sample,6,1);
+>>>>>>> parent of d214d13... trying to work with asynchronous code
 		tile.insert(db);
 		tile.addSample(sample,6,2);
 		tile.insert(db);
 		console.log(tile);
 		db.fetchTileWithId(1,extractTile,true);
-		db.fetchTileWithId(2,extractTile,true);*/
+		db.fetchTileWithId(2,extractTile,true);
 		//console.log(tile.base64DataUrl);
 		//console.log(tile);
 		//console.log(tile.base64DataUrl);
@@ -454,7 +496,7 @@ $(function() {
 		
 		//db.fetchTileWithPosition(1,2,extractTile);
 		
-			/*var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			//var base64DataUrl = this.base64DataUrl;
 			var myImage = new Image();
 			myImage.setAttribute("src", base64DataUrl);
@@ -463,7 +505,7 @@ $(function() {
 				//console.log(pixelsArray);
 				//$("body").append(canvas);
 			}
-		*/
+		
 		
 
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";

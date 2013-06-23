@@ -3,10 +3,14 @@
 	<head>
 		<script type="text/javascript" src="clientincludes/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="clientincludes/jquery.xcolor.js"></script>
+<<<<<<< HEAD
 		<script type="text/javascript" src="clientincludes/deflate.js"></script>
 		<script type="text/javascript" src="clientincludes/inflate.js"></script>
 		<script type="text/javascript" src="clientincludes/base64.js"></script>
+=======
+>>>>>>> parent of d214d13... trying to work with asynchronous code
 		<script type="text/javascript" src="clientincludes/PNG.js"></script>
+		<script type="text/javascript" src="clientincludes/base64.js"></script>
 		<script type="text/javascript" src="clientincludes/sqllite.js"></script>
 		<script type="text/javascript" src="clientincludes/visual.js"></script>
 	</head>
