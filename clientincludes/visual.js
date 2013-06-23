@@ -378,7 +378,8 @@ $(function() {
 		        b: parseInt(result[3],16)
 		    } : null;
 		}
-		//var pixelsArray = show("iVBORw0KGgoAAAANSUhEUgAAAP8AAAEACAYAAAB8u6CyAAAgAElEQ…r3aWp3kjZjQngr/MwJB0UHfj2TwpO/5cWTwiCvJaw9qM//Af2EyjoNXjwtAAAAAElFTkSuQmCC",7,7);
+		var pixelsArray = PNG("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
+		
 		//console.log(pixelsArray);
 
 		//console.log(exp);
@@ -485,10 +486,11 @@ $(function() {
 
 function doSomethingWithPixels(tile,params){
    convertBase64ToPixelsArray(tile,function(pixelsArray){
-anipulate the pixels 
-//convert them back to base64 and store it in the tile
-convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-			});`
+	//manipulate the pixels 
+	//convert them back to base64 and store it in the tile
+	tile.base64UrlData = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+	});
+}
 
 
 
