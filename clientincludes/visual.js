@@ -116,38 +116,8 @@ $(function() {
 				var end = new Date().getMilliseconds();
 			}
 		}
-
-		tile.addSample = function(sample_list,samples_available,which_sample){
-			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
-			var base64DataUrl = this.base64DataUrl;
-
-			var myImage = new Image();
-			var tile = this;
-			myImage.setAttribute("src", this.base64DataUrl);
-			myImage.onload = function() {
-				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
-				//console.log(pixelsArray);
-				var counter = 0;
-				var position = 0;
-				var tile_pixels = tile.width*tile.height;
-				var sample_pixels = sample_list.length;
-				var sample_offset = which_sample - 1;
-				for (var i = 0; i<sample_pixels; i++){
-					if (position+sample_offset>tile_pixels){
-						//TO INVERSE
-					}
-					else {
-						pixelsArray[position+sample_offset] = sample_list[i];
-						position += samples_available;
-						counter++;
-					}
-				}
-
-				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-				//$("body").append(canvas);
-				$(tile).trigger("sampleAdded");
-			}
-		}
+		z = 0;
+		
 			/*var counter = 0;
 			var position = 0;
 			var tile_pixels = this.width*this.height;
@@ -205,15 +175,99 @@ $(function() {
 				pixelsArray[i] = []
 			}
 			else {
-				pixelsArray[i] = [Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
+				pixelsArray[i] = defaultColor;//[Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
 			}
 		}
 		return pixelsArray;
 	}
 
+	function addSample(tile,sample_list,samples_available,which_sample){
+			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+			//var base64DataUrl = this.base64DataUrl;
+			convertBase64ToPixelsArray(tile,function(pixelsArray){
+				var counter = 0;
+				var position = 0;
+				var tile_pixels = tile.width*tile.height;
+				var sample_pixels = sample_list.length;
+				var sample_offset = which_sample - 1;
+				for (var i = 0; i<sample_pixels; i++){
+					if (position+sample_offset>tile_pixels){
+						//TO INVERSE
+					}
+					else {
+						pixelsArray[position+sample_offset] = sample_list[i];
+						position += samples_available;
+						counter++;
+					}
+				}
+				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+				tile.render();
+				//tile.insert(db);
+			});
+
+			/*$(base64DataUrl).on("addSample",function(){
+				//console.log(z++)
+			});*/
+			/*var myImage = new Image();
+			var tile = this;
+			myImage.setAttribute("src", this.base64DataUrl);
+			myImage.onload = function() {
+				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
+				//console.log(pixelsArray);
+				var counter = 0;
+				var position = 0;
+				var tile_pixels = tile.width*tile.height;
+				var sample_pixels = sample_list.length;
+				var sample_offset = which_sample - 1;
+				for (var i = 0; i<sample_pixels; i++){
+					if (position+sample_offset>tile_pixels){
+						//TO INVERSE
+					}
+					else {
+						pixelsArray[position+sample_offset] = sample_list[i];
+						position += samples_available;
+						counter++;
+					}
+				}
+
+				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+				//$("body").append(canvas);
+				$(tile).trigger("sampleAdded");
+			}*/
+
+
+		}
+
+	function convertBase64ToPixelsArray(tile,whatToDoNext){
+		var base64DataUrl = tile.base64DataUrl;
+		var mCanvas = newEl("canvas");
+		var ctx = mCanvas.getContext("2d");
+		var pixelsArray = [];
+
+		var img = newEl("img");
+		img.onload = getRGB;
+		img.src = base64DataUrl;
+
+		function getRGB(){
+			mCanvas.width = img.width;
+			mCanvas.height = img.height;
+			ctx.drawImage(img,0,0);
+			var data = ctx.getImageData(0,0,mCanvas.width, mCanvas.height).data;
+			for (var i=0; i<data.length; i+=4){
+				pixelsArray.push([data[i],data[i+1],data[i+2]]);
+			}
+			//console.log(pixels);
+			whatToDoNext(pixelsArray);
+			//$(base64DataUrl).trigger(whatToDoNext);
+		}
+	}
+
+	
+
+
 
 	$(document).ready(function() {
-		var db = createDatabaseIfNotExists(':memory:',2*1024*1024);
+		db = createDatabaseIfNotExists(':memory:',2*1024*1024);
 		db.dropTilesTableIfExists();
 		db.createTilesTableIfNotExists();
 		
@@ -221,12 +275,18 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		
-		var tile = initialize_tile({width: 8,height: 8,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
-		tile.render(db);
-		console.log(tile.base64DataUrl);
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
+		//tile.render(db);
+		//console.log(tile.base64DataUrl);
 		//show(tile.base64DataUrl,8,8);
+		//tile.render();
+		addSample(tile,sample,6,1);
+		addSample(tile,sample,6,2);
+		addSample(tile,sample,6,3);
+		addSample(tile,sample,6,4);
+		addSample(tile,sample,6,5);
+		addSample(tile,sample,6,6);
 		//tile.addSample(sample,6,1);
-
 		/*var callbacks = $.Callbacks();
 		callbacks.add(function(){tile.addSample(sample,6,1)});
 		callbacks.fire();
@@ -248,15 +308,39 @@ $(function() {
 		    return txt + this;
 		};
 
+		// function myPNG(data){
+		//     var reader = new Base64Reader(data);
+		//     reader.skip(8);
+		//     var length = reader.readInt();
+		//     var type = reader.readChars(4);
+		//     var data = [];
+		//     console.log("bika");
+		//     if (reader.read(data, 0, length) != length){
+		//         throw 'Out of bounds';
+		//     }
+		//     reader.skip(4);
+		//     return { type: type, data: data };
+		// }
+
+
 		function show(base64Data,width,height){
-		    var png = new PNG(base64Data); // data is the base64 encoded data
+		    var png = myPNG(base64Data); // data is the base64 encoded data
+			//var reader = new Base64Reader(base64Data);
+  			console.log(png);
+
 			var line;
+			var byte;
 			var y = 0;
 			var pixelCount = 0;
 			var pixelsArray = new Array();
-			while(line = png.readLine())
+			//byte = reader.readByte();
+			//console.log(byte);
+			/*while(byte = reader.readByte()){
+				console.log(byte);
+			}*/
+			/*while(line = png.readLine())
 			{
-			    //console.log(line);
+			    console.log(line);
 			    //pixelsArray[y] = new Array(line.length);
 			    for (var x = 0; x < line.length; x++){
 			    	
@@ -273,7 +357,7 @@ $(function() {
 			    }
 			    
 			    y++;
-			}
+			}*/
 			//console.log("~~~"+pixelsArray[pixelCount]);
 			/*function doSomethingWithPixelData(color) {
 			    // guess what? do something with pixel data here ;)
@@ -294,8 +378,8 @@ $(function() {
 		        b: parseInt(result[3],16)
 		    } : null;
 		}
-		var pixelsArray = show("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
-		console.log(pixelsArray);
+		//var pixelsArray = show("iVBORw0KGgoAAAANSUhEUgAAAP8AAAEACAYAAAB8u6CyAAAgAElEQ…r3aWp3kjZjQngr/MwJB0UHfj2TwpO/5cWTwiCvJaw9qM//Af2EyjoNXjwtAAAAAElFTkSuQmCC",7,7);
+		//console.log(pixelsArray);
 
 		//console.log(exp);
 		//var pixelsArray2 = show(convertPixelsArrayToCanvas(pixelsArray,7,7).convertToBase64());
@@ -398,3 +482,13 @@ $(function() {
 
 	});
 });
+
+function doSomethingWithPixels(tile,params){
+   convertBase64ToPixelsArray(tile,function(pixelsArray){
+anipulate the pixels 
+//convert them back to base64 and store it in the tile
+convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+			});`
+
+
+
