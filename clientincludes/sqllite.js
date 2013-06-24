@@ -33,7 +33,7 @@ function createDatabaseIfNotExists(dbname,dbsize){
 		});
 	}
 
-	db.fetchTileWithId = function(id,extractTile,renderFlag){
+	db.fetchTileWithId = function(id,extractTile,render,dispatcher){
 		this.transaction(function (tx) {
 			tx.executeSql('SELECT * FROM Tiles WHERE id='+id, [], function (tx, results) {
 				var len = results.rows.length, i;
@@ -42,9 +42,11 @@ function createDatabaseIfNotExists(dbname,dbsize){
 				//if (len>=1){
 					row = results.rows.item(0);
 					tile = extractTile(row);
-					if (renderFlag){
-						tile.render();
-					}
+					//render(tile);
+					console.log("here");
+					dispatcher.check();
+					dispatcher.addNew({func: render,config: {tile: tile}});
+
 				//}
 			}, null);
 		});

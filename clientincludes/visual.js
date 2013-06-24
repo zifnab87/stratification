@@ -41,13 +41,7 @@ $(function() {
 		var mContext = mCanvas.getContext('2d');
       	mContext.drawImage(myImage, 0, 0);
         var end = new Date().getMilliseconds();
-		console.log((end-start)+"ms");
-		//console.log(mCanvas);
-
-
-		//var canvas = newEl('canvas');
-		//var ctx = canvas.getContext('2d');
-		//ctx.drawImage(myImage, 0, 0);
+		//console.log((end-start)+"ms");
 		return mCanvas;
 	}
 
@@ -104,13 +98,11 @@ $(function() {
 			return JSON.stringify(this.pixelsArray);
 		}
 
-		tile.insert = function(db){
-			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.base64DataUrl);
-		}
+
 
 		tile.updatePixels = function(db){
 			//console.log(tile["id"]);
-			db.updateTilePixelDataWithId(this["id"], this.serializePixels());
+			db.updateTilePixelDataWithId(this["id"], this.base64DataUrl);
 		}
 
 		tile.setId = function(id){
@@ -123,7 +115,6 @@ $(function() {
 	}
 
 	function extractTile(dbObj){
-			console.log(dbObj["base64DataUrl"]);
 			return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, base64DataUrl: dbObj["base64DataUrl"] });
 	}
 
@@ -133,8 +124,6 @@ $(function() {
 		var height = config["height"];
 		var defaultColor = config["defaultColor"];
 		var pixelsArray = new Array(width*height);
-		//rgbData.width = width;
-		//rgbData.height = height;
 		for (var i = 0; i < pixelsArray.length; i++){
 			if (!defaultColor){
 				pixelsArray[i] = []
@@ -152,6 +141,7 @@ $(function() {
 			var tile = config["tile"];	
 			var myImage = new Image();
 			myImage.setAttribute("src", tile.base64DataUrl);
+			console.log(tile);
 			myImage.onload = function() {
 				var mCanvas = convertBase64toCanvas(myImage,tile.width,tile.height);
 				var start = new Date().getMilliseconds();
@@ -163,33 +153,48 @@ $(function() {
 		}
 
 	function addSample(config,dispatcher){
-			var tile = config["tile"]
-			var sample_list = config["sample"]
-			var samples_available = config["num_samples"];
-			var which_sample = config["which_sample"];
-			convertBase64ToPixelsArray(tile,function(pixelsArray){
-				var counter = 0;
-				var position = 0;
-				var tile_pixels = tile.width*tile.height;
-				var sample_pixels = sample_list.length;
-				var sample_offset = which_sample - 1;
-				for (var i = 0; i<sample_pixels; i++){
-					if (position+sample_offset>tile_pixels){
-						//TO INVERSE
-					}
-					else {
-						pixelsArray[position+sample_offset] = sample_list[i];
-						position += samples_available;
-						counter++;
-					}
+		var tile = config["tile"]
+		var sample_list = config["sample"]
+		var samples_available = config["num_samples"];
+		var which_sample = config["which_sample"];
+		convertBase64ToPixelsArray(tile,function(pixelsArray){
+			var counter = 0;
+			var position = 0;
+			var tile_pixels = tile.width*tile.height;
+			var sample_pixels = sample_list.length;
+			var sample_offset = which_sample - 1;
+			for (var i = 0; i<sample_pixels; i++){
+				if (position+sample_offset>tile_pixels){
+					//TO INVERSE
 				}
-				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-				
-				dispatcher.check();
+				else {
+					pixelsArray[position+sample_offset] = sample_list[i];
+					position += samples_available;
+					counter++;
+				}
+			}
+			tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+			
+			dispatcher.check();
 
-			});
-		}
+		});
+	}
+	function tileInsert(config,dispatcher){
+		var tile = config["tile"];
+		var db = config["db"];
+		db.insertTileData(tile.posX, tile.posY, tile.zoomLevel,tile.base64DataUrl);
+		dispatcher.check();
+	}
 
+	function tileFetchById(config,dispatcher){
+		var tile = config["tile"];
+		var db = config["db"];
+		var id = config["id"];
+		var extractTile = config["extractTile"];
+		var render = config["render"];
+		db.fetchTileWithId(id,extractTile,render,dispatcher);
+
+	}
 	function convertBase64ToPixelsArray(tile,whatToDoNext){
 		var base64DataUrl = tile.base64DataUrl;
 		var mCanvas = newEl("canvas");
@@ -208,15 +213,9 @@ $(function() {
 			for (var i=0; i<data.length; i+=4){
 				pixelsArray.push([data[i],data[i+1],data[i+2]]);
 			}
-			//console.log(pixels);
 			whatToDoNext(pixelsArray);
-			//$(base64DataUrl).trigger(whatToDoNext);
 		}
 	}
-
-	
-
-
 
 	$(document).ready(function() {
 		db = createDatabaseIfNotExists(':memory:',2*1024*1024);
@@ -227,7 +226,7 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
-		
+
 		var dispatcher = { };
 		dispatcher.current = 0;
 		dispatcher.total = 0 ;
@@ -243,7 +242,8 @@ $(function() {
 			return this;
 		}
 		dispatcher.exec = function(){
-			this[this.current].func(this[this.current].config,this);	
+			this[this.current].func(this[this.current].config,this);
+			delete this[this.current];
 		}
 
 		dispatcher.check = function(){
@@ -255,134 +255,18 @@ $(function() {
 
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 1}});
 		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
 		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 3}});
 		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: tileFetchById,config: {id: 1, db: db, render: render, extractTile: extractTile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 4}});
-		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
-		setInterval(function(){dispatcher.check();},1000);
+		setInterval(function(){dispatcher.check(); },1000);
 		
-		//dispatcher.start();	
 
 
-
-		//disp.func(disp.config,dispatcher);
-		/*addSample(tile,sample,6,1);
-		addSample(tile,sample,6,2);
-		addSample(tile,sample,6,3);
-		addSample(tile,sample,6,4);
-		addSample(tile,sample,6,5);
-		addSample(tile,sample,6,6);*/
-		//tile.addSample(sample,6,1);
-		/*var callbacks = $.Callbacks();
-		callbacks.add(function(){tile.addSample(sample,6,1)});
-		callbacks.fire();
-		callbacks.add(function(){tile.insert(db)});
-		callbacks.fire();
-		callbacks.add(function(){tile.addSample(sample,6,2)});
-		callbacks.fire();
-		callbacks.add(function(){tile.insert(db)});
-		callbacks.fire();
-		callbacks.add(function(){ db.fetchTileWithId(1,extractTile,true); });
-		callbacks.fire();*/
-		var exp = new Array(8);
-		for (var i = 0; i < 8; i++) {
-            exp[i] = new Array(8);
-        }
-		String.prototype.padRight = function(c, n) {
-		    var txt = '';
-		    for (var i = 0; i < n - this.length; i++) txt += c;
-		    return txt + this;
-		};
-
-		// function myPNG(data){
-		//     var reader = new Base64Reader(data);
-		//     reader.skip(8);
-		//     var length = reader.readInt();
-		//     var type = reader.readChars(4);
-		//     var data = [];
-		//     console.log("bika");
-		//     if (reader.read(data, 0, length) != length){
-		//         throw 'Out of bounds';
-		//     }
-		//     reader.skip(4);
-		//     return { type: type, data: data };
-		// }
-
-
-		function show(base64Data,width,height){
-		    var png = myPNG(base64Data); // data is the base64 encoded data
-			//var reader = new Base64Reader(base64Data);
-  			console.log(png);
-
-			var line;
-			var byte;
-			var y = 0;
-			var pixelCount = 0;
-			var pixelsArray = new Array();
-			//byte = reader.readByte();
-			//console.log(byte);
-			/*while(byte = reader.readByte()){
-				console.log(byte);
-			}*/
-			/*while(line = png.readLine())
-			{
-			    console.log(line);
-			    //pixelsArray[y] = new Array(line.length);
-			    for (var x = 0; x < line.length; x++){
-			    	
-
-			    	//var hexColor = '#' + line[x].toString(16).padRight('0',6);
-			    	//1var rgbColor = hexToRgb(hexColor);
-			    	
-			    	var pixel = doSomethingWithPixelData(x, y, '#' + line[x].toString(16).padRight('0', 6))
-			        //pixelsArray[pixelCount][0] = rgbColor.r.toString(16);
-			        //pixelsArray[pixelCount][1] = rgbColor.g.toString(16);
-			        //pixelsArray[pixelCount][2] = rgbColor.b.toString(16);
-			        //console.log("~~~"+pixelsArray[pixelCount]);
-			    	//pixelCount++;	
-			    }
-			    
-			    y++;
-			}*/
-			//console.log("~~~"+pixelsArray[pixelCount]);
-			/*function doSomethingWithPixelData(color) {
-			    // guess what? do something with pixel data here ;)
-			}*/
-			return pixelsArray;
-		}
-
-		function doSomethingWithPixelData(x, y, color) {
-		    exp[x][y] = color;
-		}
-
-		function hexToRgb(hex) {
-			console.log(hex);
-		    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		    return result ? {
-		        r: parseInt(result[1],16),
-		        g: parseInt(result[2],16),
-		        b: parseInt(result[3],16)
-		    } : null;
-		}
-		//var pixelsArray = PNG("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
-		
-		//tile.base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
-		
-	
-			/*var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
-			//var base64DataUrl = this.base64DataUrl;
-			var myImage = new Image();
-			myImage.setAttribute("src", base64DataUrl);
-			myImage.onload = function() {
-				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,7,7));
-				//console.log(pixelsArray);
-				//$("body").append(canvas);
-			}*/
-		
-		
 
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
 		console.log("max:"+Math.ceil(7*7 / 6));
@@ -390,14 +274,6 @@ $(function() {
 
 	});
 });
-
-function doSomethingWithPixels(tile,params){
-   convertBase64ToPixelsArray(tile,function(pixelsArray){
-	//manipulate the pixels 
-	//convert them back to base64 and store it in the tile
-	tile.base64UrlData = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-	});
-}
 
 
 
