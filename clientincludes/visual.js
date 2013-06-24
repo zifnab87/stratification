@@ -116,11 +116,6 @@ $(function() {
 				var end = new Date().getMilliseconds();
 			}
 		}
-<<<<<<< HEAD
-		z = 0;
-		
-=======
-
 		tile.addSample = function(sample_list,samples_available,which_sample){
 			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			var base64DataUrl = this.base64DataUrl;
@@ -149,8 +144,7 @@ $(function() {
 				//$("body").append(canvas);
 
 			}
-		}
->>>>>>> parent of d214d13... trying to work with asynchronous code
+		}	
 			/*var counter = 0;
 			var position = 0;
 			var tile_pixels = this.width*this.height;
@@ -208,19 +202,40 @@ $(function() {
 				pixelsArray[i] = []
 			}
 			else {
-<<<<<<< HEAD
 				pixelsArray[i] = defaultColor;//[Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
-=======
-				pixelsArray[i] = defaultColor;
->>>>>>> parent of d214d13... trying to work with asynchronous code
+
+
 			}
 		}
 		return pixelsArray;
 	}
 
-	function addSample(tile,sample_list,samples_available,which_sample){
+	function render(config,dispatcher){
+			var tile = config["tile"];	
+			var myImage = new Image();
+			myImage.setAttribute("src", tile.base64DataUrl);
+			myImage.onload = function() {
+				var mCanvas = convertBase64toCanvas(myImage,tile.width,tile.height);
+				var start = new Date().getMilliseconds();
+				mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
+				document.body.appendChild( mCanvas );
+				//var end = new Date().getMilliseconds();
+				dispatcher.check();
+				/*if (dispatcher.hasMore()){
+					dispatcher.next();
+					dispatcher.exec();
+					//dispatcher[dispatcher.current].func(dispatcher[dispatcher.current].config,dispatcher);
+				}*/
+			}
+		}
+
+	function addSample(config,dispatcher){
 			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			//var base64DataUrl = this.base64DataUrl;
+			var tile = config["tile"]
+			var sample_list = config["sample"]
+			var samples_available = config["num_samples"];
+			var which_sample = config["which_sample"];
 			convertBase64ToPixelsArray(tile,function(pixelsArray){
 				var counter = 0;
 				var position = 0;
@@ -238,8 +253,15 @@ $(function() {
 					}
 				}
 				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-				tile.render();
+				//tile.render();
 				//tile.insert(db);
+				dispatcher.check();
+				/*if (dispatcher.hasMore()){
+					dispatcher.next();
+					dispatcher.exec();
+					//dispatcher[dispatcher.current].func(dispatcher[dispatcher.current].config,dispatcher);
+				}*/
+
 			});
 
 			/*$(base64DataUrl).on("addSample",function(){
@@ -311,19 +333,58 @@ $(function() {
 		var msg;
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
-		
-<<<<<<< HEAD
 		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
 		//tile.render(db);
 		//console.log(tile.base64DataUrl);
 		//show(tile.base64DataUrl,8,8);
 		//tile.render();
-		addSample(tile,sample,6,1);
+		var dispatcher = { };
+		dispatcher.current = 0;
+		dispatcher.total = 0 ;
+		dispatcher.next = function(){
+			this.current++;
+		}
+		dispatcher.hasMore = function(){
+			return dispatcher.current<dispatcher.total;
+		}
+		dispatcher.addNew = function(todo){
+			this.total++;
+			this[this.total] = todo;
+			return this;
+		}
+		dispatcher.exec = function(){
+			this[this.current].func(this[this.current].config,this);	
+		}
+
+		dispatcher.check = function(){
+			if (this.hasMore()){
+				dispatcher.next();
+				dispatcher.exec();
+			}
+		}
+
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 1}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 3}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 4}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
+		setInterval(function(){dispatcher.check();},1000);
+		
+		//dispatcher.start();	
+
+
+
+		//disp.func(disp.config,dispatcher);
+		/*addSample(tile,sample,6,1);
 		addSample(tile,sample,6,2);
 		addSample(tile,sample,6,3);
 		addSample(tile,sample,6,4);
 		addSample(tile,sample,6,5);
-		addSample(tile,sample,6,6);
+		addSample(tile,sample,6,6);*/
 		//tile.addSample(sample,6,1);
 		/*var callbacks = $.Callbacks();
 		callbacks.add(function(){tile.addSample(sample,6,1)});
@@ -416,87 +477,12 @@ $(function() {
 		        b: parseInt(result[3],16)
 		    } : null;
 		}
-		var pixelsArray = PNG("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
+		//var pixelsArray = PNG("iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=",7,7);
 		
-		//console.log(pixelsArray);
-
-		//console.log(exp);
-		//var pixelsArray2 = show(convertPixelsArrayToCanvas(pixelsArray,7,7).convertToBase64());
-		//console.log(convertPixelsArrayToCanvas(pixelsArray2,7,7).convertToBase64());
-
-		/*$.when(	tile.addSample(sample,6,1), tile.addSample(sample,6,1) )
-		.then(function(){console.log(tile.base64DataUrl)});
-		$.when(function(){tile.addSample(sample,6,1);}
-		).then(function(){console.log(tile.base64DataUrl)});
-		).then(function(){db.fetchTileWithId(1,extractTile,true);}
-		).then(function(){tile.addSample(sample,6,2);}
-		).then(function(){tile.insert(db);}
-		).then(function(){db.fetchTileWithId(2,extractTile,true);});*/
-
-		/*tile.addSample(sample,6,1);
-=======
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
-		tile.addSample(sample,6,1);
->>>>>>> parent of d214d13... trying to work with asynchronous code
-		tile.insert(db);
-		tile.addSample(sample,6,2);
-		tile.insert(db);
-		console.log(tile);
-		db.fetchTileWithId(1,extractTile,true);
-		db.fetchTileWithId(2,extractTile,true);
-		//console.log(tile.base64DataUrl);
-		//console.log(tile);
-		//console.log(tile.base64DataUrl);
 		//tile.base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
 		
-		//tile.addSample(sample,6,2);
-		//tile.addSample(sample,6,3);
-		//tile.addSample(sample,6,4);
-		//tile.addSample(sample,6,5);
-		//tile.addSample(sample,6,6);
-		//console.log(tile);
-		//tile.insert(db);
-		//tile.addSample(sample,6,0);
-		//tile.insert(db);
-		/*tile.insert(db);
-
-
-
-		db.fetchTileWithId(1,extractTile,true);
-		tile.setId(1);
-		tile.addSample(sample,6,1);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,2);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,3);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,4);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,5);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,6);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);*/
-		//tile.insert(db);
-		//tile.addSample(sample,6,2);
-		//tile.insert(db);
-		//tile.addSample(sample,6,3);
-		//tile.insert(db);
-		//tile.addSample(sample,6,4);
-		//tile.insert(db);
-		//tile.addSample(sample,6,5);
-		//tile.insert(db);
-
-		//db.fetchTileWithId(3,extractTile);
-		
-		//db.fetchTileWithPosition(1,2,extractTile);
-		
-			var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
+	
+			/*var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
 			//var base64DataUrl = this.base64DataUrl;
 			var myImage = new Image();
 			myImage.setAttribute("src", base64DataUrl);
@@ -504,22 +490,11 @@ $(function() {
 				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,7,7));
 				//console.log(pixelsArray);
 				//$("body").append(canvas);
-			}
+			}*/
 		
 		
 
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
-		//convertBase64toCanvas()
-		/*var binaryImg = atob(base64Image);
-	    var length = binaryImg.length;
-	    var ab = new ArrayBuffer(length);
-	    console.log(length);
-	    var ua = new Uint8Array(ab);
-	    for (var i = 0; i < length; i++) {
-	        ua[i] = binaryImg.charCodeAt(i);
-	    }
-	     console.log(ua);*/
-		//var pix_array = convertCanvasToPixelsArray(canvas);
 		console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);
 
