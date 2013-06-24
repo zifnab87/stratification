@@ -98,68 +98,6 @@ $(function() {
 			tile.id = id;
 		}
 		
-		
-		
-		//tile.pixelsArray = pixelsArray;
-		
-
-		tile.render = function(){
-			var myImage = new Image();
-			var tile = this;
-			console.log(this.base64DataUrl);
-			myImage.setAttribute("src", this.base64DataUrl);
-			myImage.onload = function() {
-				var mCanvas = convertBase64toCanvas(myImage,tile.width,tile.height);
-				var start = new Date().getMilliseconds();
-				mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
-				document.body.appendChild( mCanvas );
-				var end = new Date().getMilliseconds();
-			}
-		}
-		tile.addSample = function(sample_list,samples_available,which_sample){
-			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
-			var base64DataUrl = this.base64DataUrl;
-			var myImage = new Image();
-			var tile = this;
-			myImage.setAttribute("src", this.base64DataUrl);
-			myImage.onload = function() {
-				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
-				var counter = 0;
-				var position = 0;
-				var tile_pixels = tile.width*tile.height;
-				var sample_pixels = sample_list.length;
-				var sample_offset = which_sample - 1;
-				for (var i = 0; i<sample_pixels; i++){
-					if (position+sample_offset>tile_pixels){
-						//TO INVERSE
-					}
-					else {
-						pixelsArray[position+sample_offset] = sample_list[i];
-						position += samples_available;
-						counter++;
-					}
-				}
-				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-
-				//$("body").append(canvas);
-
-			}
-		}	
-			/*var counter = 0;
-			var position = 0;
-			var tile_pixels = this.width*this.height;
-			var sample_pixels = sample_list.length;
-			var sample_offset = which_sample - 1;
-			for (var i = 0; i<sample_pixels; i++){
-				if (position+sample_offset>tile_pixels){;
-					return;
-				}
-				tile.pixelsArray[position+sample_offset] = sample_list[i];
-				position += samples_available;
-				counter++;
-			}*/
-
-		
 
 		tile.serializePixels = function(){
 			//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
@@ -221,17 +159,10 @@ $(function() {
 				document.body.appendChild( mCanvas );
 				//var end = new Date().getMilliseconds();
 				dispatcher.check();
-				/*if (dispatcher.hasMore()){
-					dispatcher.next();
-					dispatcher.exec();
-					//dispatcher[dispatcher.current].func(dispatcher[dispatcher.current].config,dispatcher);
-				}*/
 			}
 		}
 
 	function addSample(config,dispatcher){
-			//var base64DataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg==";
-			//var base64DataUrl = this.base64DataUrl;
 			var tile = config["tile"]
 			var sample_list = config["sample"]
 			var samples_available = config["num_samples"];
@@ -253,48 +184,10 @@ $(function() {
 					}
 				}
 				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-				//tile.render();
-				//tile.insert(db);
+				
 				dispatcher.check();
-				/*if (dispatcher.hasMore()){
-					dispatcher.next();
-					dispatcher.exec();
-					//dispatcher[dispatcher.current].func(dispatcher[dispatcher.current].config,dispatcher);
-				}*/
 
 			});
-
-			/*$(base64DataUrl).on("addSample",function(){
-				//console.log(z++)
-			});*/
-			/*var myImage = new Image();
-			var tile = this;
-			myImage.setAttribute("src", this.base64DataUrl);
-			myImage.onload = function() {
-				var pixelsArray = convertCanvasToPixelsArray(convertBase64toCanvas(myImage,tile.width,tile.height));
-				//console.log(pixelsArray);
-				var counter = 0;
-				var position = 0;
-				var tile_pixels = tile.width*tile.height;
-				var sample_pixels = sample_list.length;
-				var sample_offset = which_sample - 1;
-				for (var i = 0; i<sample_pixels; i++){
-					if (position+sample_offset>tile_pixels){
-						//TO INVERSE
-					}
-					else {
-						pixelsArray[position+sample_offset] = sample_list[i];
-						position += samples_available;
-						counter++;
-					}
-				}
-
-				tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
-				//$("body").append(canvas);
-				$(tile).trigger("sampleAdded");
-			}*/
-
-
 		}
 
 	function convertBase64ToPixelsArray(tile,whatToDoNext){
@@ -334,10 +227,7 @@ $(function() {
 
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
-		//tile.render(db);
-		//console.log(tile.base64DataUrl);
-		//show(tile.base64DataUrl,8,8);
-		//tile.render();
+		
 		var dispatcher = { };
 		dispatcher.current = 0;
 		dispatcher.total = 0 ;
