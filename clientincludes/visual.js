@@ -121,8 +121,27 @@ function initialize_pixelsArray(config){ //if num_of_samples is 1 then there is 
 			pixelsArray[i] = []
 		}
 		else {
+<<<<<<< HEAD
 			pixelsArray[i] = defaultColor;//[Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
 
+=======
+			var defaultColor = config["defaultColor"];
+			pixelsArray = initialize_pixelsArray({width: width,height: height,defaultColor: defaultColor});
+		}
+		if (config["id"]){
+			id = config["id"];
+			tile.id = id;
+		}
+		
+		
+		tile.width = width;
+		tile.height = height;
+		tile.posX = x;
+		tile.posY = y;
+		tile.zoomLevel = zoomLevel;
+		tile.pixelsArray = pixelsArray;
+		tile.pixelsRemoved = new Array();
+>>>>>>> origin/master
 
 		}
 	}
@@ -169,8 +188,36 @@ function addSample(config,dispatcher){
 		
 		dispatcher.check();
 
+<<<<<<< HEAD
 	});
 }
+=======
+		var bucket = [];
+
+		for (var i=0;i<=48;i++) {
+		    bucket.push(i);
+		}
+
+		function getRandomFromBucket() {
+		   var randomIndex = Math.floor(Math.random()*bucket.length);
+		   return bucket.splice(randomIndex, 1)[0];
+		}
+
+		tile.removeRandom = function(samplesize){
+			
+			var pixelsRemovedCount = 0;
+			while(pixelsRemovedCount<samplesize){
+					this.pixelsArray[getRandomFromBucket()] = [0xaa,0x00,0x00];
+					pixelsRemovedCount++;
+				}
+				
+		}
+
+		tile.serializePixels = function(){
+			//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
+			return JSON.stringify(this.pixelsArray);
+		}
+>>>>>>> origin/master
 
 function convertBase64ToPixelsArray(tile,whatToDoNext){
 	var base64DataUrl = tile.base64DataUrl;
@@ -214,7 +261,6 @@ $(function() {
 		createTilesTableIfNotExists(db);
 		
 		var msg;
-
 		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
 		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
 

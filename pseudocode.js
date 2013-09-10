@@ -35,7 +35,7 @@ function process (request_unprocessed){
 	return request_processed;
 }
 
-function process (request){
+function process_request(request){
 	foreach tile in request:
 		if cache doesnt contain tile: 
 			put tile in new_request
@@ -55,6 +55,19 @@ function server_request(new_request){
 	sort tiles in cache in ascending likelihood order and ascending samples num order 
 	and remove one by one till the needed space is free
 	push in the cache the servers response
+
+function get_server_response(new_request){
+	send the filtered_request and get response
+	return server_response
+}
+
+function free_space_in_cache(server_response){
+	sort tiles in cache in ascending LOD order and ascending fragm_count order 
+	calculate space needed in cache based on the number of tiles and fragments of each tile in server_repsonse
+	while more space is needed:
+		remove one tile and recalculate space needed by subtracting fragm_count of that tile
+	push in the cache the tiles and samples of this server response
+
 }
 
 
