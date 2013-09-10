@@ -311,9 +311,11 @@ $(function() {
 		dispatcher.check();
 
 
-
+		$.post("../img2csv", {} function(data){
+			console.log(data);
+		},"JSON")
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
-		console.log("max:"+Math.ceil(7*7 / 6));
+		//console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);
 
 	});
