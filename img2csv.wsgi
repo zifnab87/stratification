@@ -7,7 +7,7 @@ def application(environ, start_response):
     
    
     start_response('200 OK', [('Content-Type', 'json/image')])
-    im = Image.open('/var/www/html/stratification/image.gif')
+    im = Image.open('/var/www/html/stratification/image.jpg')
     rgb_im = im.convert('RGB')
     width, height = im.size
     bitmap = [[x for x in xrange(3)] for x in xrange(width*height)]
