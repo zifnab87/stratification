@@ -104,6 +104,7 @@ $(function() {
 		tile.posY = y;
 		tile.zoomLevel = zoomLevel;
 		tile.pixelsArray = pixelsArray;
+		tile.pixelsRemoved = new Array();
 
 		tile.render = function(){
 
@@ -136,6 +137,27 @@ $(function() {
 				counter++;
 			}
 			
+		}
+
+		var bucket = [];
+
+		for (var i=0;i<=48;i++) {
+		    bucket.push(i);
+		}
+
+		function getRandomFromBucket() {
+		   var randomIndex = Math.floor(Math.random()*bucket.length);
+		   return bucket.splice(randomIndex, 1)[0];
+		}
+
+		tile.removeRandom = function(samplesize){
+			
+			var pixelsRemovedCount = 0;
+			while(pixelsRemovedCount<samplesize){
+					this.pixelsArray[getRandomFromBucket()] = [0xaa,0x00,0x00];
+					pixelsRemovedCount++;
+				}
+				
 		}
 
 		tile.serializePixels = function(){
@@ -192,37 +214,54 @@ $(function() {
 		
 		var msg;
 
-		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
+		var sample = [[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00]]
 		
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [], x: 1, y: 2, zoomLevel: 1});
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
 		//tile.insert(db);
 		//tile.addSample(sample,6,0);
 		//tile.insert(db);
-		tile.insert(db);
+		/*tile.insert(db);
 
 
 
 		db.fetchTileWithId(1,extractTile,true);
 		tile.setId(1);
-		tile.addSample(sample,6,1);
+		tile.addSample(sample,7,1);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,2);
+		tile.addSample(sample,7,2);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,3);
+		tile.addSample(sample,7,3);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,4);
+		tile.addSample(sample,7,4);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,5);
+		tile.addSample(sample,7,5);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,6,6);
+		tile.addSample(sample,7,6);
 		tile.updatePixels(db);
 		db.fetchTileWithId(1,extractTile,true);
-		//tile.insert(db);
+		tile.addSample(sample,7,7);
+		tile.updatePixels(db);
+		db.fetchTileWithId(1,extractTile,true);*/
+		tile.render();
+		tile.removeRandom(7);
+		tile.render();
+		tile.removeRandom(7);
+		tile.render();		
+		tile.removeRandom(7);
+		tile.render();
+		tile.removeRandom(7);
+		tile.render();
+		tile.removeRandom(7);
+		tile.render();		
+		tile.removeRandom(7);
+		tile.render();
+		tile.removeRandom(7);
+		tile.render();//tile.insert(db);
 		//tile.addSample(sample,6,2);
 		//tile.insert(db);
 		//tile.addSample(sample,6,3);
