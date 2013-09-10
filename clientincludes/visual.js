@@ -1,283 +1,316 @@
-$(function() {
+function newEl(tag){
+		return document.createElement(tag);
+}
 
-	function newEl(tag){
-			return document.createElement(tag);
-	}
-
-	function convertPixelsArrayToCanvas(pixelsArray, width, height){
-		
-		var mCanvas = newEl('canvas');
-		mCanvas.width = width;
-		mCanvas.height = height;
-		
-		var mContext = mCanvas.getContext('2d');
-		var mImgData = mContext.createImageData(width, height);
-		
-		var srcIndex=0, dstIndex=0, curPixelNum=0;
-		
-		for (curPixelNum=0; curPixelNum<width*height;  curPixelNum++)
-		{
-			mImgData.data[dstIndex] = pixelsArray[srcIndex][0];		// r
-			mImgData.data[dstIndex+1] = pixelsArray[srcIndex][1];	// g
-			mImgData.data[dstIndex+2] = pixelsArray[srcIndex][2];	// b
-			mImgData.data[dstIndex+3] = 255; // 255 = 0xFF - constant alpha, 100% opaque
-			srcIndex += 1;
-			dstIndex += 4;
-		}
-		mContext.putImageData(mImgData, 0, 0);
-
-		mCanvas.convertToBase64 = function(){
-			return (String)(this.toDataURL());
-		}
-		return mCanvas;
-	}
-
-	function convertBase64toCanvas(base64DataUrl,width,height){
-		var start = new Date().getMilliseconds();
-		var myImage = new Image();	
-		myImage.src = base64DataUrl;
-		var mCanvas = newEl("canvas");
-		mCanvas.width = width;
-		mCanvas.height = height;
-		mCanvas.setAttribute('style', "width:"+10*width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*height+"px;"); // make it large enough to be visible
-		var mContext = mCanvas.getContext('2d');
-		myImage.onload = function() {
-          	mContext.drawImage(myImage, 0, 0);
-			console.log(convertCanvasToPixelsArray(mCanvas));
-        };
-        var end = new Date().getMilliseconds();
-		console.log((end-start)+"ms");
-		console.log(mCanvas);
-
-
-		//var canvas = newEl('canvas');
-		//var ctx = canvas.getContext('2d');
-		//ctx.drawImage(myImage, 0, 0);
+function convertPixelsArrayToCanvas(pixelsArray, width, height){
 	
+	var mCanvas = newEl('canvas');
+	mCanvas.width = width;
+	mCanvas.height = height;
+	
+	var mContext = mCanvas.getContext('2d');
+	var mImgData = mContext.createImageData(width, height);
+	
+	var srcIndex=0, dstIndex=0, curPixelNum=0;
+	
+	for (curPixelNum=0; curPixelNum<width*height;  curPixelNum++)
+	{
+		mImgData.data[dstIndex] = pixelsArray[srcIndex][0];		// r
+		mImgData.data[dstIndex+1] = pixelsArray[srcIndex][1];	// g
+		mImgData.data[dstIndex+2] = pixelsArray[srcIndex][2];	// b
+		mImgData.data[dstIndex+3] = 255; // 255 = 0xFF - constant alpha, 100% opaque
+		srcIndex += 1;
+		dstIndex += 4;
+	}
+	mContext.putImageData(mImgData, 0, 0);
+
+	mCanvas.convertToBase64 = function(){
+		return (String)(this.toDataURL());
+	}
+	return mCanvas;
+}
+
+function convertBase64toCanvas(myImage,width,height){
+	var start = new Date().getMilliseconds();
+	var mCanvas = newEl("canvas");
+	mCanvas.width = width;
+	mCanvas.height = height;
+	mCanvas.setAttribute('style', "width:"+10*width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*height+"px;"); // make it large enough to be visible
+	var mContext = mCanvas.getContext('2d');
+  	mContext.drawImage(myImage, 0, 0);
+    var end = new Date().getMilliseconds();
+	//console.log((end-start)+"ms");
+	return mCanvas;
+}
+
+function convertCanvasToPixelsArray(mCanvas){
+	var mContext = mCanvas.getContext('2d');
+	console.log(mCanvas.width);
+	var mImgData = mContext.getImageData(0,0,mCanvas.width,mCanvas.height);
+	
+	var srcIndex=0, dstIndex=0, curPixelNum=0;
+	var pixelsArray = new Array(mCanvas.width*mCanvas.height);
+	for (curPixelNum=0; curPixelNum<mCanvas.width*mCanvas.height;  curPixelNum++)
+	{
+		pixelsArray[dstIndex] = new Array(3);
+		pixelsArray[dstIndex][0] = mImgData.data[srcIndex];	// r
+		pixelsArray[dstIndex][1] = mImgData.data[srcIndex+1];	// g
+		pixelsArray[dstIndex][2] = mImgData.data[srcIndex+2];	// b
+		//mImgData.data[dstIndex+3] = 255; // 255 = 0xFF - constant alpha, 100% opaque
+		dstIndex += 1;
+		srcIndex += 4;
+	}
+	return pixelsArray;
+}
+
+function initialize_tile(config){
+	var x = config["x"];
+	var y = config["y"];
+	var width = config["width"];
+	var height = config["height"];
+	
+	var zoomLevel = config["zoomLevel"];
+	var pixelsArray;
+	var tile = new Object();
+	tile.width = width;
+	tile.height = height;
+	tile.posX = x;
+	tile.posY = y;
+	tile.zoomLevel = zoomLevel;
+	if (config["base64DataUrl"]){
+		tile.base64DataUrl = config["base64DataUrl"];
+	}
+	else {
+		var defaultColor = config["defaultColor"];
+		pixelsArray = initialize_pixelsArray({width: width,height: height,defaultColor: defaultColor});
+		tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
+	}
+	if (config["id"]){
+		id = config["id"];
+		tile.id = id;
+	}
+	
+
+	tile.serializePixels = function(){
+		//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
+		return JSON.stringify(this.pixelsArray);
 	}
 
-	function convertCanvasToPixelsArray(mCanvas){
-		var mContext = mCanvas.getContext('2d');
-		console.log(mCanvas.width);
-		var mImgData = mContext.getImageData(0,0,mCanvas.width,mCanvas.height);
-		
-		var srcIndex=0, dstIndex=0, curPixelNum=0;
-		var pixelsArray = new Array(mCanvas.width*mCanvas.height);
-		for (curPixelNum=0; curPixelNum<mCanvas.width*mCanvas.height;  curPixelNum++)
-		{
-			pixelsArray[dstIndex] = new Array(3);
-			pixelsArray[dstIndex][0] = mImgData.data[srcIndex];	// r
-			pixelsArray[dstIndex][1] = mImgData.data[srcIndex+1];	// g
-			pixelsArray[dstIndex][2] = mImgData.data[srcIndex+2];	// b
-			//mImgData.data[dstIndex+3] = 255; // 255 = 0xFF - constant alpha, 100% opaque
-			dstIndex += 1;
-			srcIndex += 4;
-		}
-		return pixelsArray;
+
+	tile.setId = function(id){
+		tile.id = id;
 	}
 
-	function initialize_tile(config){
-		var x = config["x"];
-		var y = config["y"];
-		var width = config["width"];
-		var height = config["height"];
-		
-		var zoomLevel = config["zoomLevel"];
-		var pixelsArray;
-		var tile = new Object();
-		if (config["pixelsArray"]){
-			pixelsArray = config["pixelsArray"];
+	
+	return tile;
+	//var likelihood = config["likelihood"];
+}
+
+function extractTile(dbObj){
+		return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, base64DataUrl: dbObj["base64DataUrl"] });
+}
+
+
+function initialize_pixelsArray(config){ //if num_of_samples is 1 then there is no sampling
+	var width = config["width"];
+	var height = config["height"];
+	var defaultColor = config["defaultColor"];
+	var pixelsArray = new Array(width*height);
+	for (var i = 0; i < pixelsArray.length; i++){
+		if (!defaultColor){
+			pixelsArray[i] = []
 		}
 		else {
+			pixelsArray[i] = defaultColor;//[Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256) ]//defaultColor;
 			var defaultColor = config["defaultColor"];
-			pixelsArray = initialize_pixelsArray({width: width,height: height,defaultColor: defaultColor});
 		}
 		if (config["id"]){
 			id = config["id"];
 			tile.id = id;
+			tile.width = width;
+			tile.height = height;
+			tile.posX = x;
+			tile.posY = y;
+			tile.zoomLevel = zoomLevel;
+			tile.pixelsArray = pixelsArray;
+			tile.pixelsRemoved = new Array();
+
 		}
-		
-		
-		tile.width = width;
-		tile.height = height;
-		tile.posX = x;
-		tile.posY = y;
-		tile.zoomLevel = zoomLevel;
-		tile.pixelsArray = pixelsArray;
-		tile.pixelsRemoved = new Array();
+	}
+	return pixelsArray;
+}
 
-		tile.render = function(){
-
+function render(config,dispatcher){
+		var tile = config["tile"];	
+		var myImage = new Image();
+		myImage.setAttribute("src", tile.base64DataUrl);
+		console.log(tile);
+		myImage.onload = function() {
+			var mCanvas = convertBase64toCanvas(myImage,tile.width,tile.height);
 			var start = new Date().getMilliseconds();
-			// 1. - append data as a canvas element
-			var mCanvas = convertPixelsArrayToCanvas(this.pixelsArray, this.width, this.height);
 			mCanvas.setAttribute('style', "width:"+10*this.width+"px; margin-left: 2px; margin-bottom:2px; height:"+10*this.height+"px;"); // make it large enough to be visible
 			document.body.appendChild( mCanvas );
-			var end = new Date().getMilliseconds();
-			//console.log((end-start)+" ms");
-			//console.log("edw"+mCanvas.convertToBase64().length*4+"bytes");
-			console.log(mCanvas.convertToBase64());
-			
-
-			return mCanvas;
+			//var end = new Date().getMilliseconds();
+			dispatcher.check();
 		}
+	}
 
-		tile.addSample = function(sample_list,samples_available,which_sample){
-			var counter = 0;
-			var position = 0;
-			var tile_pixels = this.width*this.height;
-			var sample_pixels = sample_list.length;
-			var sample_offset = which_sample - 1;
-			for (var i = 0; i<sample_pixels; i++){
-				if (position+sample_offset>tile_pixels){;
-					return;
-				}
-				this.pixelsArray[position+sample_offset] = sample_list[i];
+function addSample(config,dispatcher){
+	var tile = config["tile"]
+	var sample_list = config["sample"]
+	var samples_available = config["num_samples"];
+	var which_sample = config["which_sample"];
+	convertBase64ToPixelsArray(tile,function(pixelsArray){
+		var counter = 0;
+		var position = 0;
+		var tile_pixels = tile.width*tile.height;
+		var sample_pixels = sample_list.length;
+		var sample_offset = which_sample - 1;
+		for (var i = 0; i<sample_pixels; i++){
+			if (position+sample_offset>tile_pixels){
+				//TO INVERSE
+			}
+			else {
+				pixelsArray[position+sample_offset] = sample_list[i];
 				position += samples_available;
 				counter++;
 			}
-			
 		}
-
-		var bucket = [];
-
-		for (var i=0;i<=48;i++) {
-		    bucket.push(i);
-		}
-
-		function getRandomFromBucket() {
-		   var randomIndex = Math.floor(Math.random()*bucket.length);
-		   return bucket.splice(randomIndex, 1)[0];
-		}
-
-		tile.removeRandom = function(samplesize){
-			
-			var pixelsRemovedCount = 0;
-			while(pixelsRemovedCount<samplesize){
-					this.pixelsArray[getRandomFromBucket()] = [0xaa,0x00,0x00];
-					pixelsRemovedCount++;
-				}
-				
-		}
-
-		tile.serializePixels = function(){
-			//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
-			return JSON.stringify(this.pixelsArray);
-		}
-
-		tile.insert = function(db){
-			db.insertTileData(this.posX, this.posY, this.zoomLevel,this.serializePixels());
-		}
-
-		tile.updatePixels = function(db){
-			//console.log(tile["id"]);
-			db.updateTilePixelDataWithId(this["id"], this.serializePixels());
-		}
-
-		tile.setId = function(id){
-			tile.id = id;
-		}
-
+		tile.base64DataUrl = convertPixelsArrayToCanvas(pixelsArray,tile.width,tile.height).convertToBase64();
 		
-		return tile;
-		//var likelihood = config["likelihood"];
+		dispatcher.check();
+	});
+}
+
+	var bucket = [];
+
+	for (var i=0;i<=48;i++) {
+	    bucket.push(i);
 	}
 
-	function extractTile(dbObj){
-			return initialize_tile({id:dbObj["id"],x:dbObj["x"], y:dbObj["y"], zoomLevel:dbObj["zoomLevel"],width:7,height:7, pixelsArray: JSON.parse(dbObj["pixelsArray"]) });
+	function getRandomFromBucket() {
+	   var randomIndex = Math.floor(Math.random()*bucket.length);
+	   return bucket.splice(randomIndex, 1)[0];
 	}
 
+	tile.removeRandom = function(samplesize){
+		
+		var pixelsRemovedCount = 0;
+		while(pixelsRemovedCount<samplesize){
+				this.pixelsArray[getRandomFromBucket()] = [0xaa,0x00,0x00];
+				pixelsRemovedCount++;
+			}
+			
+	}
 
-	function initialize_pixelsArray(config){ //if num_of_samples is 1 then there is no sampling
-		var width = config["width"];
-		var height = config["height"];
-		var defaultColor = config["defaultColor"];
-		var pixelsArray = new Array(width*height);
-		//rgbData.width = width;
-		//rgbData.height = height;
-		for (var i = 0; i < pixelsArray.length; i++){
-			if (!defaultColor){
-				pixelsArray[i] = []
-			}
-			else {
-				pixelsArray[i] = defaultColor;
-			}
+	tile.serializePixels = function(){
+		//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
+		return JSON.stringify(this.pixelsArray);
+	}
+
+function convertBase64ToPixelsArray(tile,whatToDoNext){
+	var base64DataUrl = tile.base64DataUrl;
+	var mCanvas = newEl("canvas");
+	var ctx = mCanvas.getContext("2d");
+	var pixelsArray = [];
+
+	var img = newEl("img");
+	img.onload = getRGB;
+	img.src = base64DataUrl;
+
+	function getRGB(){
+		mCanvas.width = img.width;
+		mCanvas.height = img.height;
+		ctx.drawImage(img,0,0);
+		var data = ctx.getImageData(0,0,mCanvas.width, mCanvas.height).data;
+		for (var i=0; i<data.length; i+=4){
+			pixelsArray.push([data[i],data[i+1],data[i+2]]);
 		}
-		return pixelsArray;
+		whatToDoNext(pixelsArray);
 	}
+}
+
+$(function() {
+
+	
+	/*function tileFetchById(config,dispatcher){
+		var tile = config["tile"];
+		var db = config["db"];
+		var id = config["id"];
+		var extractTile = config["extractTile"];
+		var render = config["render"];
+		db.fetchTileWithId(id,extractTile,render,dispatcher);
+
+	}*/
 
 
 	$(document).ready(function() {
-		var db = createDatabaseIfNotExists(':memory:',2*1024*1024);
-		db.dropTilesTableIfExists();
-		db.createTilesTableIfNotExists();
+		db = createDatabaseIfNotExists(':memory:',2*1024*1024);
+		dropTilesTableIfExists(db);
+		createTilesTableIfNotExists(db);
 		
 		var msg;
+		var sample = [[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f],[0x7f,0x7f,0x7f]]
+		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0xAA,0x00], x: 1, y: 2, zoomLevel: 1});
 
-		var sample = [[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00],[0xaa,0x00,0x00]]
+		var dispatcher = { };
+		dispatcher.current = 0;
+		dispatcher.total = 0 ;
+		dispatcher.next = function(){
+			this.current++;
+		}
+		dispatcher.hasMore = function(){
+			return dispatcher.current<dispatcher.total;
+		}
+		dispatcher.addNew = function(todo){
+			this.total++;
+			this[this.total] = todo;
+			return this;
+		}
+		dispatcher.exec = function(){
+			this[this.current].func(this[this.current].config,this);
+			delete this[this.current];
+		}
+
+		dispatcher.check = function(){
+			if (this.hasMore()){
+				dispatcher.next();
+				dispatcher.exec();
+			}
+		}
+		dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		//dispatcher.addNew({func: render,config: {tile: tile}});
+		dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 1}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 3}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 4}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
+		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 6}});
+		dispatcher.addNew({func: tilePixelDataUpdate, config:{tile: tile, db:db}});
+		dispatcher.addNew({func: tileFetchById,config: {id: 2, db: db}});
+		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
+		//dispatcher.addNew({func: render,config: {tile: tile}});
+		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 3}});
+		//dispatcher.addNew({func: render,config: {tile: tile}});
+		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		//dispatcher.addNew({func: tileFetchById,config: {id: 4, db: db}});
+		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 4}});
+		//dispatcher.addNew({func: render,config: {tile: tile}});
+		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
+		setInterval(function(){dispatcher.check(); },1000);
 		
-		var tile = initialize_tile({width: 7,height: 7,defaultColor: [0x00,0x00,0x00], x: 1, y: 2, zoomLevel: 1});
-		//tile.insert(db);
-		//tile.addSample(sample,6,0);
-		//tile.insert(db);
-		/*tile.insert(db);
 
 
 
-		db.fetchTileWithId(1,extractTile,true);
-		tile.setId(1);
-		tile.addSample(sample,7,1);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,2);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,3);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,4);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,5);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,6);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);
-		tile.addSample(sample,7,7);
-		tile.updatePixels(db);
-		db.fetchTileWithId(1,extractTile,true);*/
-		tile.render();
-		tile.removeRandom(7);
-		tile.render();
-		tile.removeRandom(7);
-		tile.render();		
-		tile.removeRandom(7);
-		tile.render();
-		tile.removeRandom(7);
-		tile.render();
-		tile.removeRandom(7);
-		tile.render();		
-		tile.removeRandom(7);
-		tile.render();
-		tile.removeRandom(7);
-		tile.render();//tile.insert(db);
-		//tile.addSample(sample,6,2);
-		//tile.insert(db);
-		//tile.addSample(sample,6,3);
-		//tile.insert(db);
-		//tile.addSample(sample,6,4);
-		//tile.insert(db);
-		//tile.addSample(sample,6,5);
-		//tile.insert(db);
-
-		//db.fetchTileWithId(3,extractTile);
-		//db.fetchTileWithPosition(1,2,extractTile);
-		var canvas = convertBase64toCanvas("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAE0lEQVQIW2Osr6//z4ADMA4pSQC09hFsUmxH9AAAAABJRU5ErkJggg== ",7,7)
-		$("body").append(canvas);
-		//var pix_array = convertCanvasToPixelsArray(canvas);
+		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
 		console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);
 
 	});
 });
+
+
+

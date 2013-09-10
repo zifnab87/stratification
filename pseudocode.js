@@ -44,10 +44,17 @@ function process_request(request){
 			remove the sample ids from request that exist in cached tile
 			if samples list not:
 				put the changed tile in the new_request
-			else:
+			else
 				render tile from cache
 	return new_request
 }
+
+function server_request(new_request){
+	send server the request and get response
+	count space needed in cache based on the number of tiles and samples of each tile
+	sort tiles in cache in ascending likelihood order and ascending samples num order 
+	and remove one by one till the needed space is free
+	push in the cache the servers response
 
 function get_server_response(new_request){
 	send the filtered_request and get response
@@ -60,6 +67,7 @@ function free_space_in_cache(server_response){
 	while more space is needed:
 		remove one tile and recalculate space needed by subtracting fragm_count of that tile
 	push in the cache the tiles and samples of this server response
+
 }
 
 
