@@ -182,7 +182,7 @@ function addSample(config,dispatcher){
 	});
 }
 
-	var bucket = [];
+	/*var bucket = [];
 
 	for (var i=0;i<=48;i++) {
 	    bucket.push(i);
@@ -206,7 +206,7 @@ function addSample(config,dispatcher){
 	tile.serializePixels = function(){
 		//console.log(JSON.stringify(this.pixelsArray).length*4+"bytes");
 		return JSON.stringify(this.pixelsArray);
-	}
+	}*/
 
 function convertBase64ToPixelsArray(tile,whatToDoNext){
 	var base64DataUrl = tile.base64DataUrl;
@@ -279,16 +279,23 @@ $(function() {
 			}
 		}
 		dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
 		//dispatcher.addNew({func: render,config: {tile: tile}});
-		dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 1}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 3}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 4}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
 		dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 6}});
-		dispatcher.addNew({func: tilePixelDataUpdate, config:{tile: tile, db:db}});
-		dispatcher.addNew({func: tileFetchById,config: {id: 2, db: db}});
+		dispatcher.addNew({func: render,config: {tile: tile}});
+		//dispatcher.addNew({func: tilePixelDataUpdate, config:{tile: tile, db:db}});
+		//dispatcher.addNew({func: tileFetchById,config: {id: 2, db: db}});
 		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 2}});
 		//dispatcher.addNew({func: render,config: {tile: tile}});
 		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
@@ -300,8 +307,8 @@ $(function() {
 		//dispatcher.addNew({func: render,config: {tile: tile}});
 		//dispatcher.addNew({func: tileInsert,config: {tile: tile, db: db}});
 		//dispatcher.addNew({func: addSample, config: {tile: tile,sample: sample, num_samples: 6, which_sample: 5}});
-		setInterval(function(){dispatcher.check(); },1000);
-		
+		//setInterval(function(){dispatcher.check(); },1);
+		dispatcher.check();
 
 
 
