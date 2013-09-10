@@ -10,6 +10,8 @@ def application(environ, start_response):
     im = Image.open('/var/www/html/stratification/image.jpeg')
     rgb_im = im.convert('RGB')
     width, height = im.size
+    width = width - 180
+    height = height - 180
     bitmap = [[x for x in xrange(3)] for x in xrange(width*height)]
     count = 0
     for i in range(height):
