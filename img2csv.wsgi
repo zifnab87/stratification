@@ -14,7 +14,7 @@ def application(environ, start_response):
     count = 0
     for i in range(height):
         for j in range(width):           
-            r,g,b = rgb_im.getpixel((i,j))
+            r,g,b = rgb_im.getpixel((j,i))
             bitmap[count][0] = r
             bitmap[count][1] = g
             bitmap[count][2] = b
