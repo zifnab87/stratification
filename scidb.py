@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal, assert_
+#from numpy.testing import assert_allclose, assert_equal, assert_
 from scidbpy import interface, SciDBQueryError, SciDBArray
 sdb = interface.SciDBShimInterface('http://localhost:8080')
 
@@ -9,19 +9,17 @@ sdb = interface.SciDBShimInterface('http://localhost:8080')
 def init_array():
     """Test export to a SciDB array"""
     X = np.random.random((10, 6))
-
     Xsdb = sdb.from_array(X)
-
-    def check_toarray(transfer_bytes):
-        Xnp = Xsdb.toarray(transfer_bytes=transfer_bytes)
-        # set ATOL high because we're translating text
-        assert_allclose(Xnp, X, atol=1E-5)
-
-    for transfer_bytes in (True, False):
-        yield check_toarray, transfer_bytes
-
+    #def check_toarray(transfer_bytes):
+    #    Xnp = Xsdb.toarray(transfer_bytes=transfer_bytes)
+    #    # set ATOL high because we're translating text
+    #    assert_allclose(Xnp, X, atol=1E-5)
+    # 
+    #for transfer_bytes in (True, False):
+    #    yield check_toarray, transfer_bytes
 
 if __name__ == '__main__':
+    print("scidb.py is being run directly")
     init_array()
 
 
