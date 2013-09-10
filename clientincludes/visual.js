@@ -311,8 +311,8 @@ $(function() {
 		dispatcher.check();
 
 
-		$.post("../img2csv", {}, function(data){
-			console.log(data);
+		$.post("img2csv", {}, function(data){
+			$("body").append(convertPixelsArrayToCanvas(data,200,200));
 		},"JSON");
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
 		//console.log("max:"+Math.ceil(7*7 / 6));
