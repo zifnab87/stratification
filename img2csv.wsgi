@@ -2,6 +2,9 @@
 
 import json
 import Image
+from scidbpy import interface, SciDBQueryError, SciDBArray
+sdb = interface.SciDBShimInterface('http://localhost:8080')
+
 
 def application(environ, start_response):
     
