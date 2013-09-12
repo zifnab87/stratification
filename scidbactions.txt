@@ -14,5 +14,5 @@ csv2scidb -s 1 -p NNNNN < test.csv > test.scidb
 iquery -a -q "CREATE ARRAY Michalis2 <r:int64, g:int64, b:int64> [i=0:199,10,0, j=0:199,10,0]"
 iquery -a -q "CREATE ARRAY Michalis2Flat < i:int64, j:int64, r:int64, g:int64, b:int64 > [v=0:*,1000000,0]"
 iquery -q "LOAD Michalis2Flat FROM '/var/www/html/stratification/test.scidb'"
-iquery -a "redimension_store(Michalis2Flat,Michalis2)"
+iquery -a  -q "redimension_store(Michalis2Flat,Michalis2)"
 iquery -o csv -q "SELECT * FROM subarray(Michalis2,0,0,100,100)"
