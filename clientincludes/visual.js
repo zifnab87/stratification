@@ -312,8 +312,8 @@ $(function() {
 
 
 		$.post("img2csv", {}, function(data){
-			$("body").append(convertPixelsArrayToCanvas(data,20,20));
-		},"JSON");
+			$("body").append(convertPixelsArrayToCanvas(data,1024,1024));
+			},"JSON");
 		//var base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAFElEQVQIW2NkYGD4D8RYAeOQkgQAERQHAbuZaGoAAAAASUVORK5CYII=";
 		//console.log("max:"+Math.ceil(7*7 / 6));
 		//db.fetchAllTiles(extractTile);

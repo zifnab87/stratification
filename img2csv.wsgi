@@ -17,8 +17,8 @@ def application(environ, start_response):
     height = height
     bitmap = [[x for x in xrange(3)] for x in xrange(width*height)]
     count = 0
-    f = open('/var/www/html/stratification/test.csv','w')
-    f.write(str("i,j,r,g,b\n"))
+    #f = open('/var/www/html/stratification/test.csv','w')
+    #f.write(str("i,j,r,g,b\n"))
     for i in range(height):
         for j in range(width):           
             r,g,b = rgb_im.getpixel((j,i))
@@ -26,6 +26,6 @@ def application(environ, start_response):
             bitmap[count][1] = g
             bitmap[count][2] = b
             count = count + 1
-            f.write(str(i)+","+str(j)+","+str(r)+","+str(g)+","+str(b)+"\n")
+            #f.write(str(i)+","+str(j)+","+str(r)+","+str(g)+","+str(b)+"\n")
     return [json.dumps(bitmap)]
 
