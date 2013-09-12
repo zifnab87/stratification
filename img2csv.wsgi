@@ -2,8 +2,8 @@
 
 import json
 import Image
-from scidbpy import interface, SciDBQueryError, SciDBArray
-sdb = interface.SciDBShimInterface('http://localhost:8080')
+#from scidbpy import interface, SciDBQueryError, SciDBArray
+#sdb = interface.SciDBShimInterface('http://localhost:8080')
 
 
 def application(environ, start_response):
@@ -17,6 +17,8 @@ def application(environ, start_response):
     height = height - 180
     bitmap = [[x for x in xrange(3)] for x in xrange(width*height)]
     count = 0
+    f = open('imagefile','w')
+    f.write(str("i,j,r,g,b"))
     for i in range(height):
         for j in range(width):           
             r,g,b = rgb_im.getpixel((j,i))
@@ -24,5 +26,6 @@ def application(environ, start_response):
             bitmap[count][1] = g
             bitmap[count][2] = b
             count = count + 1
+            f.write(str((i,j,r,g,b)))
     return [json.dumps(bitmap)]
-    
+

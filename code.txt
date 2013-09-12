@@ -1,0 +1,138 @@
+
+
+Main {
+	while (memory_is_available()){
+		prefetch();
+	}
+	estimate time_user_window // time that the user needs between each movement
+	estimate time_prediction // time needed for the system to have a prediction based on history
+	while user hasn't made a move {
+	
+	}
+	wait(1000);
+}
+
+--------------------------
+
+
+Main {
+	while (true){
+		eventHandler("Prefetch");
+		wait(time_interval);
+	}
+}
+
+
+function get_server_response(filtered_request){
+	send the filtered_request to server and get server_response
+	return server_response
+}
+
+
+function eventHandler(event) {
+	if (event == "User made a move"){
+		filtered_request = filter_request(event.request);
+		server_response = fetch(filtered_request);
+		if ( memory == full ){
+	         free_space_in_cache(server_response);
+	    }
+	  	load_cache(server_response);
+	}
+	else if ( event == "Prefetch"){
+		if average user latency is more than a boundary or prefetch hit high {
+		    make prefetching window smaller and make it happen less often, except 
+		    if size is 0, or time interval is 0
+		}
+		else if prefetch hit is low {
+		    make prefething window bigger and make it happen more often, except 
+		    if size is max_window_size or time interval is max_time_interval
+		}
+		server_response = prefetch();
+	    if ( memory == full ){
+	         free_space_in_cache(server_response);
+	    }
+	  	load_cache(server_response);
+	}
+}
+
+
+function free_space_in_cache(server_response){
+	sort tiles in cache in ascending LOD order 
+	calculate response_size_fragment_count based on the number of tiles and fragments of each tile in server_repsonse
+	while  evicted_fragment_count < response_size_fragment_count: 
+		remove top tile from cache and add its fragm_count to evicted_fragment_count
+	push in the cache the tiles and fragments of this server response
+}
+
+
+function filter_request(request){
+	foreach tile in request:
+		if cache doesn’t contain tile: 
+			put tile in filtered_request
+		else:
+			get tile from the cache
+			filter request from  fragment ids, that exist in cached tile 
+			if filtered fragment list of tile not empty:
+				put the changed tile in the filtered_request
+			else:
+				render tile from cache
+	return filtered_request
+}
+
+
+
+---
+
+
+state = "free";
+
+
+function arrangePrefetching(cachehit,predictionhit,avg_time_between_user_moves, latency){
+	
+    latency_estimate = latency to render a tile,
+    latency to fetch a tile from the database,
+    latency to fetch a sample from the database (includes network latency)
+    latency to assemble the sample in the existing tile in cache
+
+    if average user latency is more than a boundary or predictionhit high {
+		    make prefetching window smaller and make it happen less often, except 
+		    if size is 0, or time interval is 0
+	}
+	else if predictionhit is low {
+	    make prefething window bigger and make it happen more often, except 
+	    if size is max_window_size or time interval is max_time_interval
+	}
+
+	return new (prefetch_window, prefetch interval);
+}
+
+
+setInterval(function() { throw "prefetch(prefetch_window)", prefetch_interval)
+
+
+
+
+function eventHandler(e) {
+	if (e == "user made a move"){
+	    if (not everything is in the cache){
+	         throw "server fetch"
+	         throw "cache fetch"
+	    }
+	    else {
+	         throw "cache fetch"
+	    }
+	}
+	else if(e == "server fetch"){
+	    state = "busy";
+	    kill any possible server prefetch;
+        do (server_fetch, callback:done() { state = "free"})
+	}
+    else if(e == "cache fetch"){
+            do (cache_fetch)
+    }
+    else if (e == "prefeth"){
+        if (state != "busy"){
+            do (prefetch)
+        }
+    }
+}
