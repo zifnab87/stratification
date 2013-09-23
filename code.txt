@@ -94,11 +94,11 @@ function arrangePrefetching(cachehit,predictionhit,avg_time_between_user_moves, 
     latency to fetch a sample from the database (includes network latency)
     latency to assemble the sample in the existing tile in cache
 
-    if average user latency is more than a boundary or predictionhit high {
+    if average user latency is more than a boundary or prediction hit percentage is low {
 		    make prefetching window smaller and make it happen less often, except 
 		    if size is 0, or time interval is 0
 	}
-	else if predictionhit is low {
+	else {
 	    make prefething window bigger and make it happen more often, except 
 	    if size is max_window_size or time interval is max_time_interval
 	}
@@ -130,9 +130,9 @@ function eventHandler(e) {
     else if(e == "cache fetch"){
             do (cache_fetch)
     }
-    else if (e == "prefeth"){
+    else if (e == "server prefeth"){
         if (state != "busy"){
-            do (prefetch)
+            do (prefetch,callback:done(){ arrangePrefetching();})
         }
     }
 }
