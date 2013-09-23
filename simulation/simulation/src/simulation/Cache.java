@@ -8,4 +8,8 @@ public class Cache {
 	public void insert(Tile tile){
 		
 	}
+	//insert fragment to that tile
+	public void insert(Fragment fragm,int tileId){
+		
+	}
 }

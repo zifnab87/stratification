@@ -8,10 +8,14 @@ public class Tile {
 	public final static int HEIGHT = 256;
 	public int id;
 	public int[][][] pixels;
-	
+	//public list of fragments
 	
 	
 	public static void randomGenerator(){
+		
+	}
+	
+	public void insert(Fragment fragm){
 		
 	}
 	
