@@ -24,7 +24,8 @@ public class Database {
 		return null;
 	}
 	
-	public Fragment  getFragment(int tileId,int FragmentNumber){
-		return null;
+	public Fragment getFragmentOfTile(int FragmentNumber,int tileId){
+		Tile tile = tiles.get(tileId);
+		return tile.getFragment(FragmentNumber);
 	}
 }
