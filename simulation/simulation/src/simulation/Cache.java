@@ -2,11 +2,13 @@ package simulation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Cache {
 	//tiles
 	//fragments
 	private Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	private FixedSizePriorityQueue<Tile> queue= new FixedSizePriorityQueue<Tile>(Predictor.PREDICTION_SIZE,Tile.lodComparator);
 	
 	
 	public int getTileNumber(){

@@ -6,7 +6,7 @@ public class Fragment {
 	public int num;
 	public final static int FRAGMENTS_PER_TILE = 8;
 	public final static int FRAGMENT_SIZE = (Tile.HEIGHT*Tile.WIDTH)/Fragment.FRAGMENTS_PER_TILE;
-	public int[][] pixels;
+	public byte[][] pixels;
 	private static long seed = 3l;
 	private static Random random = new Random(seed);
 	//public static int fragmentIdCounter = 0;
@@ -26,7 +26,7 @@ public class Fragment {
 		 return pixels;
 	}
 	
-	public Fragment(int fragmentNumber, int[][] pixels){
+	public Fragment(int fragmentNumber, byte[][] pixels){
 		this.num = fragmentNumber;
 		this.pixels = pixels;
 	}
@@ -35,15 +35,15 @@ public class Fragment {
 		return FragmentIndexPositions[this.num];
 	}
 	
-	public int[] getPixel(int pixelIndex){
+	public byte[] getPixel(int pixelIndex){
 		return pixels[pixelIndex];
 	}
 	
 	public static Fragment random(int fragmentNumber){
-		int[][] pixels = new int[FRAGMENT_SIZE][Tile.COLORS];
+		byte[][] pixels = new byte[FRAGMENT_SIZE][Tile.COLORS];
 		for (int i=0; i<FRAGMENT_SIZE; i++){
 			for (int c=0; c<Tile.COLORS; c++){
-				pixels[i][c] = random.nextInt(255);
+				pixels[i][c] = (byte) random.nextInt(255);
 			}
 		}
 		return new Fragment(fragmentNumber,pixels);

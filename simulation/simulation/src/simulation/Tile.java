@@ -1,8 +1,8 @@
 package simulation;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class Tile {
 
@@ -17,12 +17,28 @@ public class Tile {
 	public final static int HEIGHT = 256;
 	public final static int COLORS = 3;
 	public int id;
-	public int[][][] pixels;
-	public static int tileIdCounter = 0;
+	public byte[][][] pixels;
+	private static int tileIdCounter = 0;
+	private static int colCounter = 0;
+	private static int rowCounter = 0;
+	public static int lod;
 	
-	public Tile(int id, int[][][] pixels){
+	public int x;
+	public int y;
+	
+	public static Comparator<Tile> lodComparator = new Comparator<Tile>(){
+		@Override
+		public int compare(Tile t1, Tile t2) {
+            return (int) (t1.lod - t2.lod);
+        }
+	};
+	
+	public Tile(int id, int y, int x, byte[][][] pixels){
 		this.id = id;
 		this.pixels = pixels;
+		this.x = x;
+		this.y = y;
+		
 	}
 
 	public int getFragmentNumber(){
@@ -32,7 +48,11 @@ public class Tile {
 	
 	public static Tile random(){
 		int tileId = Tile.tileIdCounter++;
-		int[][][] pixels = new int[Tile.HEIGHT][Tile.WIDTH][Tile.COLORS];
+		if ((colCounter+1)%25 == 0){
+			rowCounter++;
+		}
+		colCounter++;
+		byte[][][] pixels = new byte[Tile.HEIGHT][Tile.WIDTH][Tile.COLORS];
 		for (int i=0; i<Fragment.FRAGMENTS_PER_TILE; i++){ //8
 			Fragment fragm = Fragment.random(i);
 			int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
@@ -42,7 +62,7 @@ public class Tile {
 				pixels[y][x] = fragm.getPixel(j);
 			}
 		}
-		return new Tile(tileId,pixels);
+		return new Tile(tileId,rowCounter,colCounter,pixels);
 	}
 	
 	public void addFragment(Fragment fragm){
