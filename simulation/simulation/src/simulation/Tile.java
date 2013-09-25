@@ -21,7 +21,8 @@ public class Tile {
 	private static int tileIdCounter = 0;
 	private static int colCounter = 0;
 	private static int rowCounter = 0;
-	public static int lod;
+	public int lod;
+	public float likelihood;
 	
 	public int x;
 	public int y;
@@ -33,11 +34,13 @@ public class Tile {
         }
 	};
 	
-	public Tile(int id, int y, int x, byte[][][] pixels){
-		this.id = id;
+	public Tile(int y, int x, byte[][][] pixels){
+		
 		this.pixels = pixels;
 		this.x = x;
 		this.y = y;
+		this.id = ((y+"-"+x).hashCode());
+		System.out.println(this.id);
 		
 	}
 
@@ -47,11 +50,13 @@ public class Tile {
 	
 	
 	public static Tile random(){
-		int tileId = Tile.tileIdCounter++;
-		if ((colCounter+1)%25 == 0){
+		//int tileId = Tile.tileIdCounter++;
+		
+		if ((colCounter)%25 == 0 && colCounter!=0){
 			rowCounter++;
+			colCounter=0;
 		}
-		colCounter++;
+
 		byte[][][] pixels = new byte[Tile.HEIGHT][Tile.WIDTH][Tile.COLORS];
 		for (int i=0; i<Fragment.FRAGMENTS_PER_TILE; i++){ //8
 			Fragment fragm = Fragment.random(i);
@@ -62,16 +67,19 @@ public class Tile {
 				pixels[y][x] = fragm.getPixel(j);
 			}
 		}
-		return new Tile(tileId,rowCounter,colCounter,pixels);
+		return new Tile(rowCounter,colCounter++,pixels);
 	}
 	
 	public void addFragment(Fragment fragm){
-		fragments.put(fragm.num, fragm);
-		
+		fragments.put(fragm.num, fragm);	
 	}
 	
-	public Fragment getFragment(int fragmId){
-		return fragments.get(fragmId);
+	public void removeFragment(int fragmNumber){
+		fragments.remove(fragmNumber);
+	}
+	
+	public Fragment getFragment(int fragmNumber){
+		return fragments.get(fragmNumber);
 	}
 	
 	public void containsFragment(Fragment fragm){
