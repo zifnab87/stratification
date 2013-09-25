@@ -2,7 +2,6 @@ package simulation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -23,6 +22,9 @@ public class Cache {
 		queue.remove(tile);
 		queue.add(tile);
 	}
+	public void updateTileLODwithPos(Point index){
+		updateTileLODwithId(index.hashCode());
+	}
 	
 	public void updateAllTilesLOD(){
 		Set<Integer> tileIds = tiles.keySet();
@@ -32,7 +34,6 @@ public class Cache {
 		}
 	}
 	
-	// cache datastructure
 	public void addTile(Tile tile){
 		this.tiles.put(tile.id, tile);
 	}
@@ -43,6 +44,10 @@ public class Cache {
 		return fragmCount;
 	}
 	
+	public int removeTile(Point index){
+		return removeTile(index.hashCode());
+	}
+	
 	public void removeFragment(int tileId,int fragmNumber){
 		Tile tile = this.tiles.get(tileId);
 		int fragmCount = tile.getFragmentNumber();
@@ -50,9 +55,16 @@ public class Cache {
 			tile.removeFragment(fragmNumber);
 		}
 	}
+	public void removeFragment(Point index,int fragmNumber){
+		removeFragment(index.hashCode(),fragmNumber);
+	}
 	
 	public Tile getTile(int tileId){
 		return this.tiles.get(tileId);
+	}
+	
+	public Tile getTile(Point index){
+		return getTile(index.hashCode());
 	}
 	//insert fragment to that tile in cache
 	public void addFragment(Fragment fragm,int tileId){

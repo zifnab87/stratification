@@ -23,9 +23,9 @@ public class Tile {
 	private static int rowCounter = 0;
 	public int lod;
 	public float likelihood;
-	
-	public int x;
-	public int y;
+	public Point point; //index
+	//public int x;
+	//public int y;
 	
 	public static Comparator<Tile> lodComparator = new Comparator<Tile>(){
 		@Override
@@ -34,13 +34,11 @@ public class Tile {
         }
 	};
 	
-	public Tile(int y, int x, byte[][][] pixels){
+	public Tile(Point point, byte[][][] pixels){
 		
 		this.pixels = pixels;
-		this.x = x;
-		this.y = y;
-		this.id = ((y+"-"+x).hashCode());
-		System.out.println(this.id);
+		this.point = point;
+		this.id = this.point.hashCode();
 		
 	}
 
@@ -67,7 +65,7 @@ public class Tile {
 				pixels[y][x] = fragm.getPixel(j);
 			}
 		}
-		return new Tile(rowCounter,colCounter++,pixels);
+		return new Tile(new Point(rowCounter,colCounter++),pixels);
 	}
 	
 	public void addFragment(Fragment fragm){

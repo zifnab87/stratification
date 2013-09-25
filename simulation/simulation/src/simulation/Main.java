@@ -1,12 +1,20 @@
 package simulation;
 
-import java.util.PriorityQueue;
+import static simulation.Config.viewportHeight;
+import static simulation.Config.viewportWidth;
+import static simulation.Config.upperLeftStartingPoint;
 
 public class Main {
 	public static void main(String args[]){
 		Database db = new Database();
+		Viewport viewport = new Viewport(viewportHeight,viewportWidth,upperLeftStartingPoint);
+		db.setViewport(viewport);
 		db.init(625); //625
-		System.out.println("done");
+		//System.out.println("done");
+		
+		
+	}
+		
 		
 		
 		//user moved
@@ -24,5 +32,5 @@ public class Main {
 		//protrusion length could be based on speed of user
 		
 		
-	}
+	
 }
