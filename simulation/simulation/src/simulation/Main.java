@@ -3,6 +3,7 @@ package simulation;
 import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
+import static simulation.Config.DATABASE_TILES_NUM;
 
 import java.text.DecimalFormat;
 
@@ -16,11 +17,18 @@ public class Main {
 		
 		
 		
-		//Main.db.setViewport(viewport);
-		//db.init(625); //625
-		//System.out.println("done");
+		db.setViewport(viewport);
+		db.init(DATABASE_TILES_NUM);
+		System.out.println("init done");
 		System.out.println(Predictor.likelihoodToLOD(1.0d));
+		Predictor.constantTrain(db);
+		Predictor.spiralTrain(db);
+		System.out.println("train done");
+		System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLikelihood());
+		System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLikelihood());
 		
+		System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLOD());
+		System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLOD());
 		
 
 	}

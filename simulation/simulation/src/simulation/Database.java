@@ -7,7 +7,7 @@ import static simulation.Config.FRAGMENTS_PER_TILE;
 
 public class Database {
 	
-	private Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	public Viewport viewport;
 	
 	
@@ -31,7 +31,9 @@ public class Database {
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
-					vec.add(getTile(index));
+					Tile tile = getTile(index);
+					tile.setLikelihood(1.0d);
+					vec.add(tile);
 				}
 				//if tile exists but partial
 				else if(!Main.cache.tileExistsAndNotFull(index)  ){
@@ -43,6 +45,7 @@ public class Database {
 							fullfillingTile.addFragment(getFragmentOfTile(fragmNum, index));
 						}
 					}
+					fullfillingTile.setLikelihood(1.0d);
 					vec.add(fullfillingTile);
 				}
 			}

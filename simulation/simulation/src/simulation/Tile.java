@@ -12,8 +12,7 @@ import static simulation.Config.FRAGMENT_SIZE;
 public class Tile {
 
 	private Map<Integer,Fragment> fragments = new HashMap<Integer, Fragment>();
-	
-	//private static Random random = new Random(seed);
+
 	
 	
 	public int id;
@@ -24,8 +23,6 @@ public class Tile {
 	private int lod;
 	private double likelihood;
 	public Point point; //index
-	//public int x;
-	//public int y;
 	
 	
 	
@@ -101,10 +98,14 @@ public class Tile {
 
 	public void setLikelihood(double likelihood) {
 		this.likelihood = likelihood;
-		
+		this.lod = Predictor.likelihoodToLOD(likelihood);
 	}
 	
-	public int getLOD(int lod){
+	public double getLikelihood(){
+		return this.likelihood = likelihood;
+	}
+	
+	public int getLOD(){
 		return this.lod;
 	}
 	
