@@ -72,6 +72,34 @@ public class Cache {
 		return this.tiles.get(tileId);
 	}
 	
+	public boolean tileFull(int tileId){
+		Tile tile = getTile(tileId);
+		if (tile!=null){
+			return tile.isFull();
+		}
+		else {
+			return false;
+		}
+	}
+	public boolean tileFull(Point index){
+		return tileFull(index.hashCode());
+	}
+	
+	public boolean tileExistsAndFull(int tileId){
+		Tile tile = getTile(tileId);
+		return (tile!=null) && tile.isFull();
+	}
+	public boolean tileExistsAndFull(Point index){
+		return tileExistsAndFull(index.hashCode());
+	}
+	
+	public boolean tileExistsAndNotFull(int tileId){
+		Tile tile = getTile(tileId);
+		return (tile!=null) && !tile.isFull();
+	}
+	public boolean tileExistsAndNotFull(Point index){
+		return tileExistsAndFull(index.hashCode());
+	}
 	
 	public boolean tileExists(int tileId){
 		return tiles.containsKey(tileId);
@@ -79,6 +107,8 @@ public class Cache {
 	public boolean tileExists(Point index){
 		return tileExists(index.hashCode());
 	}
+	
+
 	
 	//insert fragment to that tile in cache
 	public void addFragment(Fragment fragm,int tileId){

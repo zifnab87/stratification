@@ -37,6 +37,11 @@ public class Tile {
         }
 	};
 	
+	public Tile(Point point){
+		this.point = point;
+		this.id = this.point.hashCode();
+	}
+	
 	public Tile(Point point, byte[][][] pixels){
 		
 		this.pixels = pixels;
@@ -83,9 +88,11 @@ public class Tile {
 		return fragments.get(fragmNumber);
 	}
 	
-	public void containsFragment(Fragment fragm){
-		fragments.containsKey(fragm.num);
+	
+	public boolean containsFragment(int fragmNumber){
+		return fragments.containsKey(fragmNumber);
 	}
+	
 	
 	public boolean isFull(){ //contains as many fragments as possible
 		return fragments.size() == FRAGMENTS_PER_TILE;

@@ -3,6 +3,7 @@ package simulation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import static simulation.Config.FRAGMENTS_PER_TILE;
 
 public class Database {
 	
@@ -28,8 +29,21 @@ public class Database {
 		for (int y=upperLeft.y; y<=lowerRight.y; y++){
 			for (int x=upperLeft.x; y<=lowerRight.x; y++){
 				Point index = new Point(y,x);
+				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
 					vec.add(getTile(index));
+				}
+				//if tile exists but partial
+				else if(!Main.cache.tileExistsAndNotFull(index)  ){
+					Tile fullfillingTile = new Tile(index);
+					Tile cachedPartialTile = Main.cache.getTile(index);
+					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
+						//if fragment doesn't exist fetch it from database;
+						if (!cachedPartialTile.containsFragment(fragmNum)){
+							fullfillingTile.addFragment(getFragmentOfTile(fragmNum, index));
+						}
+					}
+					vec.add(fullfillingTile);
 				}
 			}
 		}
@@ -56,10 +70,18 @@ public class Database {
 		return tile;		
 	}
 	
-	
-	
-	public Fragment getFragmentOfTile(int FragmentNumber,int tileId){
+	public Tile getTile(int tileId){
 		Tile tile = tiles.get(tileId);
-		return tile.getFragment(FragmentNumber);
+		return tile;		
+	}
+	
+	public Fragment getFragmentOfTile(int fragmentNumber,Point index){
+		
+		return getFragmentOfTile(fragmentNumber,index.hashCode());
+	}
+	
+	public Fragment getFragmentOfTile(int fragmentNumber,int tileId){
+		Tile tile = getTile(tileId);
+		return tile.getFragment(fragmentNumber);
 	}
 }
