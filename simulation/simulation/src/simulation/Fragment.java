@@ -1,11 +1,14 @@
 package simulation;
-
+import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.FRAGMENT_SIZE;
+import static simulation.Config.COLORS;
+import static simulation.Config.SEED;
 import java.util.Random;
+import java.util.Vector;
 
 public class Fragment {
 	public int num;
-	public final static int FRAGMENTS_PER_TILE = 8;
-	public final static int FRAGMENT_SIZE = (Tile.HEIGHT*Tile.WIDTH)/Fragment.FRAGMENTS_PER_TILE;
+
 	public byte[][] pixels;
 	private static long seed = 3l;
 	private static Random random = new Random(seed);
@@ -39,13 +42,20 @@ public class Fragment {
 		return pixels[pixelIndex];
 	}
 	
-	public static Fragment random(int fragmentNumber){
-		byte[][] pixels = new byte[FRAGMENT_SIZE][Tile.COLORS];
+	public static Fragment randomizer(int fragmentNumber){
+		byte[][] pixels = new byte[FRAGMENT_SIZE][COLORS];
 		for (int i=0; i<FRAGMENT_SIZE; i++){
-			for (int c=0; c<Tile.COLORS; c++){
+			for (int c=0; c<COLORS; c++){
 				pixels[i][c] = (byte) random.nextInt(255);
 			}
 		}
 		return new Fragment(fragmentNumber,pixels);
+	}
+	
+	public static int chooseRandomFromNumbers(Vector<Integer> collection){
+		Random randomGenerator = new Random(SEED);
+		int index = randomGenerator.nextInt(collection.size());
+		return collection.get(index);
+		
 	}
 }

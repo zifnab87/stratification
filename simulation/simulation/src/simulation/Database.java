@@ -2,6 +2,7 @@ package simulation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 public class Database {
 	
@@ -20,40 +21,41 @@ public class Database {
 		this.viewport = viewport;
 	}
 	
-	public void viewportFetch(){
+	public Vector<Tile> viewportFetch(){
 		Point upperLeft = this.viewport.upperLeft;
 		Point lowerRight = this.viewport.lowerRight;
+		Vector<Tile> vec = new Vector<Tile>();
 		for (int y=upperLeft.y; y<=lowerRight.y; y++){
 			for (int x=upperLeft.x; y<=lowerRight.x; y++){
-				
+				Point index = new Point(y,x);
+				if (!Main.cache.tileExists(index)){
+					vec.add(getTile(index));
+				}
 			}
 		}
-		
+		return vec;
 	}
 	
 	public void init(int numTiles){
 		for (int i=0; i<numTiles; i++){
-			Tile tile = Tile.random();
+			Tile tile = Tile.randomizer();
 			putTile(tile);
 		}
 	}
 	
 	public void putTile(Tile tile){
-		tileExists(tile.id);
 		tiles.put(tile.id, tile);
 	}
 	
-	public void tileExists(int tileId){
-		if (tiles.containsKey(tileId)){
-			System.out.println("error");
-		}
+	public boolean tileExists(int tileId){
+		return tiles.containsKey(tileId);
 	}
 	
 	public Tile getTile(Point index){
 		Tile tile = tiles.get(index.hashCode());
-		return tile;
-			
+		return tile;		
 	}
+	
 	
 	
 	public Fragment getFragmentOfTile(int FragmentNumber,int tileId){

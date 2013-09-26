@@ -1,19 +1,31 @@
 package simulation;
 
-import static simulation.Config.viewportHeight;
-import static simulation.Config.viewportWidth;
-import static simulation.Config.upperLeftStartingPoint;
+import static simulation.Config.VIEWPORT_HEIGHT;
+import static simulation.Config.VIEWPORT_WIDTH;
+import static simulation.Config.UPPER_LEFT_STARTING_POINT;
+
+import java.text.DecimalFormat;
 
 public class Main {
+	
+	public static Database db = new Database();
+	public static Cache cache = new Cache();
+	public static Viewport viewport = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+	
 	public static void main(String args[]){
-		Database db = new Database();
-		Viewport viewport = new Viewport(viewportHeight,viewportWidth,upperLeftStartingPoint);
-		db.setViewport(viewport);
-		db.init(625); //625
+		
+		
+		
+		//Main.db.setViewport(viewport);
+		//db.init(625); //625
 		//System.out.println("done");
+		System.out.println(Predictor.likelihoodToLOD(1.0d));
 		
 		
+
 	}
+	
+
 		
 		
 		

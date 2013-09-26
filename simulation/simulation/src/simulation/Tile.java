@@ -3,34 +3,37 @@ package simulation;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import static simulation.Config.TILE_WIDTH;
+import static simulation.Config.TILE_HEIGHT;
+import static simulation.Config.COLORS;
+import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.FRAGMENT_SIZE;
 
 public class Tile {
 
 	private Map<Integer,Fragment> fragments = new HashMap<Integer, Fragment>();
-	private static long seed = 3l;
+	
 	//private static Random random = new Random(seed);
 	
-	public final static int RENDER_TIME = 10;
-	public final static int DATABASE_FETCH_TIME = 3000;
-	public final static int NETWORK_FETCH_TIME = 6000;
-	public final static int WIDTH = 256;
-	public final static int HEIGHT = 256;
-	public final static int COLORS = 3;
+	
 	public int id;
 	public byte[][][] pixels;
 	private static int tileIdCounter = 0;
 	private static int colCounter = 0;
 	private static int rowCounter = 0;
-	public int lod;
-	public float likelihood;
+	private int lod;
+	private double likelihood;
 	public Point point; //index
 	//public int x;
 	//public int y;
 	
-	public static Comparator<Tile> lodComparator = new Comparator<Tile>(){
+	
+	
+	
+	public static Comparator<Tile> likelihoodComparator = new Comparator<Tile>(){
 		@Override
 		public int compare(Tile t1, Tile t2) {
-            return (int) (t1.lod - t2.lod);
+            return (int) (t1.likelihood - t2.likelihood);
         }
 	};
 	
@@ -47,7 +50,7 @@ public class Tile {
 	}
 	
 	
-	public static Tile random(){
+	public static Tile randomizer(){
 		//int tileId = Tile.tileIdCounter++;
 		
 		if ((colCounter)%25 == 0 && colCounter!=0){
@@ -55,13 +58,13 @@ public class Tile {
 			colCounter=0;
 		}
 
-		byte[][][] pixels = new byte[Tile.HEIGHT][Tile.WIDTH][Tile.COLORS];
-		for (int i=0; i<Fragment.FRAGMENTS_PER_TILE; i++){ //8
-			Fragment fragm = Fragment.random(i);
+		byte[][][] pixels = new byte[TILE_HEIGHT][TILE_WIDTH][COLORS];
+		for (int i=0; i<FRAGMENTS_PER_TILE; i++){ //8
+			Fragment fragm = Fragment.randomizer(i);
 			int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
-			for (int j=0; j<Fragment.FRAGMENT_SIZE; j++){ 
-				int y = pixelIndexesOfFragment[j] % Tile.WIDTH;
-				int x = pixelIndexesOfFragment[j] / Tile.WIDTH;
+			for (int j=0; j<FRAGMENT_SIZE; j++){ 
+				int y = pixelIndexesOfFragment[j] % TILE_WIDTH;
+				int x = pixelIndexesOfFragment[j] / TILE_WIDTH;
 				pixels[y][x] = fragm.getPixel(j);
 			}
 		}
@@ -82,6 +85,20 @@ public class Tile {
 	
 	public void containsFragment(Fragment fragm){
 		fragments.containsKey(fragm.num);
+	}
+	
+	public boolean isFull(){ //contains as many fragments as possible
+		return fragments.size() == FRAGMENTS_PER_TILE;
+		
+	}
+
+	public void setLikelihood(double likelihood) {
+		this.likelihood = likelihood;
+		
+	}
+	
+	public int getLOD(int lod){
+		return this.lod;
 	}
 	
 	
