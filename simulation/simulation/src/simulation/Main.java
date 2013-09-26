@@ -19,6 +19,9 @@ public class Main {
 		
 		db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
+		db.viewportFetch();
+		System.out.println(cache.tiles.size());
+		System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
 		//System.out.println("init done");
 		//System.out.println(Predictor.likelihoodToLOD(1.0d));
 		//Predictor.constantTrain(db);

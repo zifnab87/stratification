@@ -8,7 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class Cache {
 	//tiles
 	//fragments
-	private Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	private PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	
 	
@@ -36,16 +36,16 @@ public class Cache {
 
 	public void addTile(Tile tile){
 		this.tiles.put(tile.id, tile);
+		this.queue.add(tile);
 	}
 	
-	public int removeTile(Point index){
-		return removeTile(index.hashCode());
+	public void removeTile(Point index){
+		removeTile(index.hashCode());
 	}
 	
-	public int removeTile(int tileId){
-		Tile tile = this.tiles.get(tileId);
-		int fragmCount = tile.getFragmentNumber();
-		return fragmCount;
+	public void removeTile(int tileId){
+		Tile tile = this.tiles.remove(tileId);
+		queue.remove(tile);
 	}
 	
 

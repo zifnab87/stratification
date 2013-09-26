@@ -26,8 +26,8 @@ public class Database {
 		Point upperLeft = this.viewport.upperLeft;
 		Point lowerRight = this.viewport.lowerRight;
 		Vector<Tile> vec = new Vector<Tile>();
-		for (int y=upperLeft.y; y<=lowerRight.y; y++){
-			for (int x=upperLeft.x; y<=lowerRight.x; y++){
+		for (int y=upperLeft.y; y<lowerRight.y; y++){
+			for (int x=upperLeft.x; x<lowerRight.x; x++){
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
@@ -36,7 +36,7 @@ public class Database {
 					vec.add(tile);
 				}
 				//if tile exists but partial
-				else if(!Main.cache.tileExistsAndNotFull(index)  ){
+				else if(!Main.cache.tileExistsAndNotFull(index)){
 					Tile fullfillingTile = new Tile(index);
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
@@ -49,6 +49,9 @@ public class Database {
 					vec.add(fullfillingTile);
 				}
 			}
+		}
+		for(Tile tile: vec){
+			Main.cache.addTile(tile);
 		}
 		return vec;
 	}
