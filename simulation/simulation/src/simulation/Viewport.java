@@ -8,7 +8,9 @@ public class Viewport {
 	public Point upperRight;
 	public Point lowerLeft;
 	public Point lowerRight;
+	public Point center;
 	
+	//public static Point previousCenter = null;
 	public int getWidth() {
 		return width;
 	}
@@ -32,6 +34,10 @@ public class Viewport {
 		this.upperRight = new Point(upperLeft.y, upperLeft.x + width);
 		this.lowerRight = new Point(upperRight.y+height, upperRight.x);
 		this.lowerLeft = new Point(upperLeft.y + height, upperLeft.x);
+		//previousCenter = this.center;
+		this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
+		//System.out.println(center.y+"!!!"+center.x);
+		
 	}
 	
 	

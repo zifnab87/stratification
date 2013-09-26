@@ -19,18 +19,19 @@ public class Main {
 		
 		db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
-		System.out.println("init done");
-		System.out.println(Predictor.likelihoodToLOD(1.0d));
-		Predictor.constantTrain(db);
-		Predictor.spiralTrain(db);
-		System.out.println("train done");
-		System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLikelihood());
-		System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLikelihood());
+		//System.out.println("init done");
+		//System.out.println(Predictor.likelihoodToLOD(1.0d));
+		//Predictor.constantTrain(db);
+		//Predictor.spiralTrain(db);
+		//System.out.println("train done");
+		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLikelihood());
+		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLikelihood());
 		
-		System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLOD());
-		System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLOD());
+		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLOD());
+		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLOD());
+		Viewport view = new Viewport(4, 3, new Point(3,2));
 		
-
+		System.out.println(Predictor.distance(new Point(1,3),new Point(10,10)));
 	}
 	
 

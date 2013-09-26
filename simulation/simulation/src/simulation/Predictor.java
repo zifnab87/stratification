@@ -5,13 +5,29 @@ import java.util.Random;
 import java.util.Set;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.PREFETCH_DISTANCE;
 public class Predictor {
 	
 	public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
 	
-	public static void getLikelihood(Tile tile){
-		float likelihood = 1f;
-		tile.setLikelihood(likelihood);
+	public static double getLikelihood(Tile tile){
+		double tileStaticLikelihood = tile.getLikelihood();
+		double distance = distance(tile);
+		// 40% static likelihood
+		// 60% distance
+		// min of (max_distance - distance)/max_distance and 0
+		return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
+	}
+
+	
+	public static double distance(Point a, Point b){
+		double dist = Math.sqrt(Math.pow(a.y-b.y,2)+Math.pow(a.x-b.x,2));
+		return Math.floor(dist);
+	}
+	public static double distance(Tile tile){
+		Point currentCenterIndex = Main.viewport.center;
+		Point tileIndex = tile.point;
+		return distance(currentCenterIndex,tileIndex);
 	}
 	
 	public static void trainDatabase(Database db){
