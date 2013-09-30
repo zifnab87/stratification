@@ -4,14 +4,22 @@ import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
+import simulation.events.EventHandler;
 
-import java.text.DecimalFormat;
+import java.lang.reflect.Method;
+
 
 public class Main {
 	
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
 	public static Viewport viewport = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+	
+	
+	public void sendEvent (final EventHandler handler, final Object event) throws Exception {
+	    final Method method = EventHandler.class.getDeclaredMethod ("handle", new Class[] {event.getClass ()});
+	    method.invoke (handler, event);
+	}
 	
 	public static void main(String args[]){
 		
@@ -20,6 +28,10 @@ public class Main {
 		db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
 		db.viewportFetch();
+		
+		
+		
+		
 		System.out.println(cache.tiles.size());
 		System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
 		//System.out.println("init done");
