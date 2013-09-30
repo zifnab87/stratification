@@ -3,8 +3,8 @@ package simulation;
 public class Config {
 	
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 625;
-	public static final int DATABASE_WIDTH = 25;
+	public static final int DATABASE_TILES_NUM = 100;//625;
+	public static final int DATABASE_WIDTH = 10;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(0,0);
 	public static final int VIEWPORT_HEIGHT = 3;

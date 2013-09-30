@@ -5,6 +5,7 @@ import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
 import simulation.events.EventHandler;
+import simulation.events.UserMove;
 
 import java.lang.reflect.Method;
 
@@ -13,21 +14,22 @@ public class Main {
 	
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
-	public static Viewport viewport = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+	public final static Viewport viewport = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
 	
 	
-	public void sendEvent (final EventHandler handler, final Object event) throws Exception {
-	    final Method method = EventHandler.class.getDeclaredMethod ("handle", new Class[] {event.getClass ()});
-	    method.invoke (handler, event);
-	}
+
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws Exception{
 		
 		
 		
-		db.setViewport(viewport);
+		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
-		db.viewportFetch();
+		System.out.println("usermove");
+		UserMove usermove = new UserMove(UPPER_LEFT_STARTING_POINT);
+		usermove.action();
+		
+		//db.viewportFetch();
 		
 		
 		

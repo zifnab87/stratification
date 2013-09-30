@@ -115,6 +115,9 @@ public class Cache {
 		Tile tile = tiles.get(tileId);
 		tile.addFragment(fragm);
 	}
-
+	
+	public void addFragment(Fragment fragm,Point index){
+		addFragment(fragm,index.hashCode());
+	}
 	
 }
