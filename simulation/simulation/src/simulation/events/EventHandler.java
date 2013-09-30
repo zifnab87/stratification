@@ -130,23 +130,7 @@ public class EventHandler {
     	fragmentedTileQueue.add(event);
     }
     
-    
-    public void handle(final PrefetchFinished event){
-    	prefetchQueue.poll().action();
-    }
-
-    
-    public void handle(final FetchFinished event) throws Exception{
-    	fetchQueue.poll().action();
-    }
-    
-    public void handle(final TileFetchFinished event) throws Exception{
-    	tileQueue.poll().action();
-    }
-    
-    public void handle(final FragmentedTileFetchFinished event){
-    	fragmentedTileQueue.poll().action();
-    }
+ 
 
     
     
