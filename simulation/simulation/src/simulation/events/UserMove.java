@@ -15,8 +15,10 @@ public class UserMove extends Event {
 	
 	public void action() throws Exception{
 		System.out.println("UserMove Event");
-		Main.db.setViewport(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH, upperLeft));
-		this.sendEvent(new Fetch(Main.viewport));
+		Viewport newMove = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH, upperLeft);
+		Main.db.setViewport(newMove);
+		this.sendEvent(new Fetch(newMove));
+		this.sendEvent(new Prefetch(newMove));
 	}
 	
 }

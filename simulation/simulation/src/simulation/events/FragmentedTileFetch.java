@@ -19,11 +19,10 @@ public class FragmentedTileFetch extends Event {
 		Vector<Integer> fragmentNums = this.fragmentedPointToFetch.fragmentNums;
 		for ( int fragmentNum: fragmentNums){
 			Fragment fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToFetch);
+			//render fragment TOD
 			Main.cache.addFragment(fragment, this.fragmentedPointToFetch);
 		}
-		
-		
-		// TODO Auto-generated method stub
+	
 
 	}
 

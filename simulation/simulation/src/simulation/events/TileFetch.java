@@ -19,7 +19,7 @@ public class TileFetch extends Event {
 		//tile cache
 		Main.cache.addTile(tile);
 		
-		//this.sendEvent(new TileFetchFinished());
+		
 	}
 
 }

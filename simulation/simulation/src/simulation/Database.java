@@ -22,9 +22,55 @@ public class Database {
 		this.viewport = viewport;
 	}
 	
-	public Vector<Point> viewportFetch(){
-		Point upperLeft = this.viewport.upperLeft;
-		Point lowerRight = this.viewport.lowerRight;
+	public Vector<Point> aroundViewportPrefetch(Viewport viewport){
+		Point upperLeft = viewport.upperLeft;
+		Point lowerRight = viewport.lowerRight;
+		Vector<Point> vec = new Vector<Point>();
+		Vector<Integer> fragmentNums = new Vector<Integer>();
+		for (int y=upperLeft.y-5; y<lowerRight.y+5; y++){
+			for (int x=upperLeft.x-5; x<lowerRight.x+5; x++){
+				Point index = new Point(y,x);
+				//if tile doesn't exist in cache
+				if (!Main.cache.tileExists(index)){
+					//Tile tile = getTile(index);
+					//tile.setLikelihood(1.0d);
+					vec.add(index);
+				}
+				//if tile exists but partial
+				else if(!Main.cache.tileExistsAndNotFull(index)){
+					//Tile fullfillingTile = new Tile(index);
+					Tile cachedPartialTile = Main.cache.getTile(index);
+					index.setFragmentNums(fragmentNums);
+					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
+						//if fragment doesn't exist fetch it from database;
+						if (!cachedPartialTile.containsFragment(fragmNum)){
+							//fullfillingTile.addFragment(this.getFragmentOfTile(fragmNum, index));
+							index.fragmentNums.add(fragmNum);
+						}
+					}
+					//fullfillingTile.setLikelihood(1.0d);
+					vec.add(index);
+				}
+				
+			}
+		}
+		//remove what is in the viewport
+		for (int y=upperLeft.y; y<lowerRight.y; y++){
+			for (int x=upperLeft.x; x<lowerRight.x; x++){
+				Point index = new Point(y,x);
+				vec.remove(index);
+			}
+		}
+		
+		/*for(Tile tile: vec){
+			Main.cache.addTile(tile);
+		}*/
+		return vec;
+	}
+	
+	public Vector<Point> viewportFetch(Viewport viewport){
+		Point upperLeft = viewport.upperLeft;
+		Point lowerRight = viewport.lowerRight;
 		Vector<Point> vec = new Vector<Point>();
 		Vector<Integer> fragmentNums = new Vector<Integer>();
 		for (int y=upperLeft.y; y<lowerRight.y; y++){
