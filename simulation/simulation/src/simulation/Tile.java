@@ -96,18 +96,6 @@ public class Tile {
 		
 	}
 
-	public void setLikelihood(double likelihood) {
-		this.likelihood = likelihood;
-		this.lod = Predictor.likelihoodToLOD(likelihood);
-	}
-	
-	public double getLikelihood(){
-		return this.likelihood = likelihood;
-	}
-	
-	public int getLOD(){
-		return this.lod;
-	}
 	
 	
 }

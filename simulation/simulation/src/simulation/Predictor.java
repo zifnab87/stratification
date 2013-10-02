@@ -1,6 +1,8 @@
 package simulation;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -9,14 +11,17 @@ import static simulation.Config.PREFETCH_DISTANCE;
 public class Predictor {
 	
 	public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
+	public static Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
+	
 	
 	public static double getLikelihood(Tile tile){
-		double tileStaticLikelihood = tile.getLikelihood();
-		double distance = distance(tile);
+		double tileStaticLikelihood = getLikelihood(tile.point);
+		//double distance = distance(tile);
 		// 40% static likelihood
 		// 60% distance
 		// min of (max_distance - distance)/max_distance and 0
-		return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
+		//return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
+		return tileStaticLikelihood;
 	}
 
 	
@@ -31,10 +36,32 @@ public class Predictor {
 	}
 	
 	public static void trainDatabase(Database db){
-		
+		Predictor.constantTrain(db);
+		Predictor.spiralTrain(db);
 	}
 	
-	public static int likelihoodToLOD(double likelihood){
+	
+	public static double getLikelihood(Point index){
+		return getLikelihood(index.hashCode());
+	}
+	
+	public static double getLikelihood(int index){
+		return likelihoods.get(index);
+	}
+	
+	public static int getLOD(Point index){
+		return getLOD(index.hashCode());
+	}
+	
+	public static int getLOD(int index){
+		return Predictor.likelihoodToLOD(likelihoods.get(index));
+	}
+	
+	
+	
+	
+	
+	private static int likelihoodToLOD(double likelihood){
 		int lod = 1;
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(3);
@@ -53,7 +80,7 @@ public class Predictor {
 		return Math.max(lod,FRAGMENTS_PER_TILE);
 	}
 	
-	public static float[] lodIntervals(int fragments){
+	private static float[] lodIntervals(int fragments){
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(3);
 		float[] result = new float[fragments+1];
@@ -68,16 +95,16 @@ public class Predictor {
 		
 		return result;
 	}
-	public static void constantTrain(Database db){
+	private static void constantTrain(Database db){
 		Set<Integer> keys = db.tiles.keySet();
 		for(Integer key: keys){
 			Random r = new Random();
 			double randomValue = 0.0d + (0.25d - 0.0d) * r.nextDouble();
-			db.tiles.get(key).setLikelihood(randomValue);
+			likelihoods.put(key, randomValue);
 		}
 	}
 	
-	public static void spiralTrain(Database db){
+	private static void spiralTrain(Database db){
 		int width = simulation.Config.DATABASE_WIDTH;
 		boolean horizontal = true;
 		int length = width;
@@ -107,7 +134,7 @@ public class Predictor {
 				}
 				Random r = new Random();
 				double randomValue = 0.25d + (1.0d - 0.25d) * r.nextDouble();
-				db.tiles.get(new Point(j,i).hashCode()).setLikelihood(randomValue);
+				likelihoods.put(new Point(j,i).hashCode(), randomValue);
 			}
 			if (flipflop){
 				incrementing = !incrementing;

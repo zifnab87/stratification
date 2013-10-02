@@ -37,8 +37,17 @@ public class Viewport {
 		//previousCenter = this.center;
 		this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
 		//System.out.println(center.y+"!!!"+center.x);
-		
 	}
 	
+	public boolean contains(Point point){
+		return contains(point.y,point.x);
+	}
 	
+	public boolean contains(int y,int x){
+		if (x>=upperLeft.x && x<=upperRight.x && y>=upperLeft.y && y<=lowerLeft.y){
+			return true;
+		}
+		else
+			return false;
+	}	
 }

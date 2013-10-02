@@ -25,7 +25,8 @@ public class Main {
 		
 		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
-		System.out.println("usermove");
+		Predictor.trainDatabase(db);
+		//System.out.println("usermove");
 		UserMove usermove = new UserMove(UPPER_LEFT_STARTING_POINT);
 		usermove.action();
 		
@@ -38,8 +39,7 @@ public class Main {
 		System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
 		//System.out.println("init done");
 		//System.out.println(Predictor.likelihoodToLOD(1.0d));
-		//Predictor.constantTrain(db);
-		//Predictor.spiralTrain(db);
+
 		//System.out.println("train done");
 		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLikelihood());
 		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLikelihood());

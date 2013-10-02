@@ -32,23 +32,18 @@ public class Database {
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
-					//Tile tile = getTile(index);
-					//tile.setLikelihood(1.0d);
 					vec.add(index);
 				}
 				//if tile exists but partial
 				else if(!Main.cache.tileExistsAndNotFull(index)){
-					//Tile fullfillingTile = new Tile(index);
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					index.setFragmentNums(fragmentNums);
 					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
-						//if fragment doesn't exist fetch it from database;
+						//if fragment doesn't exist request fetch from database;
 						if (!cachedPartialTile.containsFragment(fragmNum)){
-							//fullfillingTile.addFragment(this.getFragmentOfTile(fragmNum, index));
 							index.fragmentNums.add(fragmNum);
 						}
 					}
-					//fullfillingTile.setLikelihood(1.0d);
 					vec.add(index);
 				}
 				
@@ -78,23 +73,18 @@ public class Database {
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
-					//Tile tile = getTile(index);
-					//tile.setLikelihood(1.0d);
 					vec.add(index);
 				}
 				//if tile exists but partial
 				else if(!Main.cache.tileExistsAndNotFull(index)){
-					//Tile fullfillingTile = new Tile(index);
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					index.setFragmentNums(fragmentNums);
 					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
-						//if fragment doesn't exist fetch it from database;
+						//if fragment doesn't exist request fetch from database;
 						if (!cachedPartialTile.containsFragment(fragmNum)){
-							//fullfillingTile.addFragment(this.getFragmentOfTile(fragmNum, index));
 							index.fragmentNums.add(fragmNum);
 						}
 					}
-					//fullfillingTile.setLikelihood(1.0d);
 					vec.add(index);
 				}
 				
