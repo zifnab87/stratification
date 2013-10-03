@@ -12,8 +12,9 @@ public class Fetch extends Event{
 		this.viewport = viewport;
 	}
 	public void action() throws Exception{
-		System.out.println("Fetch Event");
+
 		Vector<Point> vec = Main.db.viewportFetch(viewport);
+		System.out.println("Fetch Event "+vec);
 		for (Point point : vec){
 			//if point is for a tile to be fetch 100%
 			if (point.fragmentNums==null){

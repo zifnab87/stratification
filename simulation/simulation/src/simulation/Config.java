@@ -13,7 +13,7 @@ public class Config {
 	//TILE
 	public final static int TILE_WIDTH = 256;
 	public final static int TILE_HEIGHT = 256;
-	public final static int FRAGMENTS_PER_TILE = 800;
+	public final static int FRAGMENTS_PER_TILE = 8;
 	public final static int COLORS = 3;
 	
 	//FRAGMENT

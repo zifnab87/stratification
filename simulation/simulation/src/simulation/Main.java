@@ -14,7 +14,8 @@ public class Main {
 	
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
-	public final static Viewport viewport = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+	public static Viewport next;
+	public static Viewport preivous;
 	
 	
 
@@ -27,8 +28,12 @@ public class Main {
 		db.init(DATABASE_TILES_NUM);
 		Predictor.trainDatabase(db);
 		//System.out.println("usermove");
-		UserMove usermove = new UserMove(UPPER_LEFT_STARTING_POINT);
-		usermove.action();
+		for (int i=0; i<4; i++){
+			UserMove usermove = new UserMove(new Point(0,i));
+			Viewport previous = next;
+			Viewport next = usermove.newMove;
+			usermove.action();
+		}
 		
 		//db.viewportFetch();
 		
@@ -46,9 +51,9 @@ public class Main {
 		
 		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLOD());
 		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLOD());
-		Viewport view = new Viewport(4, 3, new Point(3,2));
+		//Viewport view = new Viewport(4, 3, new Point(3,2));
 		
-		System.out.println(Predictor.distance(new Point(1,3),new Point(10,10)));
+		//System.out.println(Predictor.distance(new Point(1,3),new Point(10,10)));
 	}
 	
 

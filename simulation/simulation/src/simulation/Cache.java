@@ -15,21 +15,21 @@ public class Cache {
 	public int getTileNumber(){
 		return tiles.size();
 	}
-	public void updateTileLODwithPos(Point index){
-		updateTileLODwithId(index.hashCode());
+	public void updateTileLODwithPos(Point index,Viewport viewport){
+		updateTileLODwithId(index.hashCode(),viewport);
 	}
 	
-	public void updateAllTilesLOD(){
+	public void updateAllTilesLOD(Viewport viewport){
 		Set<Integer> tileIds = tiles.keySet();
 		for(Integer tileId : tileIds){
-			updateTileLODwithId(tileId);
+			updateTileLODwithId(tileId,viewport);
 			
 		}
 	}
 	
-	public void updateTileLODwithId(int tileId){
+	public void updateTileLODwithId(int tileId,Viewport viewport){
 		Tile tile = tiles.get(tileId);
-		Predictor.getLikelihood(tile);
+		Predictor.getLikelihood(tile,viewport);
 		queue.remove(tile);
 		queue.add(tile);
 	}
@@ -108,16 +108,34 @@ public class Cache {
 		return tileExists(index.hashCode());
 	}
 	
+	public boolean tileContainsFragment(int tileId,int fragmNumber){
+		return this.tiles.get(tileId).containsFragment(fragmNumber);
+	}
 
 	
-	//insert fragment to that tile in cache
-	public void addFragment(Fragment fragm,int tileId){
-		Tile tile = tiles.get(tileId);
+	public void addFragment(Fragment fragm,Point point){
+		Tile tile = tiles.get(point.hashCode());
+		if (tile==null){
+			//add a new empty tile if there is not one already //warning with the pixels
+			this.addTile(new Tile(new Point(point.y,point.x)));
+			tile = tiles.get(point.hashCode());
+		}
 		tile.addFragment(fragm);
 	}
 	
-	public void addFragment(Fragment fragm,Point index){
+	//insert fragment to that tile in cache
+	/*public void addFragment(Fragment fragm,int tileId){
+		Tile tile = tiles.get(tileId);
+		if (tile!=null){
+			tile.addFragment(fragm);
+		}
+		else {
+			tile.addTile(new Tile());
+		}
+	}*/
+	
+	/*public void addFragment(Fragment fragm,Point index){
 		addFragment(fragm,index.hashCode());
-	}
+	}*/
 	
 }

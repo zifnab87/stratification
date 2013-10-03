@@ -26,27 +26,39 @@ public class Database {
 		Point upperLeft = viewport.upperLeft;
 		Point lowerRight = viewport.lowerRight;
 		Vector<Point> vec = new Vector<Point>();
-		Vector<Integer> fragmentNums = new Vector<Integer>();
+
 		for (int y=upperLeft.y-5; y<lowerRight.y+5; y++){
 			for (int x=upperLeft.x-5; x<lowerRight.x+5; x++){
+				if (x<0 || y<0) continue;
+				Vector<Integer> fragmentNums = new Vector<Integer>();
 				Point index = new Point(y,x);
+				index.fragmentNums = fragmentNums;
+				int LOD = Predictor.getLOD(index,viewport);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
+					
+					if (LOD < FRAGMENTS_PER_TILE){
+						for (int fragmNum=1; fragmNum<=LOD; fragmNum++){
+							//if fragment doesn't exist request fetch from database;
+							index.fragmentNums.add(fragmNum);
+						}
+					}
 					vec.add(index);
+
 				}
 				//if tile exists but partial
 				else if(!Main.cache.tileExistsAndNotFull(index)){
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					index.setFragmentNums(fragmentNums);
-					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
-						//if fragment doesn't exist request fetch from database;
-						if (!cachedPartialTile.containsFragment(fragmNum)){
-							index.fragmentNums.add(fragmNum);
+					int oldLOD = cachedPartialTile.getFragmentNumber();
+					if (oldLOD<LOD){
+						for (int fragmNum=oldLOD+1; fragmNum<=LOD; fragmNum++){
+							//if fragment doesn't exist request fetch from database;
+								index.fragmentNums.add(fragmNum);
 						}
 					}
 					vec.add(index);
 				}
-				
 			}
 		}
 		//remove what is in the viewport
@@ -56,10 +68,6 @@ public class Database {
 				vec.remove(index);
 			}
 		}
-		
-		/*for(Tile tile: vec){
-			Main.cache.addTile(tile);
-		}*/
 		return vec;
 	}
 	
@@ -128,6 +136,9 @@ public class Database {
 	
 	public Fragment getFragmentOfTile(int fragmentNumber,int tileId){
 		Tile tile = getTile(tileId);
-		return tile.getFragment(fragmentNumber);
+		if (tile!=null){
+			return tile.getFragment(fragmentNumber);
+		}
+		return null;
 	}
 }

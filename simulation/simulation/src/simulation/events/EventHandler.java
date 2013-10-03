@@ -3,6 +3,8 @@ package simulation.events;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
+import simulation.Main;
+
 public class EventHandler {
 	ConcurrentLinkedQueue<Prefetch> prefetchQueue  = new ConcurrentLinkedQueue<Prefetch>();
 	ConcurrentLinkedQueue<Fetch> fetchQueue  = new ConcurrentLinkedQueue<Fetch>();
@@ -73,9 +75,9 @@ public class EventHandler {
 			}
 		};
 		
+		//-----------
 		
-		
-		Thread tileThread = new Thread() { 
+		Thread fetchTileThread = new Thread() { 
 			public void run() {
 				while(true){
 					try {
@@ -102,6 +104,34 @@ public class EventHandler {
 			}
 		};
 		
+		Thread fetchFragmentedTileThread = new Thread(){
+			public void run() {
+				while(true){
+					try {
+						if (fragmentedTileQueue.size()>0){
+							if (!EventHandler.fetchlock.isLocked()){
+								EventHandler.fetchlock.lock();
+							}
+							fragmentedTileQueue.poll().action();
+							//EventHandler.fetchlock.unlock();
+						}
+						else {
+							if (EventHandler.fetchlock.getHoldCount()!=0 && EventHandler.fetchlock.isLocked()){
+								EventHandler.fetchlock.unlock();
+								
+							}
+						}
+					
+						Thread.sleep(100);
+					} 
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
+		
 		Thread prefetchTileThread = new Thread() { 
 			public void run() {
 				while(true){
@@ -121,13 +151,42 @@ public class EventHandler {
 				}
 			}
 		};
-		tileThread.setPriority(10);
-		prefetchTileThread.setPriority(1);
-		prefetchThread.start();
+		
+		Thread prefetchFragmentedTileThread = new Thread() { 
+			public void run() {
+				while(true){
+					try {
+						
+						if (!EventHandler.fetchlock.isLocked()){
+							if (prefetchFragmentedTileQueue.size()>0){
+								prefetchFragmentedTileQueue.poll().action();
+						
+							}
+						}
+						Thread.sleep(100);
+					} 
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
+		
+		fetchTileThread.setPriority(10);
+		fetchFragmentedTileThread.setPriority(9);
+		prefetchTileThread.setPriority(2);
+		prefetchFragmentedTileThread.setPriority(1);
+		
+		
+		
 		fetchThread.start();
-		tileThread.start();
+		prefetchThread.start();
+		
+		fetchTileThread.start();
+		fetchFragmentedTileThread.start();
 		prefetchTileThread.start();
-		   
+		prefetchFragmentedTileThread.start();
 		   
 		   
 		   
@@ -149,19 +208,34 @@ public class EventHandler {
     }
     
     public void handle(final TileFetch event) throws Exception{
-    	tileQueue.add(event);
+    	
+    	if (!Main.cache.tileExists(event.pointToFetch)){
+    		tileQueue.add(event);
+    	}
+    	else {
+    		
+    	}
     }
     
     public void handle(final TilePrefetch event) throws Exception{
-    	prefetchTileQueue.add(event);
+    	if (!prefetchTileQueue.contains(event)){
+    		prefetchTileQueue.add(event);
+    		
+    	}
+    	else {
+    	}
     }
     
     public void handle(final FragmentedTileFetch event){
-    	fragmentedTileQueue.add(event);
+    	if (!fragmentedTileQueue.contains(event)){
+    		fragmentedTileQueue.add(event);
+    	}
     }
     
     public void handle(final FragmentedTilePrefetch event){
-    	prefetchFragmentedTileQueue.add(event);
+    	if (!prefetchFragmentedTileQueue.contains(event)){
+    		prefetchFragmentedTileQueue.add(event);
+    	}
     }
     
     

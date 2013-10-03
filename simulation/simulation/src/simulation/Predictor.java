@@ -14,23 +14,15 @@ public class Predictor {
 	public static Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
 	
 	
-	public static double getLikelihood(Tile tile){
-		double tileStaticLikelihood = getLikelihood(tile.point);
-		//double distance = distance(tile);
-		// 40% static likelihood
-		// 60% distance
-		// min of (max_distance - distance)/max_distance and 0
-		//return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
-		return tileStaticLikelihood;
-	}
+
 
 	
 	public static double distance(Point a, Point b){
 		double dist = Math.sqrt(Math.pow(a.y-b.y,2)+Math.pow(a.x-b.x,2));
 		return Math.floor(dist);
 	}
-	public static double distance(Tile tile){
-		Point currentCenterIndex = Main.viewport.center;
+	public static double distance(Tile tile,Viewport viewport){
+		Point currentCenterIndex = viewport.center;
 		Point tileIndex = tile.point;
 		return distance(currentCenterIndex,tileIndex);
 	}
@@ -40,21 +32,46 @@ public class Predictor {
 		Predictor.spiralTrain(db);
 	}
 	
-	
-	public static double getLikelihood(Point index){
-		return getLikelihood(index.hashCode());
+	public static double getLikelihood(Tile tile,Viewport viewport){
+		double tileStaticLikelihood = getLikelihood(tile.point,viewport);
+		//double distance = distance(tile);
+		// 40% static likelihood
+		// 60% distance
+		// min of (max_distance - distance + viewport_width )/max_distance and 0
+		//return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
+		return tileStaticLikelihood;
 	}
 	
-	public static double getLikelihood(int index){
-		return likelihoods.get(index);
+	public static double getLikelihood(int y,int x,Viewport viewport){
+		return Predictor.getLikelihood(new Point(y,x),viewport);
+	}
+	//CURRENT Viewport to determine the distance
+	public static double getLikelihood(Point index,Viewport viewport){
+		if (!viewport.contains(index)){
+			return Predictor.getLikelihood(index.hashCode(),viewport);
+		}
+		else {
+			return 1.0d;
+		}
 	}
 	
-	public static int getLOD(Point index){
-		return getLOD(index.hashCode());
+	private static double getLikelihood(int index,Viewport viewport){
+		Double likelihood = Predictor.likelihoods.get(index);
+		if (likelihood!=null){
+			return Predictor.likelihoods.get(index);
+		}
+		else {
+			return 0.0d;
+		}
+		
 	}
 	
-	public static int getLOD(int index){
-		return Predictor.likelihoodToLOD(likelihoods.get(index));
+	public static int getLOD(Point index,Viewport viewport){
+		return Predictor.getLOD(index.hashCode(),viewport);
+	}
+	
+	public static int getLOD(int index,Viewport viewport){
+		return Predictor.likelihoodToLOD(Predictor.getLikelihood(index,viewport));
 	}
 	
 	
@@ -77,7 +94,7 @@ public class Predictor {
 				lod++;
 			}
 		}
-		return Math.max(lod,FRAGMENTS_PER_TILE);
+		return Math.min(lod,FRAGMENTS_PER_TILE-1);
 	}
 	
 	private static float[] lodIntervals(int fragments){

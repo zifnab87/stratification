@@ -8,6 +8,7 @@ import static simulation.Config.TILE_HEIGHT;
 import static simulation.Config.COLORS;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.FRAGMENT_SIZE;
+import static simulation.Config.DATABASE_WIDTH;
 
 public class Tile {
 
@@ -39,6 +40,10 @@ public class Tile {
 		this.id = this.point.hashCode();
 	}
 	
+	public void setPixels(byte[][][] pixels){
+		this.pixels = pixels;
+	}
+	
 	public Tile(Point point, byte[][][] pixels){
 		
 		this.pixels = pixels;
@@ -55,12 +60,13 @@ public class Tile {
 	public static Tile randomizer(){
 		//int tileId = Tile.tileIdCounter++;
 		
-		if ((colCounter)%25 == 0 && colCounter!=0){
+		if ((colCounter)%DATABASE_WIDTH == 0 && colCounter!=0){
 			rowCounter++;
 			colCounter=0;
 		}
 
 		byte[][][] pixels = new byte[TILE_HEIGHT][TILE_WIDTH][COLORS];
+		Tile toReturn = new Tile(new Point(rowCounter,colCounter++));
 		for (int i=0; i<FRAGMENTS_PER_TILE; i++){ //8
 			Fragment fragm = Fragment.randomizer(i);
 			int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
@@ -69,8 +75,11 @@ public class Tile {
 				int x = pixelIndexesOfFragment[j] / TILE_WIDTH;
 				pixels[y][x] = fragm.getPixel(j);
 			}
+			toReturn.addFragment(fragm);
+			
 		}
-		return new Tile(new Point(rowCounter,colCounter++),pixels);
+		toReturn.setPixels(pixels);
+		return toReturn;
 	}
 	
 	public void addFragment(Fragment fragm){

@@ -8,17 +8,22 @@ import simulation.Viewport;
 
 public class UserMove extends Event {
 	Point  upperLeft;
+	public Viewport newMove;
 	
 	public UserMove(Point upperLeft){
 		this.upperLeft = upperLeft;
+		this.newMove = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH, upperLeft);
 	}
 	
 	public void action() throws Exception{
 		System.out.println("UserMove Event");
-		Viewport newMove = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH, upperLeft);
-		Main.db.setViewport(newMove);
-		this.sendEvent(new Fetch(newMove));
-		this.sendEvent(new Prefetch(newMove));
+		
+		Main.cache.updateAllTilesLOD(this.newMove);
+		this.sendEvent(new Fetch(this.newMove));
+		this.sendEvent(new Prefetch(this.newMove));
+		
+		//Main.db.setViewport(newMove);
+		
 	}
 	
 }

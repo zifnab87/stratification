@@ -18,6 +18,19 @@ public class Point {
 		this.fragmentNums = fragmentNums;
 	}
 	
+	public String toString(){
+		return "("+y+","+x+")";
+	}
+	
+	public boolean equals(Object o){
+		if (this.hashCode()==((Point)o).hashCode()){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	
 	
 }

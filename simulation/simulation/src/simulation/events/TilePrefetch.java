@@ -12,14 +12,21 @@ public class TilePrefetch extends Event {
 	}
 	@Override
 	public void action() throws Exception {
-		System.out.println("TilePrefetch Event");
+		System.out.println(this);
 		Tile tile = Main.db.getTile(this.pointToPrefetch);
-		
-		//tile cache
-		if (tile!=null){
+		if (tile == null){
+			tile = Main.db.getTile(this.pointToPrefetch);
 			Main.cache.addTile(tile);
 		}
+		else {
+			System.out.println("Tile cached! (Prefetch)");
+		}
 
+	}
+	
+	public String toString(){
+		return "Tile PreFetch Event for point"+this.pointToPrefetch.toString();
+		
 	}
 
 }
