@@ -8,6 +8,7 @@ import java.util.Set;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.PREFETCH_DISTANCE;
+import static simulation.Config.PROBABILITY_CUTOFF;
 public class Predictor {
 	
 	public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
@@ -15,7 +16,13 @@ public class Predictor {
 	
 	
 
-
+	public static double distance(Viewport viewport, Point p){
+		double distanceUpperLeft = distance(viewport.upperLeft,p);
+		double distanceUpperRight = distance(viewport.upperRight,p);
+		double distanceLowerLeft = distance(viewport.lowerLeft,p);
+		double distanceLowerRight = distance(viewport.lowerRight,p);
+		return Math.min(Math.min(distanceUpperLeft,distanceUpperRight),Math.min(distanceLowerLeft,distanceLowerRight));
+	}
 	
 	public static double distance(Point a, Point b){
 		double dist = Math.sqrt(Math.pow(a.y-b.y,2)+Math.pow(a.x-b.x,2));
@@ -32,17 +39,102 @@ public class Predictor {
 		Predictor.spiralTrain(db);
 	}
 	
-	public static double getLikelihood(Tile tile,Viewport viewport){
+	
+	
+	
+	
+	/*public static double getLikelihood(Tile tile,Viewport viewport){
 		double tileStaticLikelihood = getLikelihood(tile.point,viewport);
 		//double distance = distance(tile);
 		// 40% static likelihood
 		// 60% distance
-		// min of (max_distance - distance + viewport_width )/max_distance and 0
+		// min of (max_distance - distance - viewport_width/2 )/max_distance and 0
 		//return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
 		return tileStaticLikelihood;
+	}*/
+	
+	
+	public static double calculateLikelihood(Point index,Viewport viewport){
+		String horizontal = null;
+		String vertical = null;
+		if (index.y < viewport.upperLeft.y){
+			vertical="u";
+		}
+		else if(index.y >= viewport.upperLeft.y && index.y <= viewport.lowerLeft.y){
+			vertical="c";
+		}
+		else {
+			vertical="b";
+		}
+		
+		if (index.x < viewport.upperLeft.x){
+			horizontal = "l";
+		}
+		else if( index.x >= viewport.upperLeft.x && index.x <= viewport.upperRight.x){
+			horizontal = "c";
+		}
+		else {
+			horizontal = "r";
+		}
+		
+		String position = vertical + horizontal;
+		double probability = 0.0d;
+		if (position.equals("cc")){
+			return 1.0d;
+		}
+		
+		if (position.equals("ul")){
+			probability = 0.1d;
+		}
+		else if(position.equals("uc")){
+			probability = 0.1d;
+		}
+		else if(position.equals("ur")){
+			probability = 0.2d;
+		}
+		else if(position.equals("cl")){
+			probability = 0.1d;
+		}
+		else if(position.equals("cr")){
+			probability = 0.3d;
+		}
+		else if(position.equals("bl")){
+			probability = 0.3d;
+		}
+		else if(position.equals("bc")){
+			probability = 0.5d;
+		}
+		else if(position.equals("br")){
+			probability = 0.4d;
+		}
+		
+		
+		double distance = distance(viewport, index);
+		
+		return (4*probability + 6*Math.min((PROBABILITY_CUTOFF-distance)/PROBABILITY_CUTOFF,0d))/10d;
+		
+		
 	}
 	
-	public static double getLikelihood(int y,int x,Viewport viewport){
+	
+	public Viewport nextMove(Viewport viewport){
+		double random = Math.random();
+		if (random<=0.25d){
+			return viewport.goUp();
+		}
+		else if (random>0.25d && random<=0.50d){
+			return viewport.goDown();
+		}
+		else if (random>0.50d && random<=0.75d){
+			return viewport.goLeft();
+		}
+		else {
+			return viewport.goRight();
+		}
+	}
+	
+	
+	/*public static double getLikelihood(int y,int x,Viewport viewport){
 		return Predictor.getLikelihood(new Point(y,x),viewport);
 	}
 	//CURRENT Viewport to determine the distance
@@ -64,14 +156,11 @@ public class Predictor {
 			return 0.0d;
 		}
 		
-	}
+	}*/
+	
 	
 	public static int getLOD(Point index,Viewport viewport){
-		return Predictor.getLOD(index.hashCode(),viewport);
-	}
-	
-	public static int getLOD(int index,Viewport viewport){
-		return Predictor.likelihoodToLOD(Predictor.getLikelihood(index,viewport));
+		return Predictor.likelihoodToLOD(Predictor.calculateLikelihood(index,viewport));
 	}
 	
 	

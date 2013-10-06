@@ -29,7 +29,7 @@ public class Cache {
 	
 	public void updateTileLODwithId(int tileId,Viewport viewport){
 		Tile tile = tiles.get(tileId);
-		Predictor.getLikelihood(tile,viewport);
+		Predictor.calculateLikelihood(tile.point,viewport);
 		queue.remove(tile);
 		queue.add(tile);
 	}

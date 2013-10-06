@@ -1,4 +1,5 @@
 package simulation;
+import static simulation.Config.DATABASE_WIDTH;
 
 public class Viewport {
 	public int width;
@@ -50,4 +51,28 @@ public class Viewport {
 		else
 			return false;
 	}	
+	
+	
+	public Viewport goLeft(){
+		Point newUpperLeft = new Point(this.upperLeft.y,Math.min(this.upperLeft.x-1,0));
+		return new Viewport(this.height,this.width,newUpperLeft);
+	}
+	
+	public Viewport goRight(){
+		Point newUpperLeft = new Point(this.upperLeft.y,Math.max(this.upperLeft.x+1,DATABASE_WIDTH));
+		return new Viewport(this.height,this.width,newUpperLeft);
+	}
+	
+	public Viewport goDown(){
+		Point newUpperLeft = new Point(Math.max(this.upperLeft.y+1,DATABASE_WIDTH),this.upperLeft.x);
+		return new Viewport(this.height,this.width,newUpperLeft);
+	}
+
+	public Viewport goUp(){
+		Point newUpperLeft = new Point(Math.min(this.upperLeft.y-1,0),this.upperLeft.x);
+		return new Viewport(this.height,this.width,newUpperLeft);
+	}
+	
+	
+
 }

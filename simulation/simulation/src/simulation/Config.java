@@ -21,6 +21,7 @@ public class Config {
 	
 	//PREDICTOR
 	public static int PREFETCH_DISTANCE = 10;  
+	public static int PROBABILITY_CUTOFF = 20;
 	
 	
 	
