@@ -18,7 +18,9 @@ public class TileFetch extends Event {
 		if (tile == null){
 			tile = Main.db.getTile(this.pointToFetch);
 			System.out.println(this);
-			Main.cache.addTile(tile);
+			if (tile!=null){
+				Main.cache.addTile(tile);
+			}
 		}
 		else {
 			System.out.println("Tile cached! (Fetch)");

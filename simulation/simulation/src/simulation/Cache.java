@@ -19,7 +19,7 @@ public class Cache {
 		updateTileLODwithId(index.hashCode(),viewport);
 	}
 	
-	public void updateAllTilesLOD(Viewport viewport){
+	public synchronized void updateAllTilesLOD(Viewport viewport){
 		Set<Integer> tileIds = tiles.keySet();
 		for(Integer tileId : tileIds){
 			updateTileLODwithId(tileId,viewport);

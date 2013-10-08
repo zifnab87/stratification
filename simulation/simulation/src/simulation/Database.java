@@ -40,7 +40,9 @@ public class Database {
 					if (LOD < FRAGMENTS_PER_TILE){
 						for (int fragmNum=1; fragmNum<=LOD; fragmNum++){
 							//if fragment doesn't exist request fetch from database;
-							index.fragmentNums.add(fragmNum);
+							if(!index.fragmentNums.contains(fragmNum)){
+								index.fragmentNums.add(fragmNum);
+							}
 						}
 					}
 					vec.add(index);
@@ -54,7 +56,9 @@ public class Database {
 					if (oldLOD<LOD){
 						for (int fragmNum=oldLOD+1; fragmNum<=LOD; fragmNum++){
 							//if fragment doesn't exist request fetch from database;
+							if(!index.fragmentNums.contains(fragmNum)){
 								index.fragmentNums.add(fragmNum);
+							}
 						}
 					}
 					vec.add(index);
@@ -90,7 +94,10 @@ public class Database {
 					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
 						//if fragment doesn't exist request fetch from database;
 						if (!cachedPartialTile.containsFragment(fragmNum)){
-							index.fragmentNums.add(fragmNum);
+							//and not already in there
+							if (index.fragmentNums.contains(fragmNum)){
+								index.fragmentNums.add(fragmNum);
+							}
 						}
 					}
 					vec.add(index);
@@ -126,6 +133,7 @@ public class Database {
 	
 	public Tile getTile(int tileId){
 		Tile tile = tiles.get(tileId);
+		
 		return tile;		
 	}
 	

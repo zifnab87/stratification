@@ -3,8 +3,8 @@ package simulation;
 public class Config {
 	
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 100;//625;
-	public static final int DATABASE_WIDTH = 10;//25;
+	public static final int DATABASE_TILES_NUM = 625;//625;
+	public static final int DATABASE_WIDTH = 25;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(0,0);
 	public static final int VIEWPORT_HEIGHT = 3;
@@ -24,15 +24,15 @@ public class Config {
 	public static int PROBABILITY_CUTOFF = 20;
 	
 	
+	public final static double SIMULATION_FACTOR= 1000d;
+	public final static int RENDER_TIME = (int) Math.ceil(10 / SIMULATION_FACTOR);
+	public final static int DATABASE_TILE_FETCH_TIME = (int) Math.ceil(3300 / SIMULATION_FACTOR);
+	public final static int DATABASE_FRAGMENT_FETCH_TIME = (int) Math.ceil(475 / SIMULATION_FACTOR); 
+	public final static int NETWORK_TIME_FETCH_TIME = (int) Math.ceil(2000 / SIMULATION_FACTOR);
 	
-	public final static int RENDER_TIME = 10;
-	public final static int DATABASE_TILE_FETCH_TIME = 3300;
-	public final static int DATABASE_FRAGMENT_FETCH_TIME = 475; 
-	public final static int NETWORK_TIME_FETCH_TIME = 2000;
-	
-	public final static int NETWORK_FRAGMENT_FETCH_TIME = 300;
+	public final static int NETWORK_FRAGMENT_FETCH_TIME = (int) Math.ceil(300 / SIMULATION_FACTOR);
 
-	public final static int USER_MOVEMENT_TIME = 2000;
+	public final static int USER_MOVEMENT_TIME = (int) Math.ceil(2000 /SIMULATION_FACTOR);
 	
 	public final static long SEED = 3l;
 	

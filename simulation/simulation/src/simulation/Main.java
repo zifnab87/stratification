@@ -23,7 +23,10 @@ public class Main {
 	
 	public static void main(String args[]) throws Exception{
 		
-		
+		int a = 476;
+		double b = 476d / 1000;
+		int c = (int) Math.ceil(b);
+		System.out.println(c);
 		
 		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);

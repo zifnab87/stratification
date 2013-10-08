@@ -111,7 +111,7 @@ public class Predictor {
 		
 		double distance = distance(viewport, index);
 		
-		return (4*probability + 6*Math.min((PROBABILITY_CUTOFF-distance)/PROBABILITY_CUTOFF,0d))/10d;
+		return (3*probability + 7*Math.min((PROBABILITY_CUTOFF-distance+1)/PROBABILITY_CUTOFF,0d))/10d;
 		
 		
 	}
