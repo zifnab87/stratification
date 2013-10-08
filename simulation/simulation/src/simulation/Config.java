@@ -26,10 +26,14 @@ public class Config {
 	
 	
 	public final static int RENDER_TIME = 10;
-	public final static int DATABASE_FETCH_TIME = 3000;
-	public final static int NETWORK_FETCH_TIME = 6000;
+	public final static int DATABASE_TILE_FETCH_TIME = 3300;
+	public final static int DATABASE_FRAGMENT_FETCH_TIME = 475; 
+	public final static int NETWORK_TIME_FETCH_TIME = 2000;
+	
+	public final static int NETWORK_FRAGMENT_FETCH_TIME = 300;
 
-
+	public final static int USER_MOVEMENT_TIME = 2000;
 	
 	public final static long SEED = 3l;
+	
 }

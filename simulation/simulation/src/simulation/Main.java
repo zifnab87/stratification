@@ -4,6 +4,7 @@ import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
+import static simulation.Config.USER_MOVEMENT_TIME;
 import simulation.events.EventHandler;
 import simulation.events.UserMove;
 
@@ -28,12 +29,27 @@ public class Main {
 		db.init(DATABASE_TILES_NUM);
 		Predictor.trainDatabase(db);
 		//System.out.println("usermove");
-		for (int i=0; i<4; i++){
-			UserMove usermove = new UserMove(new Point(0,i));
-			Viewport previous = next;
-			Viewport next = usermove.newMove;
-			usermove.action();
-		}
+		
+		Thread userMovevent = new Thread() { 
+					
+			public void run() {
+				for (int i=0; i<10; i++){
+					UserMove usermove = new UserMove(new Point(0,i));
+					Viewport previous = next;
+					Viewport next = usermove.newMove;
+					try {
+						usermove.action();
+						Thread.sleep(USER_MOVEMENT_TIME);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}
+		};
+		userMovevent.run();
+		
 		
 		//db.viewportFetch();
 		

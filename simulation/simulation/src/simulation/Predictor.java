@@ -119,17 +119,17 @@ public class Predictor {
 	
 	public Viewport nextMove(Viewport viewport){
 		double random = Math.random();
-		if (random<=0.25d){
+		if (random<=0.1d){
 			return viewport.goUp();
 		}
-		else if (random>0.25d && random<=0.50d){
+		else if (random>0.1d && random<=0.4d){
+			return viewport.goRight();
+		}
+		else if (random>0.40d && random<=0.9d){
 			return viewport.goDown();
 		}
-		else if (random>0.50d && random<=0.75d){
-			return viewport.goLeft();
-		}
 		else {
-			return viewport.goRight();
+			return viewport.goLeft();
 		}
 	}
 	

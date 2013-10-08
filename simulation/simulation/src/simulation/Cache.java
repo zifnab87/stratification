@@ -120,7 +120,9 @@ public class Cache {
 			this.addTile(new Tile(new Point(point.y,point.x)));
 			tile = tiles.get(point.hashCode());
 		}
-		tile.addFragment(fragm);
+		if (tile!=null && fragm!=null){
+			tile.addFragment(fragm);
+		}
 	}
 	
 	//insert fragment to that tile in cache

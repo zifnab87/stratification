@@ -31,7 +31,7 @@ public class FragmentedTilePrefetch extends Event {
 					Main.cache.addFragment(fragment, this.fragmentedPointToPrefetch);
 				}
 				else {
-					System.out.println("Point out of db");
+					System.out.println("Point out of bound of db");
 				}
 			}
 			else {
