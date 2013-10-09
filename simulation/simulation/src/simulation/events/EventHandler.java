@@ -1,5 +1,6 @@
 package simulation.events;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,13 +19,17 @@ public class EventHandler {
 	public final static ReentrantLock fetchlock = new ReentrantLock();
 	public final static ReentrantLock prefetchLock = new ReentrantLock();
 	
+	public volatile boolean stopAll = false;
+	
+	ArrayList<Thread> threads = new ArrayList<Thread>();
+	
 	public EventHandler(){
 		
 		
 		Thread fetchThread = new Thread() { 
 			
 			public void run() {
-				while(true){
+				while(!stopAll){
 					if (fetchQueue.size()>0){
 						try {
 								//EventHandler.lock.lock();
@@ -47,11 +52,13 @@ public class EventHandler {
 				}
 			}
 		};
+		threads.add(fetchThread);
+		
 		
 		Thread prefetchThread = new Thread() { 
 			
 			public void run() {
-				while(true){
+				while(!stopAll){
 					if (prefetchQueue.size()>0){
 						try {
 								//EventHandler.lock.lock();
@@ -74,12 +81,12 @@ public class EventHandler {
 				}
 			}
 		};
-		
+		threads.add(prefetchThread);
 		//-----------
 		
 		Thread fetchTileThread = new Thread() { 
 			public void run() {
-				while(true){
+				while(!stopAll){
 					try {
 						if (tileQueue.size()>0){
 							if (!EventHandler.fetchlock.isLocked()){
@@ -103,6 +110,7 @@ public class EventHandler {
 				}
 			}
 		};
+		threads.add(fetchTileThread);
 		
 		Thread fetchFragmentedTileThread = new Thread(){
 			public void run() {
@@ -130,7 +138,7 @@ public class EventHandler {
 				}
 			}
 		};
-		
+		threads.add(fetchFragmentedTileThread);
 		
 		Thread prefetchTileThread = new Thread() { 
 			public void run() {
@@ -152,6 +160,8 @@ public class EventHandler {
 			}
 		};
 		
+		threads.add(prefetchTileThread);
+		
 		Thread prefetchFragmentedTileThread = new Thread() { 
 			public void run() {
 				while(true){
@@ -171,7 +181,7 @@ public class EventHandler {
 				}
 			}
 		};
-		
+		threads.add(prefetchFragmentedTileThread);
 		
 		fetchTileThread.setPriority(10);
 		fetchFragmentedTileThread.setPriority(9);
@@ -236,6 +246,11 @@ public class EventHandler {
     	if (!prefetchFragmentedTileQueue.contains(event)){
     		prefetchFragmentedTileQueue.add(event);
     	}
+    }
+    
+    public void handle(final StopAll event){
+    	stopAll = true;
+    	System.exit(0);
     }
     
     

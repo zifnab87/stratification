@@ -3,7 +3,10 @@ package simulation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+
+import simulation.monitor.Monitor;
 import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.PREFETCH_DISTANCE;
 
 public class Database {
 	
@@ -27,7 +30,7 @@ public class Database {
 		Point lowerRight = viewport.lowerRight;
 		Vector<Point> vec = new Vector<Point>();
 
-		for (int y=upperLeft.y-5; y<lowerRight.y+5; y++){
+		for (int y=upperLeft.y-PREFETCH_DISTANCE; y<lowerRight.y+PREFETCH_DISTANCE; y++){
 			for (int x=upperLeft.x-5; x<lowerRight.x+5; x++){
 				if (x<0 || y<0) continue;
 				Vector<Integer> fragmentNums = new Vector<Integer>();
@@ -122,8 +125,8 @@ public class Database {
 		tiles.put(tile.id, tile);
 	}
 	
-	public boolean tileExists(int tileId){
-		return tiles.containsKey(tileId);
+	public boolean tileExists(Point index){
+		return tiles.containsKey(index.hashCode());
 	}
 	
 	public Tile getTile(Point index){
@@ -131,22 +134,30 @@ public class Database {
 		return tile;		
 	}
 	
-	public Tile getTile(int tileId){
+	/*public Tile getTile(int tileId){
 		Tile tile = tiles.get(tileId);
-		
 		return tile;		
-	}
+	}*/
+	
+	
 	
 	public Fragment getFragmentOfTile(int fragmentNumber,Point index){
+		if (tileExists(index)){
+			Tile tile = getTile(index);
 		
-		return getFragmentOfTile(fragmentNumber,index.hashCode());
+			return tile.getFragment(fragmentNumber);
+		}
+		else {
+			System.out.println("tile Doesn't exist for fragment");
+			return null;
+		}
 	}
 	
-	public Fragment getFragmentOfTile(int fragmentNumber,int tileId){
+	/*public Fragment getFragmentOfTile(int fragmentNumber,int tileId){
 		Tile tile = getTile(tileId);
 		if (tile!=null){
 			return tile.getFragment(fragmentNumber);
 		}
 		return null;
-	}
+	}*/
 }

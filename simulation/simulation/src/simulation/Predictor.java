@@ -117,7 +117,7 @@ public class Predictor {
 	}
 	
 	
-	public Viewport nextMove(Viewport viewport){
+	public static Viewport nextMove(Viewport viewport){
 		double random = Math.random();
 		if (random<=0.1d){
 			return viewport.goUp();

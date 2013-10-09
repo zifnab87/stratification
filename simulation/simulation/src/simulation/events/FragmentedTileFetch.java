@@ -6,6 +6,7 @@ import simulation.Fragment;
 import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
+import simulation.monitor.Monitor;
 
 public class FragmentedTileFetch extends Event {
 
@@ -18,6 +19,7 @@ public class FragmentedTileFetch extends Event {
 	@Override
 	public void action() {
 		Vector<Integer> fragmentNums = this.fragmentedPointToFetch.fragmentNums;
+		
 		for ( int fragmentNum: fragmentNums){
 			//TODO replace with Main.cache.getFragmentOfTile( )
 			Tile tile = Main.cache.getTile(this.fragmentedPointToFetch);
@@ -28,10 +30,11 @@ public class FragmentedTileFetch extends Event {
 			if (fragment==null ){
 				System.out.println(this+" ("+fragmentNum+")");
 				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToFetch);
-				
+				Monitor.databaseFragmentFetch();
 				Main.cache.addFragment(fragment, this.fragmentedPointToFetch);
 			}
 			else {
+				Monitor.cacheFragmentFetch();
 				System.out.println("Fragment cached! (Fetch)");
 			}
 			

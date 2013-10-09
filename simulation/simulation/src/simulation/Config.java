@@ -20,11 +20,11 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static int PREFETCH_DISTANCE = 10;  
+	public static int PREFETCH_DISTANCE = 1;  
 	public static int PROBABILITY_CUTOFF = 20;
 	
 	
-	public final static double SIMULATION_FACTOR= 1000d;
+	public final static double SIMULATION_FACTOR = 1000d;
 	public final static int RENDER_TIME = (int) Math.ceil(10 / SIMULATION_FACTOR);
 	public final static int DATABASE_TILE_FETCH_TIME = (int) Math.ceil(3300 / SIMULATION_FACTOR);
 	public final static int DATABASE_FRAGMENT_FETCH_TIME = (int) Math.ceil(475 / SIMULATION_FACTOR); 

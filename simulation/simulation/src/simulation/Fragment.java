@@ -44,11 +44,11 @@ public class Fragment {
 	
 	public static Fragment randomizer(int fragmentNumber){
 		byte[][] pixels = new byte[FRAGMENT_SIZE][COLORS];
-		for (int i=0; i<FRAGMENT_SIZE; i++){
+		/*for (int i=0; i<FRAGMENT_SIZE; i++){
 			for (int c=0; c<COLORS; c++){
 				pixels[i][c] = (byte) random.nextInt(255);
 			}
-		}
+		}*/
 		return new Fragment(fragmentNumber,pixels);
 	}
 	

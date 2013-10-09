@@ -5,8 +5,11 @@ import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.USER_MOVEMENT_TIME;
+import simulation.events.Event;
 import simulation.events.EventHandler;
+import simulation.events.StopAll;
 import simulation.events.UserMove;
+import simulation.monitor.Monitor;
 
 import java.lang.reflect.Method;
 
@@ -33,34 +36,51 @@ public class Main {
 		Predictor.trainDatabase(db);
 		//System.out.println("usermove");
 		
+		
+		
+		
 		Thread userMovevent = new Thread() { 
 					
 			public void run() {
-				for (int i=0; i<10; i++){
-					UserMove usermove = new UserMove(new Point(0,i));
-					Viewport previous = next;
-					Viewport next = usermove.newMove;
+				UserMove userMove = new UserMove(new Point(0,0));
+				Viewport viewport = userMove.newMove;
+				try {
+					userMove.action();
+					//userMove.eventHandler.interruptAllThreads();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				/*for (int i=0; i<; i++){
+					viewport = Predictor.nextMove(viewport);
+					userMove = new UserMove(viewport);
 					try {
-						usermove.action();
+						userMove.action();
 						Thread.sleep(USER_MOVEMENT_TIME);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-				}
+					this.suspend();
+				}*/
+				
 			}
 		};
 		userMovevent.run();
+		
+		
+	
+		Thread.sleep(8000);
+		System.out.println("TELOS");
+		Event.sendEvent(new StopAll());
 		
 		
 		//db.viewportFetch();
 		
 		
 		
-		
-		System.out.println(cache.tiles.size());
-		System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
+		//System.out.println(cache.tiles.size());
+		//System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
 		//System.out.println("init done");
 		//System.out.println(Predictor.likelihoodToLOD(1.0d));
 

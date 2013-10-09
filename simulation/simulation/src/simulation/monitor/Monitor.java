@@ -9,7 +9,17 @@ public class Monitor {
 	public static int cacheTileFetchCount = 0;
 	public static int cacheFragmentFetchCount = 0;
 	
-	public synchronized void databaseTileFetch(){
+	public static void display(){
+		System.out.println("tileCount "+ tileCount);
+		System.out.println("fragmentCount "+ fragmentCount);
+		System.out.println("databaseTileFetchCount "+datbaseTileFetchCount);
+		System.out.println("databaseFragmentFetchCount "+databaseFragmentFetchCount);
+		System.out.println("cacheTileFetchCount "+cacheTileFetchCount);
+		System.out.println("cacheFragmentFetchCount "+cacheFragmentFetchCount);
+	}
+	
+	
+	public static synchronized void databaseTileFetch(){
 		try {
 			Thread.sleep(simulation.Config.DATABASE_TILE_FETCH_TIME);
 			datbaseTileFetchCount++;
@@ -20,7 +30,11 @@ public class Monitor {
 		}
 	}
 	
-	public synchronized void databaseFragmentFetch(){
+	public static synchronized void databaseTilePrefetch(){
+		databaseTileFetch();
+	}
+	
+	public static synchronized void databaseFragmentFetch(){
 		try {
 			Thread.sleep(simulation.Config.DATABASE_FRAGMENT_FETCH_TIME);
 			databaseFragmentFetchCount++;
@@ -31,12 +45,16 @@ public class Monitor {
 		}
 	}
 	
-	public synchronized void cacheTileFetch(){
+	public static synchronized void databaseFragmentPrefetch(){
+		databaseFragmentFetch();
+	}
+	
+	public static synchronized void cacheTileFetch(){
 		cacheTileFetchCount++;
 		tileCount++;
 	}
 	
-	public synchronized void cacheFragmentFetch(){
+	public static synchronized void cacheFragmentFetch(){
 		cacheFragmentFetchCount++;
 		fragmentCount++;
 	}

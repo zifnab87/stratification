@@ -3,6 +3,7 @@ package simulation.events;
 import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
+import simulation.monitor.Monitor;
 
 public class TilePrefetch extends Event {
 
@@ -17,8 +18,10 @@ public class TilePrefetch extends Event {
 		if (tile == null){
 			tile = Main.db.getTile(this.pointToPrefetch);
 			Main.cache.addTile(tile);
+			Monitor.databaseTileFetch();
 		}
 		else {
+			Monitor.cacheTileFetch();
 			System.out.println("Tile cached! (Prefetch)");
 		}
 

@@ -70,11 +70,11 @@ public class Tile {
 		for (int i=0; i<FRAGMENTS_PER_TILE; i++){ //8
 			Fragment fragm = Fragment.randomizer(i);
 			int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
-			for (int j=0; j<FRAGMENT_SIZE; j++){ 
+			/*for (int j=0; j<FRAGMENT_SIZE; j++){ 
 				int y = pixelIndexesOfFragment[j] % TILE_WIDTH;
 				int x = pixelIndexesOfFragment[j] / TILE_WIDTH;
 				pixels[y][x] = fragm.getPixel(j);
-			}
+			}*/
 			toReturn.addFragment(fragm);
 			
 		}

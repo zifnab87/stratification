@@ -15,6 +15,11 @@ public class UserMove extends Event {
 		this.newMove = new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH, upperLeft);
 	}
 	
+	public UserMove(Viewport viewport){
+		this.upperLeft = viewport.upperLeft;
+		this.newMove = viewport;
+	}
+	
 	public void action() throws Exception{
 		System.out.println("UserMove Event");
 		

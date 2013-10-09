@@ -6,6 +6,7 @@ import simulation.Fragment;
 import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
+import simulation.monitor.Monitor;
 
 public class FragmentedTilePrefetch extends Event {
 
@@ -27,6 +28,7 @@ public class FragmentedTilePrefetch extends Event {
 				System.out.println(this+" ("+fragmentNum+")");
 				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToPrefetch);
 				//if fragment is in the database (e.g not out of viewport)
+				Monitor.databaseFragmentFetch();
 				if (fragment!=null){
 					Main.cache.addFragment(fragment, this.fragmentedPointToPrefetch);
 				}
@@ -35,6 +37,7 @@ public class FragmentedTilePrefetch extends Event {
 				}
 			}
 			else {
+				Monitor.cacheFragmentFetch();
 				System.out.println("Fragment cached! (Prefetch)");
 			}
 			
