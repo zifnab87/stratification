@@ -5,6 +5,7 @@ import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.USER_MOVEMENT_TIME;
+import static simulation.Config.EXPERIMENT_TIME;
 import simulation.events.Event;
 import simulation.events.EventHandler;
 import simulation.events.StopAll;
@@ -12,6 +13,7 @@ import simulation.events.UserMove;
 import simulation.monitor.Monitor;
 
 import java.lang.reflect.Method;
+import java.sql.Time;
 
 
 public class Main {
@@ -26,34 +28,25 @@ public class Main {
 	
 	public static void main(String args[]) throws Exception{
 		
-		int a = 476;
-		double b = 476d / 1000;
-		int c = (int) Math.ceil(b);
-		System.out.println(c);
-		
 		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
-		Predictor.trainDatabase(db);
+		//Predictor.trainDatabase(db);
 		//System.out.println("usermove");
 		
 		
 		
 		
 		Thread userMovevent = new Thread() { 
-					
+				double start = System.nanoTime() / 1000000000d;
 			public void run() {
 				UserMove userMove = new UserMove(new Point(0,0));
 				Viewport viewport = userMove.newMove;
-				try {
-					userMove.action();
-					//userMove.eventHandler.interruptAllThreads();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				/*for (int i=0; i<; i++){
+				double diff = 0;
+				while (diff < EXPERIMENT_TIME){
+					diff = System.nanoTime()/ 1000000000d - start;
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
+					
 					try {
 						userMove.action();
 						Thread.sleep(USER_MOVEMENT_TIME);
@@ -61,8 +54,7 @@ public class Main {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					this.suspend();
-				}*/
+				}
 				
 			}
 		};
@@ -70,9 +62,11 @@ public class Main {
 		
 		
 	
-		Thread.sleep(8000);
+		Thread.sleep(1000);
+		Monitor.display();
 		System.out.println("TELOS");
 		Event.sendEvent(new StopAll());
+
 		
 		
 		//db.viewportFetch();

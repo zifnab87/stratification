@@ -21,7 +21,7 @@ public class UserMove extends Event {
 	}
 	
 	public void action() throws Exception{
-		System.out.println("UserMove Event");
+		//System.out.println("UserMove Event");
 		
 		Main.cache.updateAllTilesLOD(this.newMove);
 		this.sendEvent(new Fetch(this.newMove));

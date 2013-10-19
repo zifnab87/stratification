@@ -134,12 +134,6 @@ public class Database {
 		return tile;		
 	}
 	
-	/*public Tile getTile(int tileId){
-		Tile tile = tiles.get(tileId);
-		return tile;		
-	}*/
-	
-	
 	
 	public Fragment getFragmentOfTile(int fragmentNumber,Point index){
 		if (tileExists(index)){

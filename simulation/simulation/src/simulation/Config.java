@@ -36,4 +36,6 @@ public class Config {
 	
 	public final static long SEED = 3l;
 	
+	public final static int EXPERIMENT_TIME = 60; //seconds
+	
 }

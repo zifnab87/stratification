@@ -34,10 +34,10 @@ public class Predictor {
 		return distance(currentCenterIndex,tileIndex);
 	}
 	
-	public static void trainDatabase(Database db){
+	/*public static void trainDatabase(Database db){
 		Predictor.constantTrain(db);
 		Predictor.spiralTrain(db);
-	}
+	}*/
 	
 	
 	
@@ -111,7 +111,7 @@ public class Predictor {
 		
 		double distance = distance(viewport, index);
 		
-		return (3*probability + 7*Math.min((PROBABILITY_CUTOFF-distance+1)/PROBABILITY_CUTOFF,0d))/10d;
+		return (4*probability + 6*Math.min((PROBABILITY_CUTOFF-distance+1)/PROBABILITY_CUTOFF,0d))/10d;
 		
 		
 	}
