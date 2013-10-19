@@ -5,8 +5,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import simulation.Main;
+import simulation.monitor.Monitor;
 
 public class EventHandler {
+	
+	ConcurrentLinkedQueue<UserMove> userMoveQueue = new ConcurrentLinkedQueue<UserMove>();
+	
 	ConcurrentLinkedQueue<Prefetch> prefetchQueue  = new ConcurrentLinkedQueue<Prefetch>();
 	ConcurrentLinkedQueue<Fetch> fetchQueue  = new ConcurrentLinkedQueue<Fetch>();
 	
@@ -18,6 +22,10 @@ public class EventHandler {
 	
 	public final static ReentrantLock fetchlock = new ReentrantLock();
 	public final static ReentrantLock prefetchLock = new ReentrantLock();
+	public final static ReentrantLock usermovelock = new ReentrantLock();
+	
+	
+	
 	
 	public volatile boolean stopAll = false;
 	
@@ -92,13 +100,18 @@ public class EventHandler {
 							if (!EventHandler.fetchlock.isLocked()){
 								EventHandler.fetchlock.lock();
 							}
+							if (!EventHandler.usermovelock.isLocked()){
+								EventHandler.usermovelock.lock();
+							}
 							tileQueue.poll().action();
 							//EventHandler.fetchlock.unlock();
 						}
 						else {
 							if (EventHandler.fetchlock.getHoldCount()!=0 && EventHandler.fetchlock.isLocked()){
 								EventHandler.fetchlock.unlock();
-								
+							}
+							if (EventHandler.usermovelock.getHoldCount()!=0 && EventHandler.usermovelock.isLocked()){
+								EventHandler.usermovelock.unlock();
 							}
 						}
 					
@@ -142,7 +155,7 @@ public class EventHandler {
 		
 		Thread prefetchTileThread = new Thread() { 
 			public void run() {
-				while(true){
+				while(!stopAll){
 					try {
 						
 						if (!EventHandler.fetchlock.isLocked()){
@@ -164,7 +177,7 @@ public class EventHandler {
 		
 		Thread prefetchFragmentedTileThread = new Thread() { 
 			public void run() {
-				while(true){
+				while(!stopAll){
 					try {
 						
 						if (!EventHandler.fetchlock.isLocked()){
@@ -183,13 +196,34 @@ public class EventHandler {
 		};
 		threads.add(prefetchFragmentedTileThread);
 		
+		
+		
+		Thread userMoveThread = new Thread() { 
+			public void run() {
+				while(!stopAll){
+					try {
+						
+						if (!EventHandler.usermovelock.isLocked()){
+							if (userMoveQueue.size()>0){
+								userMoveQueue.poll().action();
+							}
+						}
+						Thread.sleep(100);
+					} 
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		userMoveThread.setPriority(10);
 		fetchTileThread.setPriority(10);
 		fetchFragmentedTileThread.setPriority(9);
 		prefetchTileThread.setPriority(2);
 		prefetchFragmentedTileThread.setPriority(1);
 		
 		
-		
+		userMoveThread.start();
 		fetchThread.start();
 		prefetchThread.start();
 		
@@ -203,7 +237,7 @@ public class EventHandler {
 	}
 	
 	public void handle(final UserMove event){
-       //... handle
+       userMoveQueue.add(event);
     }
 	
 	
@@ -250,6 +284,8 @@ public class EventHandler {
     
     public void handle(final StopAll event){
     	stopAll = true;
+		Monitor.display();
+		System.out.println("TELOS");
     	System.exit(0);
     }
     

@@ -1,5 +1,5 @@
 package simulation;
-import static simulation.Config.DATABASE_WIDTH;
+
 
 public class Viewport {
 	public int width;
@@ -33,10 +33,11 @@ public class Viewport {
 		this.width = width;
 		this.upperLeft = upperLeft;
 		this.upperRight = new Point(upperLeft.y, upperLeft.x + width);
-		this.lowerRight = new Point(upperRight.y+height, upperRight.x);
+		this.lowerRight = new Point(upperRight.y + height, upperRight.x);
 		this.lowerLeft = new Point(upperLeft.y + height, upperLeft.x);
 		//previousCenter = this.center;
 		this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
+		//System.out.println("upperLeft:"+upperLeft);
 		//System.out.println(center.y+"!!!"+center.x);
 	}
 	
@@ -54,22 +55,27 @@ public class Viewport {
 	
 	
 	public Viewport goLeft(){
-		Point newUpperLeft = new Point(this.upperLeft.y,Math.min(this.upperLeft.x-1,0));
+		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
+		//System.out.println("left");
 		return new Viewport(this.height,this.width,newUpperLeft);
 	}
 	
 	public Viewport goRight(){
-		Point newUpperLeft = new Point(this.upperLeft.y,Math.max(this.upperLeft.x+1,DATABASE_WIDTH));
+		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
+		//System.out.println("right");
 		return new Viewport(this.height,this.width,newUpperLeft);
 	}
 	
 	public Viewport goDown(){
-		Point newUpperLeft = new Point(Math.max(this.upperLeft.y+1,DATABASE_WIDTH),this.upperLeft.x);
+		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
+		//System.out.println("down");
 		return new Viewport(this.height,this.width,newUpperLeft);
 	}
 
 	public Viewport goUp(){
-		Point newUpperLeft = new Point(Math.min(this.upperLeft.y-1,0),this.upperLeft.x);
+		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
+		//System.out.println("try" + newUpperLeft);
+		//System.out.println("up");
 		return new Viewport(this.height,this.width,newUpperLeft);
 	}
 	

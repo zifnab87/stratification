@@ -20,12 +20,12 @@ public class Fragment {
 	
 	private final static int[][] initIndexPositions(){
 		 int[][] pixels = new int[FRAGMENTS_PER_TILE][FRAGMENT_SIZE];
-		 int count = 0;
+		 /*int count = 0;
 		 for (int i=0; i<FRAGMENTS_PER_TILE; i++){
 			 for (int j=0; j<FRAGMENT_SIZE; j++){
 				 pixels[i][j] = count++;
 			 }
-		 }
+		 }*/
 		 return pixels;
 	}
 	

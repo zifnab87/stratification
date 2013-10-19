@@ -104,6 +104,11 @@ public class Tile {
 		return fragments.size() == FRAGMENTS_PER_TILE;
 		
 	}
+	
+	public String toString(){
+		String str = "Tile("+this.point.y+","+this.point.x+")";
+		return str;
+	}
 
 	
 	

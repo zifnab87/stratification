@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.Vector;
+import static simulation.Config.DATABASE_WIDTH;
 
 public class Point {
 	public int x;
@@ -9,6 +10,7 @@ public class Point {
 	public Point(int y, int x){
 		this.y = y;
 		this.x = x;
+		this.validate();
 	}
 	public int hashCode(){
 		return ((this.y+"-"+this.x).hashCode());
@@ -31,6 +33,19 @@ public class Point {
 		}
 	}
 	
-	
+	public void validate(){
+		if (this.x < 0) {
+			this.x = 0;
+		}
+		else if(this.x > DATABASE_WIDTH-1){
+			this.x = DATABASE_WIDTH-1;
+		}
+		if (this.y < 0) {
+			this.y = 0;
+		}
+		else if(this.y > DATABASE_WIDTH-1){
+			this.y = DATABASE_WIDTH-1;
+		}
+	}
 	
 }

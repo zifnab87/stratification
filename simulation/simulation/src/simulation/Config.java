@@ -2,6 +2,8 @@ package simulation;
 
 public class Config {
 	
+	
+	public static final boolean PREFETCH = false;
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;
 	public static final int DATABASE_WIDTH = 25;//25;

@@ -15,13 +15,14 @@ public class TileFetch extends Event {
 	public void action() throws Exception {
 		
 		//TODO get rid off the Main.cache.tileExists because it actually calls getTile
-		Tile tile = Main.cache.getTile(this.pointToFetch);
-		if (tile == null){
-			tile = Main.db.getTile(this.pointToFetch);
+		if (!Main.cache.tileExists(this.pointToFetch)){
+			Tile tile = Main.db.getTile(this.pointToFetch);
 			
 			System.out.println(this);
+			System.out.println(tile);
 			if (tile!=null){
 				Main.cache.addTile(tile);
+				System.out.print("put in cache");
 			}
 			Monitor.databaseTileFetch();
 		}

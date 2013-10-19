@@ -18,10 +18,10 @@ public class Fetch extends Event{
 		for (Point point : vec){
 			//if point is for a tile to be fetch 100%
 			if (point.fragmentNums==null){
-				this.sendEvent(new TileFetch(point));
+				Event.sendEvent(new TileFetch(point));
 			}
 			else{
-				this.sendEvent(new FragmentedTileFetch(point));
+				Event.sendEvent(new FragmentedTileFetch(point));
 			}
 			
 		}

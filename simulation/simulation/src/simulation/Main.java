@@ -22,11 +22,11 @@ public class Main {
 	public static Cache cache = new Cache();
 	public static Viewport next;
 	public static Viewport preivous;
-	
-	
+
 
 	
 	public static void main(String args[]) throws Exception{
+		System.out.println(new Point(23,24));
 		
 		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
@@ -36,20 +36,21 @@ public class Main {
 		
 		
 		
-		Thread userMovevent = new Thread() { 
+		Thread userMovement = new Thread() { 
 				double start = System.nanoTime() / 1000000000d;
 			public void run() {
 				UserMove userMove = new UserMove(new Point(0,0));
 				Viewport viewport = userMove.newMove;
 				double diff = 0;
-				while (diff < EXPERIMENT_TIME){
+				boolean terminal = false;
+				while (true){
 					diff = System.nanoTime()/ 1000000000d - start;
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
-					
 					try {
-						userMove.action();
-						Thread.sleep(USER_MOVEMENT_TIME);
+						//userMove.action();
+						Event.sendEvent(userMove);
+						Thread.sleep(100);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -58,14 +59,13 @@ public class Main {
 				
 			}
 		};
-		userMovevent.run();
+		userMovement.run();
 		
 		
 	
 		Thread.sleep(1000);
-		Monitor.display();
-		System.out.println("TELOS");
-		Event.sendEvent(new StopAll());
+
+		
 
 		
 		
