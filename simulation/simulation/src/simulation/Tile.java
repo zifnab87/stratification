@@ -28,12 +28,7 @@ public class Tile {
 	
 	
 	
-	public static Comparator<Tile> likelihoodComparator = new Comparator<Tile>(){
-		@Override
-		public int compare(Tile t1, Tile t2) {
-            return (int) (t1.likelihood - t2.likelihood);
-        }
-	};
+
 	
 	public Tile(Point point){
 		this.point = point;
@@ -55,6 +50,8 @@ public class Tile {
 	public int getFragmentNumber(){
 		return fragments.size();
 	}
+	
+	
 	
 	
 	public static Tile randomizer(){
@@ -106,7 +103,7 @@ public class Tile {
 	}
 	
 	public String toString(){
-		String str = "Tile("+this.point.y+","+this.point.x+")";
+		String str = "Tile("+this.point.y+","+this.point.x+",LOD="+this.lod+",Likelihood="+this.likelihood+")";
 		return str;
 	}
 

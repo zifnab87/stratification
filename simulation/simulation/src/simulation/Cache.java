@@ -15,7 +15,7 @@ public class Cache {
 	//tiles
 	//fragments
 	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
-	private PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
+	private PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,CachedTile.likelihoodComparator);
 	
 	
 	
@@ -104,12 +104,14 @@ public class Cache {
 	
 	public synchronized void updateTileLODwithId(int tileId,Viewport viewport){
 		Tile tile = tiles.get(tileId);
-		Predictor.calculateAndSetLOD(tile,viewport);
+		
+		//tile.setLOD(viewport);
 		queue.remove(tile);
 		queue.add(tile);
 	}
 
 	private void addTile(Tile tile){
+		CachedTile cached =  (CachedTile) tile;
 		this.tiles.put(tile.id, tile);
 		this.queue.add(tile);
 	}

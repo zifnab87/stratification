@@ -24,6 +24,7 @@ public class FragmentedTileFetch extends Event {
 		for ( int fragmentNum: fragmentNums){
 			//TODO replace with Main.cache.getFragmentOfTile( )
 			Tile tile = Main.cache.getTile(this.fragmentedPointToFetch);
+			
 			Fragment fragment = null;
 			if (tile !=null){
 				fragment = tile.getFragment(fragmentNum);

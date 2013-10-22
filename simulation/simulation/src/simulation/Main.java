@@ -7,21 +7,18 @@ import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.USER_MOVEMENT_TIME;
 import static simulation.Config.EXPERIMENT_TIME;
 import simulation.events.Event;
-import simulation.events.EventHandler;
+
 import simulation.events.StopAll;
 import simulation.events.UserMove;
 import simulation.monitor.Monitor;
-
-import java.lang.reflect.Method;
-import java.sql.Time;
 
 
 public class Main {
 	
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
-	public static Viewport next;
-	public static Viewport preivous;
+	/*public static Viewport next;
+	public static Viewport preivous;*/
 
 	public static double startTime;
 	

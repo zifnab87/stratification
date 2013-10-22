@@ -158,7 +158,7 @@ public class Predictor {
 				lod++;
 			}
 		}
-		return Math.min(lod,FRAGMENTS_PER_TILE-1);
+		return Math.min(lod,FRAGMENTS_PER_TILE);
 	}
 	
 	public static void likelihoodToLOD(Tile tile){
