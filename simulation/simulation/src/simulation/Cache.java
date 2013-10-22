@@ -1,11 +1,15 @@
 package simulation;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.debug;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
+import simulation.monitor.Monitor;
+
 
 public class Cache {
 	//tiles
@@ -23,14 +27,22 @@ public class Cache {
 	
 	public void putMissingFragments(Point index) {
 		Tile cachedPartialTile = Main.cache.getTile(index);
-		
+		int added=0;
 		for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
 			//if fragment doesn't exist request fetch from database;
 			if (!cachedPartialTile.containsFragment(fragmNum)){
 				//and not already in there
-				if (index.fragmentNums.contains(fragmNum)){
+				if (!index.fragmentNums.contains(fragmNum)){
 					index.fragmentNums.add(fragmNum);
+					added++;
 				}
+			}
+		}
+		int fragmentsExisted = FRAGMENTS_PER_TILE - added;
+		for (int j=0; j<fragmentsExisted; j++){
+			Monitor.cacheFragmentFetch();
+			if (debug){
+				System.out.println("Fragment fetched from Cache! (UserMove)");
 			}
 		}
 	}
@@ -50,7 +62,6 @@ public class Cache {
 	
 	public void fullfillLODfromOldLOD(Point index,int LOD){
 		Tile cachedPartialTile = Main.cache.getTile(index);
-		
 		int oldLOD = cachedPartialTile.getFragmentNumber();
 		if (oldLOD<LOD){
 			for (int fragmNum=oldLOD+1; fragmNum<=LOD; fragmNum++){
@@ -60,26 +71,45 @@ public class Cache {
 				}
 			}
 		}
-	}
-	
-	public synchronized void updateAllTilesLOD(Viewport viewport){
-		Set<Integer> tileIds = tiles.keySet();
-		for(Integer tileId : tileIds){
-			updateTileLODwithId(tileId,viewport);
-			
+		int fragmentsExisted = oldLOD;
+		for (int j=0; j<fragmentsExisted; j++){
+			if (debug){
+				System.out.println("Fragment fetched from Cache! (UserMove)");
+			}
+			Monitor.cacheFragmentFetch();
 		}
 	}
 	
-	public void updateTileLODwithId(int tileId,Viewport viewport){
+	public void updateAllTilesLOD(Viewport viewport){
+		/*Set<Integer> tileIds = tiles.keySet();
+		for(Integer tileId : tileIds){
+			updateTileLODwithId(tileId,viewport);
+			
+		}*/
+		Iterator<Tile> it = queue.iterator();
+		while (it.hasNext()){
+			updateTileLODwithId(it.next().id,viewport);
+		}
+		
+	}
+	
+	public synchronized void updateTileLODwithId(int tileId,Viewport viewport){
 		Tile tile = tiles.get(tileId);
 		Predictor.calculateLikelihood(tile.point,viewport);
 		queue.remove(tile);
 		queue.add(tile);
 	}
 
-	public void addTile(Tile tile){
+	private void addTile(Tile tile){
 		this.tiles.put(tile.id, tile);
 		this.queue.add(tile);
+	}
+	public void addFullTile(Tile tile){
+		this.tiles.put(tile.id, tile);
+		this.queue.add(tile);
+		for (int i=0; i<FRAGMENTS_PER_TILE; i++){
+			addFragment(new Fragment(i,null),tile.point);
+		}
 	}
 	
 	public void removeTile(Point index){
@@ -168,19 +198,5 @@ public class Cache {
 		}
 	}
 	
-	//insert fragment to that tile in cache
-	/*public void addFragment(Fragment fragm,int tileId){
-		Tile tile = tiles.get(tileId);
-		if (tile!=null){
-			tile.addFragment(fragm);
-		}
-		else {
-			tile.addTile(new Tile());
-		}
-	}*/
-	
-	/*public void addFragment(Fragment fragm,Point index){
-		addFragment(fragm,index.hashCode());
-	}*/
 	
 }

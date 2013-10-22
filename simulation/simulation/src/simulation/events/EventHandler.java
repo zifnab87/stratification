@@ -23,18 +23,54 @@ public class EventHandler {
 	ConcurrentLinkedQueue<TilePrefetch> prefetchTileQueue  = new ConcurrentLinkedQueue<TilePrefetch>(); //whole tile
 	ConcurrentLinkedQueue<FragmentedTilePrefetch> prefetchFragmentedTileQueue  = new ConcurrentLinkedQueue<FragmentedTilePrefetch>(); //fragmented tiles
 	
-	public final static ReentrantLock fetchlock = new ReentrantLock();
-	public final static ReentrantLock prefetchLock = new ReentrantLock();
+	public final static ReentrantLock databaseLock = new ReentrantLock();
+	//public final static ReentrantLock predatabaseLock = new ReentrantLock();
 	public final static ReentrantLock usermovelock = new ReentrantLock();
 	
 	
+	public void lockDatabase(){
+		if (!databaseLock.isLocked()){
+			databaseLock.lock();
+		}
+	}
 	
+	public void unlockDatabase(){
+		if (databaseLock.isLocked() && EventHandler.databaseLock.getHoldCount()!=0){
+			databaseLock.unlock();
+		}
+	}
+	
+	public boolean isDatabaseLocked(){
+		return databaseLock.isLocked();
+	}
+	
+	public void lockUser(){
+		if (!usermovelock.isLocked()){
+			usermovelock.lock();
+		}
+	}
+	
+	public void unlockUser(){
+		if (usermovelock.isLocked() && EventHandler.usermovelock.getHoldCount()!=0){
+			usermovelock.unlock();
+		}
+	}
+	
+	public boolean isUserLocked(){
+		return usermovelock.isLocked();
+	}
 	
 	public volatile boolean stopAll = false;
 	
 	ArrayList<Thread> threads = new ArrayList<Thread>();
 	
 	public EventHandler(){
+		
+		/* assumptions
+		 * fetch and prefetch block each other (only one request in database at a time)
+		 * usermove happens only when all the fetches and prefetches have happened
+		 * cache can happen anytime
+		 */
 		
 		
 		Thread fetchThread = new Thread() { 
@@ -43,9 +79,7 @@ public class EventHandler {
 				while(!stopAll){
 					if (fetchQueue.size()>0){
 						try {
-								//EventHandler.lock.lock();
 								fetchQueue.poll().action();
-								//EventHandler.lock.unlock();
 							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -72,9 +106,7 @@ public class EventHandler {
 				while(!stopAll){
 					if (prefetchQueue.size()>0){
 						try {
-								//EventHandler.lock.lock();
 							prefetchQueue.poll().action();
-								//EventHandler.lock.unlock();
 							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -100,25 +132,18 @@ public class EventHandler {
 				while(!stopAll){
 					try {
 						if (tileQueue.size()>0){
-							if (!EventHandler.fetchlock.isLocked()){
-								EventHandler.fetchlock.lock();
+							lockUser();
+							if (!isDatabaseLocked()){
+								lockDatabase();
+								tileQueue.poll().action();
 							}
-							if (!EventHandler.usermovelock.isLocked()){
-								EventHandler.usermovelock.lock();
-							}
-							tileQueue.poll().action();
-							//EventHandler.fetchlock.unlock();
+							unlockDatabase();
 						}
 						else {
-							if (EventHandler.fetchlock.getHoldCount()!=0 && EventHandler.fetchlock.isLocked()){
-								EventHandler.fetchlock.unlock();
-							}
-							if (EventHandler.usermovelock.getHoldCount()!=0 && EventHandler.usermovelock.isLocked()){
-								EventHandler.usermovelock.unlock();
-							}
+							unlockUser();
 						}
 					
-						Thread.sleep(100);
+						Thread.sleep(DATABASE_TILE_FETCH_TIME);
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
@@ -133,17 +158,16 @@ public class EventHandler {
 				while(true){
 					try {
 						if (fragmentedTileQueue.size()>0){
-							if (!EventHandler.fetchlock.isLocked()){
-								EventHandler.fetchlock.lock();
+							lockUser();
+							if (!isDatabaseLocked()){
+								lockDatabase();
+								fragmentedTileQueue.poll().action();
 							}
-							fragmentedTileQueue.poll().action();
-							//EventHandler.fetchlock.unlock();
+							unlockDatabase();
+							//EventHandler.databaseLock.unlock();
 						}
 						else {
-							if (EventHandler.fetchlock.getHoldCount()!=0 && EventHandler.fetchlock.isLocked()){
-								EventHandler.fetchlock.unlock();
-								
-							}
+							unlockUser();
 						}
 					
 						Thread.sleep(DATABASE_FRAGMENT_FETCH_TIME);
@@ -160,13 +184,18 @@ public class EventHandler {
 			public void run() {
 				while(!stopAll){
 					try {
-						
-						if (!EventHandler.fetchlock.isLocked()){
-							if (prefetchTileQueue.size()>0){
+						if (prefetchTileQueue.size()>0){
+							lockUser();
+							if (!isDatabaseLocked()){
+								lockDatabase();
 								prefetchTileQueue.poll().action();
-						
 							}
+							unlockDatabase();
 						}
+						else {
+							unlockUser();
+						}
+						
 						Thread.sleep(DATABASE_TILE_FETCH_TIME);
 					} 
 					catch (Exception e) {
@@ -182,12 +211,16 @@ public class EventHandler {
 			public void run() {
 				while(!stopAll){
 					try {
-						
-						if (!EventHandler.fetchlock.isLocked()){
-							if (prefetchFragmentedTileQueue.size()>0){
+						if (prefetchFragmentedTileQueue.size()>0){
+							lockUser();
+							if (!isDatabaseLocked()){
+								lockDatabase();
 								prefetchFragmentedTileQueue.poll().action();
-						
 							}
+							unlockDatabase();
+						}
+						else {
+							unlockUser();
 						}
 						Thread.sleep(DATABASE_TILE_FETCH_TIME);
 					} 
@@ -205,13 +238,20 @@ public class EventHandler {
 			public void run() {
 				while(!stopAll){
 					try {
-						
-						if (!EventHandler.usermovelock.isLocked()){
-							if (userMoveQueue.size()>0){
+						if (userMoveQueue.size()>0){
+							if (!isUserLocked() && tileQueue.size()==0 && 
+								fragmentedTileQueue.size()==0 &&
+								prefetchFragmentedTileQueue.size()==0 &&
+								prefetchTileQueue.size()==0 ){
+								lockUser();
 								userMoveQueue.poll().action();
+								unlockUser();
+								//prefetchTileQueue.clear();
+								//prefetchFragmentedTileQueue.clear();
 							}
 						}
 						Thread.sleep(100);
+						//Thread.sleep(USER_MOVEMENT_TIME);
 					} 
 					catch (Exception e) {
 						e.printStackTrace();

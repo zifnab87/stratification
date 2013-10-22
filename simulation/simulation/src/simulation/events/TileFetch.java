@@ -15,7 +15,6 @@ public class TileFetch extends Event {
 	
 	public void action() throws Exception {
 		
-		//TODO get rid off the Main.cache.tileExists because it actually calls getTile
 		if (!Main.cache.tileExists(this.pointToFetch)){
 			Tile tile = Main.db.getTile(this.pointToFetch);
 			
@@ -24,7 +23,7 @@ public class TileFetch extends Event {
 				System.out.println(tile);
 			}
 			if (tile!=null){
-				Main.cache.addTile(tile);
+				Main.cache.addFullTile(tile);
 				if (debug){
 					System.out.println("put in cache");
 				}
@@ -34,7 +33,7 @@ public class TileFetch extends Event {
 		else {
 			Monitor.cacheTileFetch();
 			if(debug){
-				System.out.println("Tile cached! (Fetch)");
+				System.out.println("Tile fetched from Cache! (Fetch)");
 			}
 		}
 		//tile render TODO

@@ -34,6 +34,10 @@ public class Database {
 		for (int y=upperLeft.y-PREFETCH_DISTANCE; y<lowerRight.y+PREFETCH_DISTANCE; y++){
 			for (int x=upperLeft.x-5; x<lowerRight.x+5; x++){
 				if (x<0 || y<0) continue;
+				//don't put anything that is in the viewport
+				if (y>=upperLeft.y && y<lowerRight.y && x>=upperLeft.x && x<lowerRight.x){
+					continue;
+				}
 				Vector<Integer> fragmentNums = new Vector<Integer>();
 				Point index = new Point(y,x);
 				index.fragmentNums = fragmentNums;
@@ -52,6 +56,9 @@ public class Database {
 					index.setFragmentNums(fragmentNums);
 					Main.cache.fullfillLODfromOldLOD(index, LOD);
 					vec.add(index);
+				}
+				else {
+					Monitor.cacheTileFetch();
 				}
 			}
 		}
@@ -82,6 +89,9 @@ public class Database {
 					index.setFragmentNums(fragmentNums);
 					Main.cache.putMissingFragments(index);
 					vec.add(index);
+				}
+				else {
+					Monitor.cacheTileFetch();
 				}
 				
 			}

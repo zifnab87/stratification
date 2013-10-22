@@ -17,12 +17,12 @@ public class TilePrefetch extends Event {
 		Tile tile = Main.db.getTile(this.pointToPrefetch);
 		if (tile == null){
 			tile = Main.db.getTile(this.pointToPrefetch);
-			Main.cache.addTile(tile);
+			Main.cache.addFullTile(tile);
 			Monitor.databaseTileFetch();
 		}
 		else {
 			Monitor.cacheTileFetch();
-			System.out.println("Tile cached! (Prefetch)");
+			System.out.println("Tile fetched from Cache! (Prefetch)");
 		}
 
 	}

@@ -2,7 +2,7 @@ package simulation;
 
 public class Config {
 	
-	public static boolean debug = false;
+	public static boolean debug = true;
 	
 	public static boolean PREFETCH = true;
 	public static boolean FRAGMENT = true; 
@@ -28,10 +28,10 @@ public class Config {
 	public static int PROBABILITY_CUTOFF = 20;
 	
 	
-	public final static double SIMULATION_FACTOR = 1000d;
+	public final static double SIMULATION_FACTOR = 100d;
 	public final static int RENDER_TIME = (int) Math.ceil(10 / SIMULATION_FACTOR);
-	public final static int DATABASE_TILE_FETCH_TIME = (int) Math.ceil(3300 / SIMULATION_FACTOR);
-	public final static int DATABASE_FRAGMENT_FETCH_TIME = (int) Math.ceil(475 / SIMULATION_FACTOR); 
+	public final static int DATABASE_TILE_FETCH_TIME = (int) Math.ceil(3200 / SIMULATION_FACTOR);
+	public final static int DATABASE_FRAGMENT_FETCH_TIME = (int) Math.ceil(400 / SIMULATION_FACTOR); 
 	public final static int NETWORK_TIME_FETCH_TIME = (int) Math.ceil(2000 / SIMULATION_FACTOR);
 	
 	public final static int NETWORK_FRAGMENT_FETCH_TIME = (int) Math.ceil(300 / SIMULATION_FACTOR);

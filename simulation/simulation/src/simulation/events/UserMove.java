@@ -8,6 +8,7 @@ import static simulation.Config.debug;
 import simulation.Main;
 import simulation.Point;
 import simulation.Viewport;
+import simulation.monitor.Monitor;
 
 public class UserMove extends Event {
 	Point  upperLeft;
@@ -36,6 +37,7 @@ public class UserMove extends Event {
 		if (PREFETCH){
 			Event.sendEvent(new Prefetch(this.newMove));
 		}
+		Monitor.userMove();
 		//Main.db.setViewport(newMove);
 		
 	}

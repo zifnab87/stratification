@@ -1,5 +1,11 @@
 package simulation.monitor;
 
+import static simulation.Config.PREFETCH;
+import static simulation.Config.FRAGMENT;
+import static simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
+import static simulation.Config.DATABASE_TILE_FETCH_TIME;
+import static simulation.Config.SIMULATION_FACTOR;
+
 public class Monitor {
 	
 	public static int tileCount  = 0;
@@ -8,8 +14,12 @@ public class Monitor {
 	public static int databaseFragmentFetchCount = 0;
 	public static int cacheTileFetchCount = 0;
 	public static int cacheFragmentFetchCount = 0;
+	public static int userMoves = 0;
 	
 	public static void display(double starttime){
+		System.out.println("prefetch: "+PREFETCH);
+		System.out.println("fragment: "+FRAGMENT);
+		System.out.println("Total User Moves"+ userMoves);
 		System.out.println("fragmentCount "+ fragmentCount);
 		System.out.println("databaseFragmentFetchCount "+databaseFragmentFetchCount);
 		System.out.println("cacheFragmentFetchCount "+cacheFragmentFetchCount);
@@ -18,7 +28,8 @@ public class Monitor {
 		System.out.println("cacheTileFetchCount "+cacheTileFetchCount);
 		double endtime = (System.nanoTime() - starttime)/1000000000d;
 		System.out.println("Running time: "+endtime);
-
+		double simTime =(datbaseTileFetchCount*DATABASE_TILE_FETCH_TIME + databaseFragmentFetchCount*DATABASE_FRAGMENT_FETCH_TIME)*SIMULATION_FACTOR;
+		System.out.println("Simulated time: "+simTime);
 	}
 	
 	
@@ -62,6 +73,10 @@ public class Monitor {
 		fragmentCount++;
 	}
 	
+	
+	public static synchronized void userMove(){
+		userMoves++;
+	}
 	
 	
 	

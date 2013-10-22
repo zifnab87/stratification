@@ -26,7 +26,6 @@ public class Main {
 	public static double startTime;
 	
 	public static void main(String args[]) throws Exception{
-		System.out.println(new Point(23,24));
 		
 		//db.setViewport(viewport);
 		db.init(DATABASE_TILES_NUM);
@@ -65,28 +64,6 @@ public class Main {
 	
 		Thread.sleep(1000);
 
-		
-
-		
-		
-		//db.viewportFetch();
-		
-		
-		
-		//System.out.println(cache.tiles.size());
-		//System.out.println(((Tile)(cache.tiles.get(new Point(0,0).hashCode()))));
-		//System.out.println("init done");
-		//System.out.println(Predictor.likelihoodToLOD(1.0d));
-
-		//System.out.println("train done");
-		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLikelihood());
-		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLikelihood());
-		
-		//System.out.println(db.tiles.get(new Point(1,0).hashCode()).getLOD());
-		//System.out.println(db.tiles.get(new Point(0,24).hashCode()).getLOD());
-		//Viewport view = new Viewport(4, 3, new Point(3,2));
-		
-		//System.out.println(Predictor.distance(new Point(1,3),new Point(10,10)));
 	}
 	
 
