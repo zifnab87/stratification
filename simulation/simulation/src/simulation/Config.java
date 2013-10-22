@@ -7,10 +7,10 @@ public class Config {
 	public static boolean PREFETCH = true;
 	public static boolean FRAGMENT = true; 
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 625;//625;
-	public static final int DATABASE_WIDTH = 25;//25;
+	public static final int DATABASE_TILES_NUM = 100;//625;
+	public static final int DATABASE_WIDTH = 10;//25;
 	//VIEWPORT
-	public static final Point UPPER_LEFT_STARTING_POINT = new Point(0,0);
+	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
 	public static final int VIEWPORT_HEIGHT = 3;
 	public static final int VIEWPORT_WIDTH = 4;
 

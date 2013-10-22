@@ -22,7 +22,7 @@ public class TilePrefetch extends Event {
 		}
 		else {
 			Monitor.cacheTileFetch();
-			System.out.println("Tile fetched from Cache! (Prefetch)");
+			//System.out.println("Tile fetched from Cache! (Prefetch)");
 		}
 
 	}

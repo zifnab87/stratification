@@ -25,7 +25,7 @@ public class TileFetch extends Event {
 			if (tile!=null){
 				Main.cache.addFullTile(tile);
 				if (debug){
-					System.out.println("put in cache");
+					//System.out.println("put in cache");
 				}
 			}
 			Monitor.databaseTileFetch();
@@ -33,7 +33,7 @@ public class TileFetch extends Event {
 		else {
 			Monitor.cacheTileFetch();
 			if(debug){
-				System.out.println("Tile fetched from Cache! (Fetch)");
+				//System.out.println("Tile fetched from Cache! (Fetch)");
 			}
 		}
 		//tile render TODO

@@ -21,8 +21,8 @@ public class Tile {
 	private static int tileIdCounter = 0;
 	private static int colCounter = 0;
 	private static int rowCounter = 0;
-	private int lod;
-	private double likelihood;
+	public int lod;
+	public double likelihood;
 	public Point point; //index
 	
 	

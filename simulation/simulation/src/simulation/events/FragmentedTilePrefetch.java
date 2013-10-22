@@ -44,7 +44,7 @@ public class FragmentedTilePrefetch extends Event {
 			else {
 				Monitor.cacheFragmentFetch();
 				if (debug){
-					System.out.println("Fragment fetched from Cache! (Prefetch)");
+					//System.out.println("Fragment fetched from Cache! (Prefetch)");
 				}
 			}
 			

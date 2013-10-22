@@ -18,6 +18,15 @@ public class Cache {
 	private PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	
 	
+	
+	public String toString(){
+		String result="";
+		for(Tile tile : queue){
+			result+=tile.toString()+", ";
+		}
+		return result;
+	}
+	
 	public int getTileNumber(){
 		return tiles.size();
 	}
@@ -95,7 +104,7 @@ public class Cache {
 	
 	public synchronized void updateTileLODwithId(int tileId,Viewport viewport){
 		Tile tile = tiles.get(tileId);
-		Predictor.calculateLikelihood(tile.point,viewport);
+		Predictor.calculateAndSetLOD(tile,viewport);
 		queue.remove(tile);
 		queue.add(tile);
 	}

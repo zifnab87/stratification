@@ -36,18 +36,14 @@ public class Main {
 		startTime = System.nanoTime();
 		
 		Thread userMovement = new Thread() { 
-				//double start = System.nanoTime() / 1000000000d;
 			public void run() {
-				UserMove userMove = new UserMove(new Point(0,0));
-				Viewport viewport = userMove.newMove;
-				double diff = 0;
-				boolean terminal = false;
-				while (true){
-					//diff = System.nanoTime()/ 1000000000d - start;
+				UserMove userMove;
+				Viewport viewport = null;
+				//while (true){
+				for (int i=0; i<2; i++){
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
 					try {
-						//userMove.action();
 						Event.sendEvent(userMove);
 						Thread.sleep(100);
 					} catch (Exception e) {
@@ -56,14 +52,20 @@ public class Main {
 					}
 				}
 				
+				
 			}
 		};
 		userMovement.run();
 		
 		
 	
-		Thread.sleep(1000);
-
+		Thread.sleep(10000);
+		try {
+			Event.sendEvent(new StopAll(startTime));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 

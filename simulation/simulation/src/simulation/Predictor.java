@@ -9,6 +9,10 @@ import java.util.Set;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.PREFETCH_DISTANCE;
 import static simulation.Config.PROBABILITY_CUTOFF;
+import static simulation.Config.VIEWPORT_HEIGHT;
+import static simulation.Config.VIEWPORT_WIDTH;
+import static simulation.Config.UPPER_LEFT_STARTING_POINT;
+
 public class Predictor {
 	
 	public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
@@ -43,16 +47,36 @@ public class Predictor {
 	
 	
 	
-	/*public static double getLikelihood(Tile tile,Viewport viewport){
-		double tileStaticLikelihood = getLikelihood(tile.point,viewport);
-		//double distance = distance(tile);
-		// 40% static likelihood
-		// 60% distance
-		// min of (max_distance - distance - viewport_width/2 )/max_distance and 0
-		//return (4*tileStaticLikelihood + 6*Math.min((PREFETCH_DISTANCE-distance)/PREFETCH_DISTANCE,0d))/10d;		
-		return tileStaticLikelihood;
-	}*/
+	public static Viewport nextMove(Viewport viewport){
+		if (viewport == null){
+			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+		}
+		double random = Math.random();
+		if (random<=0.1d){
+			return viewport.goUp();
+		}
+		else if (random>0.1d && random<=0.4d){
+			return viewport.goRight();
+		}
+		else if (random>0.40d && random<=0.9d){
+			return viewport.goDown();
+		}
+		else {
+			return viewport.goLeft();
+		}
+	}
 	
+	
+	public static void calculateAndSetLOD(Tile tile ,Viewport viewport){
+		Predictor.calculateAndSetLikelihood(tile,viewport);
+		Predictor.likelihoodToLOD(tile);
+	}
+	
+	public static int calculateLOD(Point point,Viewport viewport){
+		double likelihood = Predictor.calculateLikelihood(point,viewport);
+		int lod = Predictor.likelihoodToLOD(likelihood);
+		return lod;
+	}
 	
 	public static double calculateLikelihood(Point index,Viewport viewport){
 		String horizontal = null;
@@ -110,64 +134,15 @@ public class Predictor {
 		
 		
 		double distance = distance(viewport, index);
-		
 		return (4*probability + 6*Math.min((PROBABILITY_CUTOFF-distance+1)/PROBABILITY_CUTOFF,0d))/10d;
-		
-		
 	}
 	
-	
-	public static Viewport nextMove(Viewport viewport){
-		double random = Math.random();
-		if (random<=0.1d){
-			return viewport.goUp();
-		}
-		else if (random>0.1d && random<=0.4d){
-			return viewport.goRight();
-		}
-		else if (random>0.40d && random<=0.9d){
-			return viewport.goDown();
-		}
-		else {
-			return viewport.goLeft();
-		}
+	public static void calculateAndSetLikelihood(Tile tile,Viewport viewport){	
+		tile.likelihood = Predictor.calculateLikelihood(tile.point,viewport);
 	}
 	
-	
-	/*public static double getLikelihood(int y,int x,Viewport viewport){
-		return Predictor.getLikelihood(new Point(y,x),viewport);
-	}
-	//CURRENT Viewport to determine the distance
-	public static double getLikelihood(Point index,Viewport viewport){
-		if (!viewport.contains(index)){
-			return Predictor.getLikelihood(index.hashCode(),viewport);
-		}
-		else {
-			return 1.0d;
-		}
-	}
-	
-	private static double getLikelihood(int index,Viewport viewport){
-		Double likelihood = Predictor.likelihoods.get(index);
-		if (likelihood!=null){
-			return Predictor.likelihoods.get(index);
-		}
-		else {
-			return 0.0d;
-		}
-		
-	}*/
-	
-	
-	public static int getLOD(Point index,Viewport viewport){
-		return Predictor.likelihoodToLOD(Predictor.calculateLikelihood(index,viewport));
-	}
-	
-	
-	
-	
-	
-	private static int likelihoodToLOD(double likelihood){
+
+	public static int likelihoodToLOD(double likelihood){
 		int lod = 1;
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(3);
@@ -184,6 +159,10 @@ public class Predictor {
 			}
 		}
 		return Math.min(lod,FRAGMENTS_PER_TILE-1);
+	}
+	
+	public static void likelihoodToLOD(Tile tile){
+		tile.lod = Predictor.likelihoodToLOD(tile.likelihood);
 	}
 	
 	private static float[] lodIntervals(int fragments){

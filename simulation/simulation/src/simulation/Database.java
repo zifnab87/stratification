@@ -41,7 +41,7 @@ public class Database {
 				Vector<Integer> fragmentNums = new Vector<Integer>();
 				Point index = new Point(y,x);
 				index.fragmentNums = fragmentNums;
-				int LOD = Predictor.getLOD(index,viewport);
+				int LOD = Predictor.calculateLOD(index,viewport);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
 					
