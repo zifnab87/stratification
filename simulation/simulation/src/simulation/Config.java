@@ -12,7 +12,7 @@ public class Config {
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
 	public static final int VIEWPORT_HEIGHT = 3;
-	public static final int VIEWPORT_WIDTH = 4;
+	public static final int VIEWPORT_WIDTH = 3;
 
 	//TILE
 	public final static int TILE_WIDTH = 256;

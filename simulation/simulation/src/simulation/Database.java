@@ -32,7 +32,7 @@ public class Database {
 		Vector<Point> vec = new Vector<Point>();
 
 		for (int y=upperLeft.y-PREFETCH_DISTANCE; y<lowerRight.y+PREFETCH_DISTANCE; y++){
-			for (int x=upperLeft.x-5; x<lowerRight.x+5; x++){
+			for (int x=upperLeft.x-PREFETCH_DISTANCE; x<lowerRight.x+PREFETCH_DISTANCE; x++){
 				if (x<0 || y<0) continue;
 				//don't put anything that is in the viewport
 				if (y>=upperLeft.y && y<lowerRight.y && x>=upperLeft.x && x<lowerRight.x){
