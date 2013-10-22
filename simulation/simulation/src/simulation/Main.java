@@ -23,7 +23,7 @@ public class Main {
 	public static Viewport next;
 	public static Viewport preivous;
 
-
+	public static double startTime;
 	
 	public static void main(String args[]) throws Exception{
 		System.out.println(new Point(23,24));
@@ -34,17 +34,17 @@ public class Main {
 		//System.out.println("usermove");
 		
 		
-		
+		startTime = System.nanoTime();
 		
 		Thread userMovement = new Thread() { 
-				double start = System.nanoTime() / 1000000000d;
+				//double start = System.nanoTime() / 1000000000d;
 			public void run() {
 				UserMove userMove = new UserMove(new Point(0,0));
 				Viewport viewport = userMove.newMove;
 				double diff = 0;
 				boolean terminal = false;
 				while (true){
-					diff = System.nanoTime()/ 1000000000d - start;
+					//diff = System.nanoTime()/ 1000000000d - start;
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
 					try {

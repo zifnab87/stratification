@@ -1,5 +1,7 @@
 package simulation;
 
+import static simulation.Config.FRAGMENTS_PER_TILE;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +19,47 @@ public class Cache {
 	}
 	public void updateTileLODwithPos(Point index,Viewport viewport){
 		updateTileLODwithId(index.hashCode(),viewport);
+	}
+	
+	public void putMissingFragments(Point index) {
+		Tile cachedPartialTile = Main.cache.getTile(index);
+		
+		for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
+			//if fragment doesn't exist request fetch from database;
+			if (!cachedPartialTile.containsFragment(fragmNum)){
+				//and not already in there
+				if (index.fragmentNums.contains(fragmNum)){
+					index.fragmentNums.add(fragmNum);
+				}
+			}
+		}
+	}
+	
+	public void fulfillLODfromScratch(Point index,int LOD){
+		Tile cachedPartialTile = Main.cache.getTile(index);
+		
+		if (LOD < FRAGMENTS_PER_TILE){
+			for (int fragmNum=1; fragmNum<=LOD; fragmNum++){
+				//if fragment doesn't exist request fetch from database;
+				if(!index.fragmentNums.contains(fragmNum)){
+					index.fragmentNums.add(fragmNum);
+				}
+			}
+		}
+	}
+	
+	public void fullfillLODfromOldLOD(Point index,int LOD){
+		Tile cachedPartialTile = Main.cache.getTile(index);
+		
+		int oldLOD = cachedPartialTile.getFragmentNumber();
+		if (oldLOD<LOD){
+			for (int fragmNum=oldLOD+1; fragmNum<=LOD; fragmNum++){
+				//if fragment doesn't exist request fetch from database;
+				if(!index.fragmentNums.contains(fragmNum)){
+					index.fragmentNums.add(fragmNum);
+				}
+			}
+		}
 	}
 	
 	public synchronized void updateAllTilesLOD(Viewport viewport){

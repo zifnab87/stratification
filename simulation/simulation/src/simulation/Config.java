@@ -2,8 +2,10 @@ package simulation;
 
 public class Config {
 	
+	public static boolean debug = false;
 	
-	public static final boolean PREFETCH = false;
+	public static boolean PREFETCH = true;
+	public static boolean FRAGMENT = true; 
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;
 	public static final int DATABASE_WIDTH = 25;//25;

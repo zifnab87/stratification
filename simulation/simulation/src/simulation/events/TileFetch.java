@@ -4,6 +4,7 @@ import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
 import simulation.monitor.Monitor;
+import static simulation.Config.debug;
 
 public class TileFetch extends Event {
 
@@ -18,17 +19,23 @@ public class TileFetch extends Event {
 		if (!Main.cache.tileExists(this.pointToFetch)){
 			Tile tile = Main.db.getTile(this.pointToFetch);
 			
-			System.out.println(this);
-			System.out.println(tile);
+			if (debug){
+				System.out.println(this);
+				System.out.println(tile);
+			}
 			if (tile!=null){
 				Main.cache.addTile(tile);
-				System.out.print("put in cache");
+				if (debug){
+					System.out.println("put in cache");
+				}
 			}
 			Monitor.databaseTileFetch();
 		}
 		else {
 			Monitor.cacheTileFetch();
-			System.out.println("Tile cached! (Fetch)");
+			if(debug){
+				System.out.println("Tile cached! (Fetch)");
+			}
 		}
 		//tile render TODO
 		

@@ -7,6 +7,7 @@ import java.util.Vector;
 import simulation.monitor.Monitor;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.PREFETCH_DISTANCE;
+import static simulation.Config.FRAGMENT;
 
 public class Database {
 	
@@ -40,30 +41,16 @@ public class Database {
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
 					
-					if (LOD < FRAGMENTS_PER_TILE){
-						for (int fragmNum=1; fragmNum<=LOD; fragmNum++){
-							//if fragment doesn't exist request fetch from database;
-							if(!index.fragmentNums.contains(fragmNum)){
-								index.fragmentNums.add(fragmNum);
-							}
-						}
+					if (FRAGMENT){
+						Main.cache.fulfillLODfromScratch(index,LOD);
 					}
 					vec.add(index);
 
 				}
-				//if tile exists but partial
+				//if tile partially exists in cache
 				else if(!Main.cache.tileExistsAndNotFull(index)){
-					Tile cachedPartialTile = Main.cache.getTile(index);
 					index.setFragmentNums(fragmentNums);
-					int oldLOD = cachedPartialTile.getFragmentNumber();
-					if (oldLOD<LOD){
-						for (int fragmNum=oldLOD+1; fragmNum<=LOD; fragmNum++){
-							//if fragment doesn't exist request fetch from database;
-							if(!index.fragmentNums.contains(fragmNum)){
-								index.fragmentNums.add(fragmNum);
-							}
-						}
-					}
+					Main.cache.fullfillLODfromOldLOD(index, LOD);
 					vec.add(index);
 				}
 			}
@@ -90,27 +77,16 @@ public class Database {
 				if (!Main.cache.tileExists(index)){
 					vec.add(index);
 				}
-				//if tile exists but partial
-				else if(!Main.cache.tileExistsAndNotFull(index)){
-					Tile cachedPartialTile = Main.cache.getTile(index);
+				//if tile partially exists request missing fragments
+				else if(!Main.cache.tileExistsAndNotFull(index) && !FRAGMENT){
 					index.setFragmentNums(fragmentNums);
-					for (int fragmNum=1; fragmNum<=FRAGMENTS_PER_TILE; fragmNum++){
-						//if fragment doesn't exist request fetch from database;
-						if (!cachedPartialTile.containsFragment(fragmNum)){
-							//and not already in there
-							if (index.fragmentNums.contains(fragmNum)){
-								index.fragmentNums.add(fragmNum);
-							}
-						}
-					}
+					Main.cache.putMissingFragments(index);
 					vec.add(index);
 				}
 				
 			}
 		}
-		/*for(Tile tile: vec){
-			Main.cache.addTile(tile);
-		}*/
+
 		return vec;
 	}
 	

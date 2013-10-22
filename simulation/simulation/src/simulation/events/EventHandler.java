@@ -3,6 +3,9 @@ package simulation.events;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
+import static simulation.Config.DATABASE_TILE_FETCH_TIME;
+import static simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
+import static simulation.Config.USER_MOVEMENT_TIME;
 
 import simulation.Main;
 import simulation.monitor.Monitor;
@@ -143,7 +146,7 @@ public class EventHandler {
 							}
 						}
 					
-						Thread.sleep(100);
+						Thread.sleep(DATABASE_FRAGMENT_FETCH_TIME);
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
@@ -164,7 +167,7 @@ public class EventHandler {
 						
 							}
 						}
-						Thread.sleep(100);
+						Thread.sleep(DATABASE_TILE_FETCH_TIME);
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
@@ -186,7 +189,7 @@ public class EventHandler {
 						
 							}
 						}
-						Thread.sleep(100);
+						Thread.sleep(DATABASE_TILE_FETCH_TIME);
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
@@ -284,7 +287,7 @@ public class EventHandler {
     
     public void handle(final StopAll event){
     	stopAll = true;
-		Monitor.display();
+		Monitor.display(event.startTime);
 		System.out.println("TELOS");
     	System.exit(0);
     }

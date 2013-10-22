@@ -14,7 +14,7 @@ public class Prefetch extends Event{
 	public void action() throws Exception{
 		
 		Vector<Point> vec = Main.db.aroundViewportPrefetch(viewport);
-		System.out.println("Prefetch Event "+vec);
+		//System.out.println("Prefetch Event "+vec);
 		for (Point point : vec){
 			//if point is for a tile to be fetch 100%
 			if (point.fragmentNums==null){

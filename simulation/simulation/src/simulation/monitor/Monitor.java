@@ -9,13 +9,16 @@ public class Monitor {
 	public static int cacheTileFetchCount = 0;
 	public static int cacheFragmentFetchCount = 0;
 	
-	public static void display(){
-		System.out.println("tileCount "+ tileCount);
+	public static void display(double starttime){
 		System.out.println("fragmentCount "+ fragmentCount);
-		System.out.println("databaseTileFetchCount "+datbaseTileFetchCount);
 		System.out.println("databaseFragmentFetchCount "+databaseFragmentFetchCount);
-		System.out.println("cacheTileFetchCount "+cacheTileFetchCount);
 		System.out.println("cacheFragmentFetchCount "+cacheFragmentFetchCount);
+		System.out.println("tileCount "+ tileCount);
+		System.out.println("databaseTileFetchCount "+datbaseTileFetchCount);
+		System.out.println("cacheTileFetchCount "+cacheTileFetchCount);
+		double endtime = (System.nanoTime() - starttime)/1000000000d;
+		System.out.println("Running time: "+endtime);
+
 	}
 	
 	
