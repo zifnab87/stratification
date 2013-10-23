@@ -22,7 +22,7 @@ public class TileFetch extends Event {
 				System.out.println(tile);
 			}
 			if (tile!=null){
-				Main.cache.addFullTile(tile);
+				Main.cache.cacheFullTile(tile);
 				if (debug){
 					//System.out.println("put in cache");
 				}

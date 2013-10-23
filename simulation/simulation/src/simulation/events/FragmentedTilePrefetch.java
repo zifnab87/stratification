@@ -33,7 +33,7 @@ public class FragmentedTilePrefetch extends Event {
 				//if fragment is in the database (e.g not out of viewport)
 				Monitor.databaseFragmentFetch();
 				if (fragment!=null){
-					Main.cache.addFragment(fragment, this.fragmentedPointToPrefetch);
+					Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch);
 				}
 				else {
 					if (debug){

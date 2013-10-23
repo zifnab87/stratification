@@ -24,8 +24,8 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static int PREFETCH_DISTANCE = 1;  
-	public static int PROBABILITY_CUTOFF = 20;
+	public static int PREFETCH_DISTANCE = 2;  
+	public static int PROBABILITY_CUTOFF = 8;
 	
 	
 	public final static double SIMULATION_FACTOR = 100d;

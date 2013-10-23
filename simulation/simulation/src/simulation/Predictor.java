@@ -25,7 +25,8 @@ public class Predictor {
 		double distanceUpperRight = distance(viewport.upperRight,p);
 		double distanceLowerLeft = distance(viewport.lowerLeft,p);
 		double distanceLowerRight = distance(viewport.lowerRight,p);
-		return Math.min(Math.min(distanceUpperLeft,distanceUpperRight),Math.min(distanceLowerLeft,distanceLowerRight));
+		double dist = Math.min(Math.min(distanceUpperLeft,distanceUpperRight),Math.min(distanceLowerLeft,distanceLowerRight));
+		return dist;
 	}
 	
 	public static double distance(Point a, Point b){
@@ -81,10 +82,11 @@ public class Predictor {
 	public static double calculateLikelihood(Point index,Viewport viewport){
 		String horizontal = null;
 		String vertical = null;
+		System.out.print(index+":");
 		if (index.y < viewport.upperLeft.y){
 			vertical="u";
 		}
-		else if(index.y >= viewport.upperLeft.y && index.y <= viewport.lowerLeft.y){
+		else if(index.y >= viewport.upperLeft.y && index.y < viewport.lowerLeft.y){
 			vertical="c";
 		}
 		else {
@@ -94,7 +96,7 @@ public class Predictor {
 		if (index.x < viewport.upperLeft.x){
 			horizontal = "l";
 		}
-		else if( index.x >= viewport.upperLeft.x && index.x <= viewport.upperRight.x){
+		else if( index.x >= viewport.upperLeft.x && index.x < viewport.upperRight.x){
 			horizontal = "c";
 		}
 		else {
@@ -109,32 +111,49 @@ public class Predictor {
 		
 		if (position.equals("ul")){
 			probability = 0.1d;
+			System.out.println("ul");
 		}
 		else if(position.equals("uc")){
 			probability = 0.1d;
+			System.out.println("uc");
 		}
 		else if(position.equals("ur")){
 			probability = 0.2d;
+			System.out.println("ur");
 		}
 		else if(position.equals("cl")){
 			probability = 0.1d;
+			System.out.println("cl");
 		}
 		else if(position.equals("cr")){
 			probability = 0.3d;
+			System.out.println("cr");
 		}
 		else if(position.equals("bl")){
 			probability = 0.3d;
+			System.out.println("bl");
 		}
 		else if(position.equals("bc")){
 			probability = 0.5d;
+			System.out.println("bc");
 		}
 		else if(position.equals("br")){
 			probability = 0.4d;
+			System.out.println("br");
 		}
 		
 		
 		double distance = distance(viewport, index);
-		return (4*probability + 6*Math.min((PROBABILITY_CUTOFF-distance+1)/PROBABILITY_CUTOFF,0d))/10d;
+		double likelihood;
+		System.out.println("distance "+distance);
+		if (PROBABILITY_CUTOFF >= distance){
+			likelihood = (3.5*probability + 6.5*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+		}
+		else {
+			likelihood = 0;
+		}
+		System.out.println("likelihood "+likelihood);
+		return likelihood; 
 	}
 	
 	public static void calculateAndSetLikelihood(Tile tile,Viewport viewport){	

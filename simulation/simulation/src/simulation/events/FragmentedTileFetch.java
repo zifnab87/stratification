@@ -35,7 +35,7 @@ public class FragmentedTileFetch extends Event {
 				}
 				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToFetch);
 				Monitor.databaseFragmentFetch();
-				Main.cache.addFragment(fragment, this.fragmentedPointToFetch);
+				Main.cache.cacheFragment(fragment, this.fragmentedPointToFetch);
 			}
 			else {
 				Monitor.cacheFragmentFetch();

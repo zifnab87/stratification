@@ -3,12 +3,17 @@ package simulation;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
+
+import simulation.monitor.Monitor;
+
 import static simulation.Config.TILE_WIDTH;
 import static simulation.Config.TILE_HEIGHT;
 import static simulation.Config.COLORS;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.FRAGMENT_SIZE;
 import static simulation.Config.DATABASE_WIDTH;
+import static simulation.Config.debug;
 
 public class Tile {
 
@@ -24,20 +29,28 @@ public class Tile {
 	public int lod;
 	public double likelihood;
 	public Point point; //index
+	public boolean cached = false;
 	
 	
+	public static Comparator<Tile> likelihoodComparator = new Comparator<Tile>(){
+		@Override
+		public int compare(Tile t1, Tile t2) {
+		     return (int) (t1.likelihood - t2.likelihood);
+		}
+	};
 	
-	
-
+	public static Tile copyTile(Tile tile){
+		Tile newTile = new Tile(tile.point,tile.pixels);
+		newTile.likelihood = tile.likelihood;
+		newTile.lod = tile.lod;
+		return newTile; 
+	}
 	
 	public Tile(Point point){
 		this.point = point;
 		this.id = this.point.hashCode();
 	}
 	
-	public void setPixels(byte[][][] pixels){
-		this.pixels = pixels;
-	}
 	
 	public Tile(Point point, byte[][][] pixels){
 		
@@ -49,6 +62,19 @@ public class Tile {
 
 	public int getFragmentNumber(){
 		return fragments.size();
+	}
+	
+	
+	public void setCached(boolean cached){
+		this.cached = cached;
+	}
+	
+	public boolean isCached(){
+		return this.cached;
+	}
+	
+	public void setPixels(byte[][][] pixels){
+		this.pixels = pixels;
 	}
 	
 	
@@ -103,10 +129,34 @@ public class Tile {
 	}
 	
 	public String toString(){
-		String str = "Tile("+this.point.y+","+this.point.x+",LOD="+this.lod+",Likelihood="+this.likelihood+")";
+		String str;
+		if (this.isCached()){
+			str = "Tile("+this.point.y+","+this.point.x+",LOD="+this.lod+",Likelihood="+this.likelihood+")";
+		}
+		else {
+			 str = "Tile("+this.point.y+","+this.point.x+")";
+		}
 		return str;
 	}
-
+	
+	public static Vector<Integer> getMissingFragmentIdsTillLOD(int oldLOD,int newLOD){
+		Vector<Integer>  fragmentIds = new Vector<Integer>();
+		if (oldLOD<newLOD && oldLOD <= FRAGMENTS_PER_TILE && newLOD <= FRAGMENTS_PER_TILE){
+			for (int fragmNum=oldLOD+1; fragmNum<=newLOD; fragmNum++){
+				//if fragment doesn't exist request fetch from database;
+				fragmentIds.add(fragmNum);
+			}
+		}
+		return fragmentIds;
+	}
+	
+	public static Vector<Integer> getAllFragmentIds(){
+		return getMissingFragmentIdsTillLOD(0,FRAGMENTS_PER_TILE);
+	}
+	
+	public static Vector<Integer> getMissingFragmentIdsTillFull(int oldLOD){
+		return getMissingFragmentIdsTillLOD(oldLOD, FRAGMENTS_PER_TILE);
+	}
 	
 	
 }

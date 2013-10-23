@@ -38,36 +38,55 @@ public class Database {
 				if (y>=upperLeft.y && y<lowerRight.y && x>=upperLeft.x && x<lowerRight.x){
 					continue;
 				}
-				Vector<Integer> fragmentNums = new Vector<Integer>();
+				Vector<Integer> fragmentsNeeded;
 				Point index = new Point(y,x);
-				index.fragmentNums = fragmentNums;
+				
 				int LOD = Predictor.calculateLOD(index,viewport);
+				System.out.println(LOD);
 				//if tile doesn't exist in cache
-				if (!Main.cache.tileExists(index)){
-					
-					if (FRAGMENT){
-						Main.cache.fulfillLODfromScratch(index,LOD);
+				if (LOD == FRAGMENTS_PER_TILE) {// the tile is needed to be full
+					if (Main.cache.tileExistsAndFull(index)){
+						Monitor.cacheTileFetch();
 					}
-					vec.add(index);
-
+					else if(Main.cache.tileExistsAndNotFull(index)){
+						//find what's missing
+						Tile cachedPartialTile = Main.cache.getTile(index);
+						int cachedLOD = cachedPartialTile.lod;
+						fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);
+						index.setFragmentNums(fragmentsNeeded);
+						vec.add(index);
+						//that many were cached
+						int cachedFragmentsNum = FRAGMENTS_PER_TILE - fragmentsNeeded.size();
+						for (int i=0; i<cachedFragmentsNum; i++){
+							Monitor.cacheFragmentFetch();
+						}
+					}
+					else { //tile doesn't exist in Cache
+						vec.add(index); // full Database Fetch
+					}
 				}
-				//if tile partially exists in cache
-				else if(!Main.cache.tileExistsAndNotFull(index)){
-					index.setFragmentNums(fragmentNums);
-					Main.cache.fullfillLODfromOldLOD(index, LOD);
-					vec.add(index);
+				else if (LOD>0 && LOD<FRAGMENTS_PER_TILE){ //the tile doesn't need to be full
+					if (Main.cache.tileExists(index)){
+						Tile cachedPartialTile = Main.cache.getTile(index);
+						int cachedLOD = cachedPartialTile.lod;
+						if (cachedLOD <= LOD){
+							fragmentsNeeded = Tile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
+							index.setFragmentNums(fragmentsNeeded);
+							vec.add(index);
+						}
+						else {// cachedLOD > LOD THIS SHOULDN'T HAPPEN 
+							for (int i=0; i<LOD; i++){
+								Monitor.cacheFragmentFetch();
+							}
+						}
+					}
+					else { //Tile doesn't exist and we partially needed from Database
+						fragmentsNeeded = Tile.getMissingFragmentIdsTillLOD(0, LOD);
+						index.setFragmentNums(fragmentsNeeded);
+						vec.add(index);
+					}
 				}
-				else {
-					Monitor.cacheTileFetch();
-				}
-			}
-		}
-		//remove what is in the viewport
-		for (int y=upperLeft.y; y<lowerRight.y; y++){
-			for (int x=upperLeft.x; x<lowerRight.x; x++){
-				Point index = new Point(y,x);
-				vec.remove(index);
-			}
+			}				
 		}
 		return vec;
 	}
@@ -76,19 +95,25 @@ public class Database {
 		Point upperLeft = viewport.upperLeft;
 		Point lowerRight = viewport.lowerRight;
 		Vector<Point> vec = new Vector<Point>();
-		Vector<Integer> fragmentNums = new Vector<Integer>();
+		Vector<Integer> fragmentsNeeded = null;
 		for (int y=upperLeft.y; y<lowerRight.y; y++){
 			for (int x=upperLeft.x; x<lowerRight.x; x++){
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
-					vec.add(index);
+					vec.add(index);  // full Database Fetch
 				}
 				//if tile partially exists request missing fragments
 				else if(!Main.cache.tileExistsAndNotFull(index) && !FRAGMENT){
-					index.setFragmentNums(fragmentNums);
-					Main.cache.putMissingFragments(index);
+					
+					Tile cachedPartialTile = Main.cache.getTile(index);
+					int cachedLOD = cachedPartialTile.lod;
+					fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);
+					index.setFragmentNums(fragmentsNeeded);
 					vec.add(index);
+					for (int i=0; i<cachedLOD; i++){
+						Monitor.cacheFragmentFetch();
+					}
 				}
 				else {
 					Monitor.cacheTileFetch();

@@ -1,16 +1,10 @@
 package simulation;
 
-import static simulation.Config.VIEWPORT_HEIGHT;
-import static simulation.Config.VIEWPORT_WIDTH;
-import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.DATABASE_TILES_NUM;
-import static simulation.Config.USER_MOVEMENT_TIME;
-import static simulation.Config.EXPERIMENT_TIME;
 import simulation.events.Event;
 
 import simulation.events.StopAll;
 import simulation.events.UserMove;
-import simulation.monitor.Monitor;
 
 
 public class Main {
@@ -37,7 +31,7 @@ public class Main {
 				UserMove userMove;
 				Viewport viewport = null;
 				//while (true){
-				for (int i=0; i<2; i++){
+				for (int i=0; i<1; i++){
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
 					try {
