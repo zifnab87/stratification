@@ -35,7 +35,7 @@ public class Database {
 			for (int x=upperLeft.x-PREFETCH_DISTANCE; x<lowerRight.x+PREFETCH_DISTANCE; x++){
 				if (x<0 || y<0) continue;
 				//don't put anything that is in the viewport
-				if (y>=upperLeft.y && y<lowerRight.y && x>=upperLeft.x && x<lowerRight.x){
+				if (y>=upperLeft.y && y<=lowerRight.y && x>=upperLeft.x && x<=lowerRight.x){
 					continue;
 				}
 				Vector<Integer> fragmentsNeeded;
