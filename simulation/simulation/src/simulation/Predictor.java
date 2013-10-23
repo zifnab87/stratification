@@ -22,7 +22,6 @@ public class Predictor {
 
 	public static double distance(Viewport viewport, Point p){
 		double distanceUpperLeft = distance(viewport.upperLeft,p);
-		System.out.println("UpperRight"+ viewport.upperRight + " vs "+ p);
 		double distanceUpperRight = distance(viewport.upperRight,p);
 		double distanceLowerLeft = distance(viewport.lowerLeft,p);
 		double distanceLowerRight = distance(viewport.lowerRight,p);
