@@ -26,7 +26,7 @@ public class Predictor {
 		double distanceLowerLeft = distance(viewport.lowerLeft,p);
 		double distanceLowerRight = distance(viewport.lowerRight,p);
 		double dist = Math.min(Math.min(distanceUpperLeft,distanceUpperRight),Math.min(distanceLowerLeft,distanceLowerRight));
-		System.out.println("ul: "+distanceUpperLeft+", ur: "+distanceUpperRight+", ll: "+distanceLowerLeft+", lr"+distanceLowerRight);
+		//System.out.println("ul: "+distanceUpperLeft+", ur: "+distanceUpperRight+", ll: "+distanceLowerLeft+", lr"+distanceLowerRight);
 		return dist;
 	}
 	
@@ -87,7 +87,7 @@ public class Predictor {
 		if (index.y < viewport.upperLeft.y){
 			vertical="u";
 		}
-		else if(index.y >= viewport.upperLeft.y && index.y < viewport.lowerLeft.y){
+		else if(index.y >= viewport.upperLeft.y && index.y <= viewport.lowerLeft.y){
 			vertical="c";
 		}
 		else {
@@ -97,7 +97,7 @@ public class Predictor {
 		if (index.x < viewport.upperLeft.x){
 			horizontal = "l";
 		}
-		else if( index.x >= viewport.upperLeft.x && index.x < viewport.upperRight.x){
+		else if( index.x >= viewport.upperLeft.x && index.x <= viewport.upperRight.x){
 			horizontal = "c";
 		}
 		else {
@@ -142,13 +142,13 @@ public class Predictor {
 			probability = 0.4d;
 			System.out.println("br");
 		}
-		
+		System.out.println("probability "+probability);
 		
 		double distance = distance(viewport, index);
 		double likelihood;
 		System.out.println("distance "+distance);
 		if (PROBABILITY_CUTOFF >= distance){
-			likelihood = (3.5*probability + 6.5*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			likelihood = (2*probability + 8*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
 		}
 		else {
 			likelihood = 0;
