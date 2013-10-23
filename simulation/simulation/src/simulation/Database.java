@@ -41,12 +41,17 @@ public class Database {
 				Vector<Integer> fragmentsNeeded;
 				Point index = new Point(y,x);
 				int LOD;
+				double likelihood;
 				if (FRAGMENT){
-					LOD = Predictor.calculateLOD(index,viewport);
+					likelihood = Predictor.calculateLikelihood(index, viewport);
+					LOD = Predictor.likelihoodToLOD(likelihood);
 				}
 				else {
 					LOD = FRAGMENTS_PER_TILE;
+					likelihood = 1.0d;
 				}
+				index.carriedLikeliood = likelihood;
+				index.LOD = LOD;
 				System.out.println(LOD);
 				//if tile doesn't exist in cache
 				/*if (index.equals(new Point(5,6))){
@@ -117,7 +122,7 @@ public class Database {
 					vec.add(index);  // full Database Fetch
 				}
 				//if tile partially exists request missing fragments
-				else if(!Main.cache.tileExistsAndNotFull(index) && !FRAGMENT){
+				else if(!Main.cache.tileExistsAndNotFull(index)){
 					
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					int cachedLOD = cachedPartialTile.lod;
@@ -128,7 +133,7 @@ public class Database {
 						Monitor.cacheFragmentFetch();
 					}
 				}
-				else {
+				else { // tileExistsAndFull == true
 					Monitor.cacheTileFetch();
 				}
 				

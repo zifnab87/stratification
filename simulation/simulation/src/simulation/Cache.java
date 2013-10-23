@@ -25,10 +25,12 @@ public class Cache {
 	public void cacheFullTile(Tile tile){
 		Tile tileClone = Tile.copyTile(tile);
 		tileClone.setCached(true);
+		tileClone.likelihood = 1.0d;
+		tileClone.lod = FRAGMENTS_PER_TILE;
 		this.tiles.put(tileClone.id, tileClone);
 		this.queue.add(tileClone);
-		for (int i=0; i<FRAGMENTS_PER_TILE; i++){
-			cacheFragment(new Fragment(i,null),tileClone.point);
+		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
+			cacheFragment(new Fragment(i,null),tileClone.point,tileClone.likelihood);
 		}
 	}
 	
@@ -97,7 +99,7 @@ public class Cache {
 		evictFragment(index.hashCode(),fragmNumber);
 	}
 	
-	public void cacheFragment(Fragment fragm,Point point){
+	public void cacheFragment(Fragment fragm,Point point,double likelihood){
 		
 		Tile tile = tiles.get(point.hashCode());
 		if (tile==null){
@@ -106,7 +108,10 @@ public class Cache {
 			tile = tiles.get(point.hashCode());
 		}
 		if (tile!=null && fragm!=null){
+			//TODO FIX SO THAT IS NOT HAPPENING ALL THE TIME
 			tile.addFragment(fragm);
+			tile.likelihood = likelihood;
+			tile.lod = Predictor.likelihoodToLOD(likelihood);
 			
 		}
 	}

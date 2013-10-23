@@ -90,9 +90,9 @@ public class Tile {
 
 		byte[][][] pixels = new byte[TILE_HEIGHT][TILE_WIDTH][COLORS];
 		Tile toReturn = new Tile(new Point(rowCounter,colCounter++));
-		for (int i=0; i<FRAGMENTS_PER_TILE; i++){ //8
+		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){ //8
 			Fragment fragm = Fragment.randomizer(i);
-			int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
+			//int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
 			/*for (int j=0; j<FRAGMENT_SIZE; j++){ 
 				int y = pixelIndexesOfFragment[j] % TILE_WIDTH;
 				int x = pixelIndexesOfFragment[j] / TILE_WIDTH;
@@ -143,7 +143,6 @@ public class Tile {
 		Vector<Integer>  fragmentIds = new Vector<Integer>();
 		if (oldLOD<newLOD && oldLOD <= FRAGMENTS_PER_TILE && newLOD <= FRAGMENTS_PER_TILE){
 			for (int fragmNum=oldLOD+1; fragmNum<=newLOD; fragmNum++){
-				//if fragment doesn't exist request fetch from database;
 				fragmentIds.add(fragmNum);
 			}
 		}

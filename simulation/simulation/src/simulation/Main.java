@@ -50,7 +50,7 @@ public class Main {
 		
 		
 	
-		Thread.sleep(20000);
+		Thread.sleep(10000);
 		try {
 			Event.sendEvent(new StopAll(startTime));
 		} catch (Exception e) {

@@ -12,6 +12,7 @@ import static simulation.Config.debug;
 public class FragmentedTilePrefetch extends Event {
 
 	Point fragmentedPointToPrefetch;
+
 	public FragmentedTilePrefetch(Point fragmentedPointToPrefetch){
 		this.fragmentedPointToPrefetch = fragmentedPointToPrefetch;
 	}
@@ -19,18 +20,21 @@ public class FragmentedTilePrefetch extends Event {
 	public void action() {
 
 		Vector<Integer> fragmentNums = this.fragmentedPointToPrefetch.fragmentNums;
-		
+		double likelihood = fragmentedPointToPrefetch.carriedLikeliood;
 		for (int fragmentNum: fragmentNums){
 			Fragment fragment;
 			if (Main.cache.tileExists(this.fragmentedPointToPrefetch)){
 				Tile tile = Main.cache.getTile(this.fragmentedPointToPrefetch);
+				if (fragmentedPointToPrefetch.equals(new Point(0,7))){
+					System.out.println(tile.containsFragment(1));
+				}
 				if (!tile.containsFragment(fragmentNum)){ //if this fragment is not in the cache
 					if (debug){
 						System.out.println(this+" ("+fragmentNum+")");
 					}
 					fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToPrefetch);
 					Monitor.databaseFragmentFetch();
-					Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch);
+					Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch,likelihood);
 				}
 				else { // if the fragment is in the cache
 					Monitor.cacheFragmentFetch();
@@ -42,7 +46,7 @@ public class FragmentedTilePrefetch extends Event {
 			else {
 				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToPrefetch);
 				Monitor.databaseFragmentFetch();
-				Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch);
+				Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch,likelihood);
 			}
 		}
 		/*for ( int fragmentNum: fragmentNums){

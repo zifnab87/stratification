@@ -14,13 +14,14 @@ public class FragmentedTileFetch extends Event {
 	
 	
 	Point fragmentedPointToFetch;
+
 	public FragmentedTileFetch(Point fragmentedPointToFetch){
 		this.fragmentedPointToFetch = fragmentedPointToFetch;
 	}
 	@Override
 	public void action() {
 		Vector<Integer> fragmentNums = this.fragmentedPointToFetch.fragmentNums;
-		
+		double likelihood = fragmentedPointToFetch.carriedLikeliood;
 		for (int fragmentNum: fragmentNums){
 			Fragment fragment;
 			if (Main.cache.tileExists(this.fragmentedPointToFetch)){
@@ -31,7 +32,7 @@ public class FragmentedTileFetch extends Event {
 					}
 					fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToFetch);
 					Monitor.databaseFragmentFetch();
-					Main.cache.cacheFragment(fragment, this.fragmentedPointToFetch);
+					Main.cache.cacheFragment(fragment, this.fragmentedPointToFetch,likelihood);
 				}
 				else { // if the fragment is in the cache
 					Monitor.cacheFragmentFetch();
@@ -43,7 +44,7 @@ public class FragmentedTileFetch extends Event {
 			else {
 				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToFetch);
 				Monitor.databaseFragmentFetch();
-				Main.cache.cacheFragment(fragment, this.fragmentedPointToFetch);
+				Main.cache.cacheFragment(fragment, this.fragmentedPointToFetch,likelihood);
 			}
 		}
 		
