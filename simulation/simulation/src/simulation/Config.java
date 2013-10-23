@@ -2,7 +2,7 @@ package simulation;
 
 public class Config {
 	
-	public static boolean debug = true;
+	public static boolean debug = false;
 	
 	public static boolean PREFETCH = true;
 	public static boolean FRAGMENT = true; 

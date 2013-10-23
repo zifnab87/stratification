@@ -4,6 +4,7 @@ import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
 import simulation.monitor.Monitor;
+import static simulation.Config.debug;
 
 public class TilePrefetch extends Event {
 
@@ -13,12 +14,15 @@ public class TilePrefetch extends Event {
 	}
 	@Override
 	public void action() throws Exception {
-		System.out.println(this);
+		
 	
 		if (!Main.cache.tileExists(this.pointToPrefetch)){
 			Tile tile = Main.db.getTile(this.pointToPrefetch);
 			Main.cache.cacheFullTile(tile);
 			Monitor.databaseTileFetch();
+			if (debug){
+				System.out.println(this);
+			}
 		}
 		else {
 			Monitor.cacheTileFetch();

@@ -25,14 +25,16 @@ public class UserMove extends Event {
 	}
 	
 	public void action() throws Exception{
-		System.out.println("Cache:"+Main.cache);
+		//if (debug){
+			System.out.println("Cache:"+Main.cache);
+		//}
 		boolean isTerminal = newMove.upperLeft.x == DATABASE_WIDTH-1 && newMove.upperLeft.y == DATABASE_WIDTH-1;
 		if (isTerminal){
 			Event.sendEvent(new StopAll(Main.startTime));
 		}
-		if (debug){
+		//if (debug){
 			System.out.println("UserMove Event"+this.newMove.upperLeft);
-		}
+		//}
 		Main.cache.updateAllTilesLOD(this.newMove);
 		Event.sendEvent(new Fetch(this.newMove));
 		if (PREFETCH){

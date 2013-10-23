@@ -52,7 +52,7 @@ public class Database {
 				}
 				index.carriedLikeliood = likelihood;
 				index.LOD = LOD;
-				System.out.println(LOD);
+				//System.out.println(LOD);
 				//if tile doesn't exist in cache
 				/*if (index.equals(new Point(5,6))){
 					System.out.println(Main.cache.tileExistsAndFull(index));
@@ -75,7 +75,7 @@ public class Database {
 						vec.add(index);
 						//that many were cached
 						int cachedFragmentsNum = FRAGMENTS_PER_TILE - fragmentsNeeded.size();
-						for (int i=0; i<cachedFragmentsNum; i++){
+						for (int i=1; i<cachedLOD; i++){
 							Monitor.cacheFragmentFetch();
 						}
 					}
@@ -92,10 +92,11 @@ public class Database {
 							index.setFragmentNums(fragmentsNeeded);
 							vec.add(index);
 						}
-						else {// cachedLOD > LOD THIS SHOULDN'T HAPPEN 
-							for (int i=0; i<LOD; i++){
-								Monitor.cacheFragmentFetch();
-							}
+						else {// cachedLOD > LOD THIS SHOULDN'T HAPPEN WHEN we update the cache with each User Move
+							
+						}
+						for (int i=1; i<=LOD; i++){
+							Monitor.cacheFragmentFetch();
 						}
 					}
 					else { //Tile doesn't exist and we partially needed from Database
@@ -122,14 +123,17 @@ public class Database {
 					vec.add(index);  // full Database Fetch
 				}
 				//if tile partially exists request missing fragments
-				else if(!Main.cache.tileExistsAndNotFull(index)){
-					
+				
+				else if(Main.cache.tileExistsAndNotFull(index)){
+					if (index.equals(new Point(2,5))){
+						System.out.println("bika");
+					}
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					int cachedLOD = cachedPartialTile.lod;
 					fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);
 					index.setFragmentNums(fragmentsNeeded);
 					vec.add(index);
-					for (int i=0; i<cachedLOD; i++){
+					for (int i=1; i<=cachedLOD; i++){
 						Monitor.cacheFragmentFetch();
 					}
 				}

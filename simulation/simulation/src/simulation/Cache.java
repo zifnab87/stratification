@@ -148,7 +148,11 @@ public class Cache {
 	public String toString(){
 		String result="";
 		for(Tile tile : queue){
-			result+=tile.toString()+": fragments["+tile.getFragmentNumber()+",\n";
+			result+=tile.toString()+": ("+tile.getFragmentNumber()+"): fragments[";
+		    for(int index : tile.fragments.keySet()){
+		    	result+=tile.getFragment(index).num+",";
+		    }
+		    result+="]\n";
 		}
 		return result;
 	}

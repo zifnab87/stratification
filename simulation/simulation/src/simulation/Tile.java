@@ -17,7 +17,7 @@ import static simulation.Config.debug;
 
 public class Tile {
 
-	private Map<Integer,Fragment> fragments = new HashMap<Integer, Fragment>();
+	public Map<Integer,Fragment> fragments = new HashMap<Integer, Fragment>();
 
 	
 	

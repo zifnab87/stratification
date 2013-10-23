@@ -54,7 +54,6 @@ public class Predictor {
 			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
 		}
 		double random = Math.random();
-		random = 0.3d;
 		if (random<=0.1d){
 			return viewport.goUp();
 		}
@@ -84,7 +83,6 @@ public class Predictor {
 	public static double calculateLikelihood(Point index,Viewport viewport){
 		String horizontal = null;
 		String vertical = null;
-		System.out.print(index+":");
 		if (index.y < viewport.upperLeft.y){
 			vertical="u";
 		}
