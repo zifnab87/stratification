@@ -17,7 +17,6 @@ public class Prefetch extends Event{
 		for (Point point : vec){
 			//if point is for a tile to be fetch 100%
 			if (point.fragmentNums==null){
-				
 				Event.sendEvent(new TilePrefetch(point));
 			}
 			else{

@@ -19,7 +19,6 @@ public class TileFetch extends Event {
 			Tile tile = Main.db.getTile(this.pointToFetch);
 			if (debug){
 				System.out.println(this);
-				System.out.println(tile);
 			}
 			if (tile!=null){
 				Main.cache.cacheFullTile(tile);

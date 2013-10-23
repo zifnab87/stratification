@@ -54,6 +54,7 @@ public class Predictor {
 			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
 		}
 		double random = Math.random();
+		random = 0.3d;
 		if (random<=0.1d){
 			return viewport.goUp();
 		}
@@ -112,48 +113,48 @@ public class Predictor {
 		
 		if (position.equals("ul")){
 			probability = 0.1d;
-			System.out.println("ul");
+			//System.out.println("ul");
 		}
 		else if(position.equals("uc")){
 			probability = 0.1d;
-			System.out.println("uc");
+			//System.out.println("uc");
 		}
 		else if(position.equals("ur")){
 			probability = 0.2d;
-			System.out.println("ur");
+			//System.out.println("ur");
 		}
 		else if(position.equals("cl")){
 			probability = 0.1d;
-			System.out.println("cl");
+			//System.out.println("cl");
 		}
 		else if(position.equals("cr")){
 			probability = 0.3d;
-			System.out.println("cr");
+			//System.out.println("cr");
 		}
 		else if(position.equals("bl")){
 			probability = 0.3d;
-			System.out.println("bl");
+			//System.out.println("bl");
 		}
 		else if(position.equals("bc")){
 			probability = 0.5d;
-			System.out.println("bc");
+			//System.out.println("bc");
 		}
 		else if(position.equals("br")){
 			probability = 0.4d;
-			System.out.println("br");
+			//System.out.println("br");
 		}
-		System.out.println("probability "+probability);
+		//System.out.println("probability "+probability);
 		
 		double distance = distance(viewport, index);
 		double likelihood;
-		System.out.println("distance "+distance);
+		//System.out.println("distance "+distance);
 		if (PROBABILITY_CUTOFF >= distance){
 			likelihood = (2*probability + 8*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
 		}
 		else {
 			likelihood = 0;
 		}
-		System.out.println("likelihood "+likelihood);
+		//System.out.println("likelihood "+likelihood);
 		return likelihood; 
 	}
 	

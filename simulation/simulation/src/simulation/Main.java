@@ -31,7 +31,7 @@ public class Main {
 				UserMove userMove;
 				Viewport viewport = null;
 				//while (true){
-				for (int i=0; i<1; i++){
+				for (int i=0; i<2; i++){
 					viewport = Predictor.nextMove(viewport);
 					userMove = new UserMove(viewport);
 					try {
@@ -50,7 +50,7 @@ public class Main {
 		
 		
 	
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 		try {
 			Event.sendEvent(new StopAll(startTime));
 		} catch (Exception e) {

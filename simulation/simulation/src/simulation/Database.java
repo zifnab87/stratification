@@ -40,13 +40,26 @@ public class Database {
 				}
 				Vector<Integer> fragmentsNeeded;
 				Point index = new Point(y,x);
-				
-				int LOD = Predictor.calculateLOD(index,viewport);
+				int LOD;
+				if (FRAGMENT){
+					LOD = Predictor.calculateLOD(index,viewport);
+				}
+				else {
+					LOD = FRAGMENTS_PER_TILE;
+				}
 				System.out.println(LOD);
 				//if tile doesn't exist in cache
+				/*if (index.equals(new Point(5,6))){
+					System.out.println(Main.cache.tileExistsAndFull(index));
+					System.out.println(Main.cache.tileExistsAndNotFull(index));
+					System.out.println(Main.cache.tileExists(index));
+					System.out.println(Main.cache.getTile(index).getFragmentNumber());
+				}*/
 				if (LOD == FRAGMENTS_PER_TILE) {// the tile is needed to be full
+					
 					if (Main.cache.tileExistsAndFull(index)){
 						Monitor.cacheTileFetch();
+
 					}
 					else if(Main.cache.tileExistsAndNotFull(index)){
 						//find what's missing
@@ -96,8 +109,8 @@ public class Database {
 		Point lowerRight = viewport.lowerRight;
 		Vector<Point> vec = new Vector<Point>();
 		Vector<Integer> fragmentsNeeded = null;
-		for (int y=upperLeft.y; y<lowerRight.y; y++){
-			for (int x=upperLeft.x; x<lowerRight.x; x++){
+		for (int y=upperLeft.y; y<=lowerRight.y; y++){
+			for (int x=upperLeft.x; x<=lowerRight.x; x++){
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){

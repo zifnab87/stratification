@@ -19,7 +19,33 @@ public class FragmentedTilePrefetch extends Event {
 	public void action() {
 
 		Vector<Integer> fragmentNums = this.fragmentedPointToPrefetch.fragmentNums;
-		for ( int fragmentNum: fragmentNums){
+		
+		for (int fragmentNum: fragmentNums){
+			Fragment fragment;
+			if (Main.cache.tileExists(this.fragmentedPointToPrefetch)){
+				Tile tile = Main.cache.getTile(this.fragmentedPointToPrefetch);
+				if (!tile.containsFragment(fragmentNum)){ //if this fragment is not in the cache
+					if (debug){
+						System.out.println(this+" ("+fragmentNum+")");
+					}
+					fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToPrefetch);
+					Monitor.databaseFragmentFetch();
+					Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch);
+				}
+				else { // if the fragment is in the cache
+					Monitor.cacheFragmentFetch();
+					if (debug){
+						//System.out.println("Fragment fetched from Cache! (Fetch)");
+					}
+				}
+			}
+			else {
+				fragment = Main.db.getFragmentOfTile(fragmentNum, this.fragmentedPointToPrefetch);
+				Monitor.databaseFragmentFetch();
+				Main.cache.cacheFragment(fragment, this.fragmentedPointToPrefetch);
+			}
+		}
+		/*for ( int fragmentNum: fragmentNums){
 			Tile tile = Main.cache.getTile(this.fragmentedPointToPrefetch);
 			Fragment fragment = null; 
 			if (tile !=null){
@@ -49,7 +75,7 @@ public class FragmentedTilePrefetch extends Event {
 			}
 			
 			
-		}
+		}*/
 
 	}
 	

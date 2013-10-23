@@ -54,7 +54,12 @@ public class Cache {
 	
 	public boolean tileExistsAndFull(int tileId){
 		Tile tile = getTile(tileId);
-		return (tile!=null) && tile.isFull();
+		if (tile != null){
+			return tile.isFull();
+		}
+		else {
+			return false;
+		}
 	}
 	public boolean tileExistsAndFull(Point index){
 		return tileExistsAndFull(index.hashCode());
@@ -66,7 +71,7 @@ public class Cache {
 	}
 	
 	public boolean tileExistsAndNotFull(Point index){
-		return tileExistsAndFull(index.hashCode());
+		return tileExistsAndNotFull(index.hashCode());
 	}
 	
 
@@ -93,6 +98,7 @@ public class Cache {
 	}
 	
 	public void cacheFragment(Fragment fragm,Point point){
+		
 		Tile tile = tiles.get(point.hashCode());
 		if (tile==null){
 			//add a new empty tile if there is not one already //warning with the pixels
@@ -101,6 +107,7 @@ public class Cache {
 		}
 		if (tile!=null && fragm!=null){
 			tile.addFragment(fragm);
+			
 		}
 	}
 	
@@ -132,15 +139,15 @@ public class Cache {
 	}
 	
 	
-	/*
+	
 	public String toString(){
 		String result="";
 		for(Tile tile : queue){
-			result+=tile.toString()+", ";
+			result+=tile.toString()+": fragments["+tile.getFragmentNumber()+",\n";
 		}
 		return result;
 	}
-	
+	/*
 	public int getTileNumber(){
 		return tiles.size();
 	}

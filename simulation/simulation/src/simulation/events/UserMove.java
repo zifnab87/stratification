@@ -25,6 +25,7 @@ public class UserMove extends Event {
 	}
 	
 	public void action() throws Exception{
+		System.out.println("Cache:"+Main.cache);
 		boolean isTerminal = newMove.upperLeft.x == DATABASE_WIDTH-1 && newMove.upperLeft.y == DATABASE_WIDTH-1;
 		if (isTerminal){
 			Event.sendEvent(new StopAll(Main.startTime));
