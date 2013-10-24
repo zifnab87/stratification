@@ -32,7 +32,6 @@ public class Main {
 		//Predictor.trainDatabase(db);
 		//System.out.println("usermove");
 		
-		
 		startTime = System.nanoTime();
 		
 		Thread userMovement = new Thread() { 
@@ -47,7 +46,7 @@ public class Main {
 					System.out.println("Making a new Workload "+WORKLOAD_FILE);
 				}
 				while (true){
-				//for (int i=0; i<3; i++){
+				//for (int i=0; i<5;i++){
 					if (EventHandler.userMoveQueue.size()==0){
 						if (moves!=null && moves.size()>0){
 							viewport = Predictor.nextMove(viewport,moves);
@@ -55,6 +54,11 @@ public class Main {
 						else {
 							viewport = Predictor.nextMove(viewport);
 						}
+						
+						Main.cache.updateAllTileLikelihoods(viewport);
+						System.out.println("Cache:"+Main.cache);
+						System.out.println("cachesize"+cache.tiles.size()+" "+cache.queue.size());
+						//System.out.println("Cache:"+Main.cache);
 						userMove = new UserMove(viewport);
 						try {
 							

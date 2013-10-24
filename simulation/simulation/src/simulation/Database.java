@@ -48,9 +48,10 @@ public class Database {
 				}
 				else {
 					LOD = FRAGMENTS_PER_TILE;
-					likelihood = 1.0d;
+					likelihood = Predictor.calculateLikelihood(index, viewport);
 				}
 				index.carriedLikeliood = likelihood;
+
 				index.LOD = LOD;
 				//System.out.println(LOD);
 				//if tile doesn't exist in cache

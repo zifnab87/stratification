@@ -66,6 +66,7 @@ public class Predictor {
 			return viewport.goLeft();
 		}
 		else {
+			
 			return null;
 		}
 	}
@@ -91,10 +92,10 @@ public class Predictor {
 	}
 	
 	
-	public static void calculateAndSetLOD(Tile tile ,Viewport viewport){
+	/*public static void calculateAndSetLOD(Tile tile ,Viewport viewport){
 		Predictor.calculateAndSetLikelihood(tile,viewport);
 		Predictor.likelihoodToLOD(tile);
-	}
+	}*/
 	
 	public static int calculateLOD(Point point,Viewport viewport){
 		double likelihood = Predictor.calculateLikelihood(point,viewport);
@@ -105,6 +106,10 @@ public class Predictor {
 	public static double calculateLikelihood(Point index,Viewport viewport){
 		String horizontal = null;
 		String vertical = null;
+		if (viewport.contains(index)){
+			return 1.0;
+		}
+		
 		if (index.y < viewport.upperLeft.y){
 			vertical="u";
 		}
@@ -178,9 +183,9 @@ public class Predictor {
 		return likelihood; 
 	}
 	
-	public static void calculateAndSetLikelihood(Tile tile,Viewport viewport){	
+	/*public static void calculateAndSetLikelihood(Tile tile,Viewport viewport){	
 		tile.likelihood = Predictor.calculateLikelihood(tile.point,viewport);
-	}
+	}*/
 	
 
 	public static int likelihoodToLOD(double likelihood){
@@ -190,7 +195,7 @@ public class Predictor {
 		float likelihoodf = Float.valueOf(df.format(likelihood));
 		for (int i=0; i<LOD_INTERVALS.length-1; i++){
 			if (likelihoodf == 0.0d){
-				return 1;
+				return 0;
 			}
 			if (likelihoodf>LOD_INTERVALS[i] && likelihoodf<=LOD_INTERVALS[i+1]){
 				return lod;

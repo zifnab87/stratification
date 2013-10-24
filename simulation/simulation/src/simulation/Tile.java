@@ -27,15 +27,32 @@ public class Tile {
 	private static int colCounter = 0;
 	private static int rowCounter = 0;
 	public int lod;
-	public double likelihood;
+	public double likelihood = -1.0d;
 	public Point point; //index
 	public boolean cached = false;
+	
+	public  boolean equals(Object o){
+		if (this.point.equals(((Tile)o).point)){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	
 	
 	public static Comparator<Tile> likelihoodComparator = new Comparator<Tile>(){
 		@Override
 		public int compare(Tile t1, Tile t2) {
-		     return (int) (t1.likelihood - t2.likelihood);
+		     if  (t1.likelihood > t2.likelihood){
+		    	 return 1;
+		     }
+		     else if (t1.likelihood<t2.likelihood){
+		    	 return -1;
+		     }
+		     else {
+		    	 return 0;
+		     }
 		}
 	};
 	
@@ -107,10 +124,14 @@ public class Tile {
 	
 	public void addFragment(Fragment fragm){
 		fragments.put(fragm.num, fragm);	
+		this.lod = this.getFragmentNumber();
 	}
 	
 	public void removeFragment(int fragmNumber){
+		System.out.println("~~1~~ "+this.getFragmentNumber());
 		fragments.remove(fragmNumber);
+		System.out.println("~~2~~"+this.getFragmentNumber());
+		this.lod = this.getFragmentNumber();
 	}
 	
 	public Fragment getFragment(int fragmNumber){
@@ -157,5 +178,14 @@ public class Tile {
 		return getMissingFragmentIdsTillLOD(oldLOD, FRAGMENTS_PER_TILE);
 	}
 	
+	public static Vector<Integer> getFragmentsToBeRemoved(int oldLOD, int newLOD){
+		Vector<Integer>  fragmentIds = new Vector<Integer>();
+		if (newLOD<oldLOD && newLOD>=0){
+			for (int fragmNum=newLOD+1; fragmNum<=oldLOD; fragmNum++){
+				fragmentIds.add(fragmNum);
+			}
+		}
+		return fragmentIds;
+	}
 	
 }
