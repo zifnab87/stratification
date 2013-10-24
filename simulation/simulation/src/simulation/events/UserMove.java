@@ -35,7 +35,7 @@ public class UserMove extends Event {
 		if (debug){
 			System.out.println("UserMove Event"+this.newMove.upperLeft);
 		}
-		Main.cache.updateAllTilesLOD(this.newMove);
+		//Main.cache.updateAllTilesLOD(this.newMove);
 		Event.sendEvent(new Fetch(this.newMove));
 		if (PREFETCH){
 			Event.sendEvent(new Prefetch(this.newMove));

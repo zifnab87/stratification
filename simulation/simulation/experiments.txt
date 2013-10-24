@@ -1,0 +1,125 @@
+Initializing Database
+Starting Experiment
+Making a new Workload workload.txt
+prefetch: true
+fragment: false
+Total User Moves75
+fragmentCount 0
+databaseFragmentFetchCount 0
+cacheFragmentFetchCount 0
+tileCount 3191
+databaseTileFetchCount 286
+cacheTileFetchCount 2905
+Running time: 27.437632414
+Simulated time: 915200.0
+
+Initializing Database
+Starting Experiment
+Starting Workload Execution workload.txt
+prefetch: true
+fragment: true
+Total User Moves75
+fragmentCount 17748
+databaseFragmentFetchCount 1999
+cacheFragmentFetchCount 15749
+tileCount 730
+databaseTileFetchCount 13
+cacheTileFetchCount 717
+Running time: 61.520299003
+Simulated time: 841200.0
+
+-------------------------
+
+Initializing Database
+Starting Experiment
+Making a new Workload workload_2.txt
+prefetch: true
+fragment: false
+Total User Moves83
+fragmentCount 0
+databaseFragmentFetchCount 0
+cacheFragmentFetchCount 0
+tileCount 3603
+databaseTileFetchCount 300
+cacheTileFetchCount 3303
+Running time: 38.539866137
+Simulated time: 960000.0
+
+Initializing Database
+Starting Experiment
+Starting Workload Execution workload_2.txt
+prefetch: true
+fragment: true
+Total User Moves83
+fragmentCount 19512
+databaseFragmentFetchCount 2101
+cacheFragmentFetchCount 17411
+tileCount 887
+databaseTileFetchCount 13
+cacheTileFetchCount 874
+Running time: 78.039277955
+Simulated time: 882000.0
+
+------------------------------
+
+Initializing Database
+Starting Experiment
+Making a new Workload workload_3.txt
+prefetch: true
+fragment: false
+Total User Moves88
+fragmentCount 0
+databaseFragmentFetchCount 0
+cacheFragmentFetchCount 0
+tileCount 3863
+databaseTileFetchCount 313
+cacheTileFetchCount 3550
+Running time: 40.358745146
+Simulated time: 1001600.0
+
+Initializing Database
+Starting Experiment
+Starting Workload Execution workload_3.txt
+prefetch: true
+fragment: true
+Total User Moves88
+fragmentCount 21367
+databaseFragmentFetchCount 2181
+cacheFragmentFetchCount 19186
+tileCount 970
+databaseTileFetchCount 17
+cacheTileFetchCount 953
+Running time: 93.91764864
+Simulated time: 926800.0
+
+--------------------
+
+Starting Experiment
+Making a new Workload workload_4.txt
+prefetch: true
+fragment: false
+Total User Moves110
+fragmentCount 0
+databaseFragmentFetchCount 0
+cacheFragmentFetchCount 0
+tileCount 4665
+databaseTileFetchCount 285
+cacheTileFetchCount 4380
+Running time: 46.671091105
+Simulated time: 912000.0
+
+Initializing Database
+Starting Experiment
+Starting Workload Execution workload_4.txt
+prefetch: true
+fragment: true
+Total User Moves110
+fragmentCount 27783
+databaseFragmentFetchCount 2016
+cacheFragmentFetchCount 25767
+tileCount 1196
+databaseTileFetchCount 13
+cacheTileFetchCount 1183
+Running time: 104.100173742
+Simulated time: 848000.0
+

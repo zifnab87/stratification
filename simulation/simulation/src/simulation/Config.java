@@ -5,10 +5,11 @@ public class Config {
 	public static boolean debug = false;
 	
 	public static boolean PREFETCH = true;
-	public static boolean FRAGMENT = false; 
+	public static boolean FRAGMENT = true; 
+	public final static String WORKLOAD_FILE = "workload_4.txt";
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 625;//625;
-	public static final int DATABASE_WIDTH = 25;//25;
+	public static final int DATABASE_TILES_NUM = 64;//625;
+	public static final int DATABASE_WIDTH = 8;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
 	public static final int VIEWPORT_HEIGHT = 3;
@@ -28,7 +29,7 @@ public class Config {
 	public static int PROBABILITY_CUTOFF = 8;
 	
 	
-	public final static double SIMULATION_FACTOR = 100d;
+	public final static double SIMULATION_FACTOR = 100d; // unsafe for values >400
 	public final static int RENDER_TIME = (int) Math.ceil(10 / SIMULATION_FACTOR);
 	public final static int DATABASE_TILE_FETCH_TIME = (int) Math.ceil(3200 / SIMULATION_FACTOR);
 	public final static int DATABASE_FRAGMENT_FETCH_TIME = (int) Math.ceil(400 / SIMULATION_FACTOR); 
@@ -44,6 +45,6 @@ public class Config {
 	
 	public final static int EXPERIMENT_TIME = 60; //seconds
 	
-	public final static String WORKLOAD_FILE = "workload.txt";
+	
 	
 }

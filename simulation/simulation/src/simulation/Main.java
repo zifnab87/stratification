@@ -1,10 +1,9 @@
 package simulation;
 
 import static simulation.Config.DATABASE_TILES_NUM;
+import static simulation.Config.WORKLOAD_FILE;
 
 import simulation.events.EventHandler;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import simulation.events.Event;
@@ -42,10 +41,10 @@ public class Main {
 				Viewport viewport = null;
 				//Workload.init();
 				if (moves!=null && moves.size()>0){
-					System.out.println("Starting Workload Execution");
+					System.out.println("Starting Workload Execution "+WORKLOAD_FILE);
 				}
 				else {
-					System.out.println("Making a new Workload");
+					System.out.println("Making a new Workload "+WORKLOAD_FILE);
 				}
 				while (true){
 				//for (int i=0; i<3; i++){

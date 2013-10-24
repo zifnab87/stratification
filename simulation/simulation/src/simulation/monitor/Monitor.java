@@ -19,15 +19,17 @@ public class Monitor {
 	
 	public static void display(double starttime){
 		//System.out.println("Cache:"+Main.cache);
+		
 		System.out.println("prefetch: "+PREFETCH);
 		System.out.println("fragment: "+FRAGMENT);
-		System.out.println("Total User Moves"+ userMoves);
-		System.out.println("fragmentCount "+ fragmentCount);
-		System.out.println("databaseFragmentFetchCount "+databaseFragmentFetchCount);
-		System.out.println("cacheFragmentFetchCount "+cacheFragmentFetchCount);
-		System.out.println("tileCount "+ tileCount);
-		System.out.println("databaseTileFetchCount "+datbaseTileFetchCount);
-		System.out.println("cacheTileFetchCount "+cacheTileFetchCount);
+		System.out.println("Total User Moves :"+ userMoves);
+		System.out.println("fragmentCount :"+ fragmentCount);
+		System.out.println("databaseFragmentFetchCount :"+databaseFragmentFetchCount);
+		System.out.println("cacheFragmentFetchCount :"+cacheFragmentFetchCount);
+		System.out.println("tileCount :"+ tileCount);
+		System.out.println("databaseTileFetchCount :"+datbaseTileFetchCount);
+		System.out.println("cacheTileFetchCount :"+cacheTileFetchCount);
+		System.out.println("cacheSpaceUsed :"+Main.cache.sizeBeingUsed());
 		double endtime = (System.nanoTime() - starttime)/1000000000d;
 		System.out.println("Running time: "+endtime);
 		double simTime =(datbaseTileFetchCount*DATABASE_TILE_FETCH_TIME + databaseFragmentFetchCount*DATABASE_FRAGMENT_FETCH_TIME)*SIMULATION_FACTOR;

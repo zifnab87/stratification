@@ -13,10 +13,22 @@ public class Cache {
 	//fragments
 	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	private PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
-	
+	private int SpaceBeingUsed = 0;
 	
 	public int howManyTiles(){
 		return tiles.size();
+	}
+	
+	public int sizeBeingUsed(){
+		return SpaceBeingUsed;
+	}
+	
+	public synchronized void increaseSpaceUsed(int numOfFragments){
+		this.SpaceBeingUsed = this.SpaceBeingUsed + numOfFragments;
+	}
+	
+	public synchronized void decreaseSpaceUsed(int numOfFragments){
+		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
 	}
 	
 	public void cacheFullTile(Tile tile){
@@ -74,13 +86,15 @@ public class Cache {
 	}
 	
 
-	public void evictTile(Point index){
-		evictTile(index.hashCode());
+	public void evictFullTile(Point index){
+		evictFullTile(index.hashCode());
+		
 	}
 	
-	public void evictTile(int tileId){
+	public void evictFullTile(int tileId){
 		Tile tile = this.tiles.remove(tileId);
 		queue.remove(tile);
+		decreaseSpaceUsed(FRAGMENTS_PER_TILE);
 	}
 	
 	
@@ -90,7 +104,14 @@ public class Cache {
 		int fragmCount = tile.getFragmentNumber();
 		if (fragmCount>0){
 			tile.removeFragment(fragmNumber);
+			decreaseSpaceUsed(1);
 		}
+		fragmCount = tile.getFragmentNumber();
+		//in case that was the last fragment of the tile
+		if (fragmCount==0){
+			queue.remove(tile);
+		}
+		
 	}
 	public void evictFragment(Point index,int fragmNumber){
 		evictFragment(index.hashCode(),fragmNumber);
@@ -109,7 +130,7 @@ public class Cache {
 			tile.addFragment(fragm);
 			tile.likelihood = likelihood;
 			tile.lod = Predictor.likelihoodToLOD(likelihood);
-			
+			increaseSpaceUsed(1);
 		}
 	}
 	

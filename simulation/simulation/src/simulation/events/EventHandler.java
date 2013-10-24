@@ -327,6 +327,12 @@ public class EventHandler {
     
     public void handle(final StopAll event){
     	stopAll = true;
+    	try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Monitor.display(event.startTime);
 		System.out.println("TELOS");
     	System.exit(0);

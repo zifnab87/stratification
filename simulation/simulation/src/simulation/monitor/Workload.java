@@ -68,7 +68,7 @@ public class Workload {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			// TODO Auto-generated catch block
 			return null;
 		}

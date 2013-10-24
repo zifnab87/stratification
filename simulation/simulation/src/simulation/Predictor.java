@@ -169,7 +169,7 @@ public class Predictor {
 		double likelihood;
 		//System.out.println("distance "+distance);
 		if (PROBABILITY_CUTOFF >= distance){
-			likelihood = (2*probability + 8*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			likelihood = (6*probability + 4*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
 		}
 		else {
 			likelihood = 0;
