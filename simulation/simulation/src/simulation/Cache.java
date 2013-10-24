@@ -34,13 +34,38 @@ public class Cache {
 	}
 	
 	
+	public void makeConsistent(){
+		//changes fragment number based on LOD
+		Iterator<Tile> it = queue.iterator();
+		while (it.hasNext()){
+			
+			Tile tile = it.next();
+			int oldLOD = tile.lod;
+			int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
+			if (oldLOD > newLOD){
+				Vector<Integer> fragmNums = Tile.getFragmentsToBeRemoved(oldLOD, newLOD);
+				
+				for (int fragmNum : fragmNums){
+					evictFragment(tile.id, fragmNum);
+				}
+				//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber()+" fragmentsRemoved "+fragmNums);
+			}
+			else if(oldLOD < newLOD){
+				//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber());
+			}
+			/*if (tile.lod != tile.getFragmentNumber() || tile.lod != Predictor.likelihoodToLOD(tile.likelihood)){
+				System.out.println("INCONSISTENT~~~~~~~~~~~~~~~~~~~~~~~~~");
+			}*/
+		}
+	}
+	
 	public void refresh(Tile tile){
 		
 		//updates the LOD
-		int oldLOD = tile.lod;
+	
 		
-		int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
-		System.out.println("oldLOD "+oldLOD+" newLOD"+newLOD);
+		/*int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
+		//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD"+newLOD);
 		tile.lod = newLOD;
 		
 		//changes fragment number based on LOD
@@ -50,9 +75,12 @@ public class Cache {
 			for (int fragmNum : fragmNums){
 				evictFragment(tile.id, fragmNum);
 			}
-			System.out.println("oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber()+" fragmentsRemoved "+fragmNums);
+			//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber()+" fragmentsRemoved "+fragmNums);
 		}
-		
+		else if(oldLOD < newLOD){
+			//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber());
+		}
+		*/
 		
 		//refresh repositions tile based on the new likelihood
 		queue.remove(tile);
@@ -136,10 +164,12 @@ public class Cache {
 	
 	public void evictFragmentedTile(int tileId){
 		Tile tile = this.tiles.get(tileId);
-		int fragmentCount = tile.getFragmentNumber();
-		tiles.remove(tileId);
-		queue.remove(tile);
-		decreaseSpaceUsed(fragmentCount);
+		if (tileExists(tileId)){
+			int fragmentCount = tile.getFragmentNumber();
+			tiles.remove(tileId);
+			queue.remove(tile);
+			decreaseSpaceUsed(fragmentCount);
+		}
 		
 	}
 	
@@ -213,16 +243,18 @@ public class Cache {
 	
 	private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
 		Tile tile = tiles.get(index.hashCode());
-		double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
-		//if likelihood became 0.0 (the only case that LOD=0)
-	    // then remove the tile 
-		if (newLikelihood == 0.0d){
-			
-			evictFragmentedTile(index);
-		}
-		else {
-			tile.likelihood = newLikelihood;
-			refresh(tile);
+		if (tileExists(index)){
+			double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
+			//if likelihood became 0.0 (the only case that LOD=0)
+		    // then remove the tile 
+			if (newLikelihood == 0.0d){
+				
+				evictFragmentedTile(index);
+			}
+			else {
+				tile.likelihood = newLikelihood;
+				refresh(tile);
+			}
 		}
 	}
 	
@@ -249,8 +281,9 @@ public class Cache {
 		while(iter.hasNext()){
 			Tile tile = iter.next();
 			result+=tile.toString()+": ("+tile.getFragmentNumber()+"): fragments[";
-		    for(int index : tile.fragments.keySet()){
-		    	result+=tile.getFragment(index).num+",";
+			Iterator<Integer> fragmIter = tile.fragments.keySet().iterator();
+			while(fragmIter.hasNext()){
+		    	result+=tile.getFragment(fragmIter.next()).num+",";
 		    }
 		    result+="]\n";
 		}

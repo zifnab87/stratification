@@ -18,8 +18,7 @@ public class Main {
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
 	public static Vector<String> moves = Workload.readMoves();
-	/*public static Viewport next;
-	public static Viewport preivous;*/
+	public static Viewport previousViewport=null;
 
 	public static double startTime;
 	
@@ -48,16 +47,20 @@ public class Main {
 				while (true){
 				//for (int i=0; i<5;i++){
 					if (EventHandler.userMoveQueue.size()==0){
+						
 						if (moves!=null && moves.size()>0){
 							viewport = Predictor.nextMove(viewport,moves);
+							Main.previousViewport = viewport;
 						}
 						else {
 							viewport = Predictor.nextMove(viewport);
+							Main.previousViewport = viewport;
 						}
-						
 						Main.cache.updateAllTileLikelihoods(viewport);
+						Main.cache.makeConsistent();
 						System.out.println("Cache:"+Main.cache);
 						System.out.println("cachesize"+cache.tiles.size()+" "+cache.queue.size());
+						
 						//System.out.println("Cache:"+Main.cache);
 						userMove = new UserMove(viewport);
 						try {
@@ -68,6 +71,7 @@ public class Main {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
 					}
 				}
 				
