@@ -1,16 +1,24 @@
 package simulation;
 
 import static simulation.Config.DATABASE_TILES_NUM;
+
+import simulation.events.EventHandler;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.util.Vector;
+
 import simulation.events.Event;
 
 import simulation.events.StopAll;
 import simulation.events.UserMove;
+import simulation.monitor.Workload;
 
 
 public class Main {
-	
+	public static Vector<String> workload = null;
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
+	public static Vector<String> moves = Workload.readMoves();
 	/*public static Viewport next;
 	public static Viewport preivous;*/
 
@@ -19,7 +27,9 @@ public class Main {
 	public static void main(String args[]) throws Exception{
 		
 		//db.setViewport(viewport);
+		System.out.println("Initializing Database");
 		db.init(DATABASE_TILES_NUM);
+		System.out.println("Starting Experiment");
 		//Predictor.trainDatabase(db);
 		//System.out.println("usermove");
 		
@@ -30,16 +40,31 @@ public class Main {
 			public void run() {
 				UserMove userMove;
 				Viewport viewport = null;
-				//while (true){
-				for (int i=0; i<2; i++){
-					viewport = Predictor.nextMove(viewport);
-					userMove = new UserMove(viewport);
-					try {
-						Event.sendEvent(userMove);
-						Thread.sleep(100);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				//Workload.init();
+				if (moves!=null && moves.size()>0){
+					System.out.println("Starting Workload Execution");
+				}
+				else {
+					System.out.println("Making a new Workload");
+				}
+				while (true){
+				//for (int i=0; i<3; i++){
+					if (EventHandler.userMoveQueue.size()==0){
+						if (moves!=null && moves.size()>0){
+							viewport = Predictor.nextMove(viewport,moves);
+						}
+						else {
+							viewport = Predictor.nextMove(viewport);
+						}
+						userMove = new UserMove(viewport);
+						try {
+							
+							Event.sendEvent(userMove);
+							Thread.sleep(100);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 				
@@ -50,7 +75,7 @@ public class Main {
 		
 		
 	
-		Thread.sleep(30000);
+		Thread.sleep(10000);
 		try {
 			Event.sendEvent(new StopAll(startTime));
 		} catch (Exception e) {

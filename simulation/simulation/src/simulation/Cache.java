@@ -1,14 +1,11 @@
 package simulation;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.debug;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
-import simulation.monitor.Monitor;
 
 
 public class Cache {

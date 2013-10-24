@@ -125,9 +125,6 @@ public class Database {
 				//if tile partially exists request missing fragments
 				
 				else if(Main.cache.tileExistsAndNotFull(index)){
-					if (index.equals(new Point(2,5))){
-						System.out.println("bika");
-					}
 					Tile cachedPartialTile = Main.cache.getTile(index);
 					int cachedLOD = cachedPartialTile.lod;
 					fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);

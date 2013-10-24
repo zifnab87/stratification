@@ -5,10 +5,10 @@ public class Config {
 	public static boolean debug = false;
 	
 	public static boolean PREFETCH = true;
-	public static boolean FRAGMENT = true; 
+	public static boolean FRAGMENT = false; 
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 100;//625;
-	public static final int DATABASE_WIDTH = 10;//25;
+	public static final int DATABASE_TILES_NUM = 625;//625;
+	public static final int DATABASE_WIDTH = 25;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
 	public static final int VIEWPORT_HEIGHT = 3;
@@ -40,6 +40,10 @@ public class Config {
 	
 	public final static long SEED = 3l;
 	
+
+	
 	public final static int EXPERIMENT_TIME = 60; //seconds
+	
+	public final static String WORKLOAD_FILE = "workload.txt";
 	
 }

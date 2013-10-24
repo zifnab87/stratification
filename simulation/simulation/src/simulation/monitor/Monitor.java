@@ -18,7 +18,7 @@ public class Monitor {
 	public static int userMoves = 0;
 	
 	public static void display(double starttime){
-		System.out.println("Cache:"+Main.cache);
+		//System.out.println("Cache:"+Main.cache);
 		System.out.println("prefetch: "+PREFETCH);
 		System.out.println("fragment: "+FRAGMENT);
 		System.out.println("Total User Moves"+ userMoves);

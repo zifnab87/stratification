@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Vector;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
 import static simulation.Config.PREFETCH_DISTANCE;
@@ -47,11 +48,32 @@ public class Predictor {
 	
 	
 	
+	public static Viewport nextMove(Viewport viewport,Vector<String> moves){
+		if (viewport == null){
+			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null);
+		}
+		String move = moves.remove(0);
+		if (move.equals("up")){
+			return viewport.goUp();
+		}
+		else if (move.equals("right")){
+			return viewport.goRight();
+		}
+		else if (move.equals("down")){
+			return viewport.goDown();
+		}
+		else if (move.equals("left")){
+			return viewport.goLeft();
+		}
+		else {
+			return null;
+		}
+	}
 	
 	
 	public static Viewport nextMove(Viewport viewport){
 		if (viewport == null){
-			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT);
+			return new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null);
 		}
 		double random = Math.random();
 		if (random<=0.1d){
