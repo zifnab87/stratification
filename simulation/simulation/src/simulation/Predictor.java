@@ -27,7 +27,6 @@ public class Predictor {
 		double distanceLowerLeft = distance(viewport.lowerLeft,p);
 		double distanceLowerRight = distance(viewport.lowerRight,p);
 		double dist = Math.min(Math.min(distanceUpperLeft,distanceUpperRight),Math.min(distanceLowerLeft,distanceLowerRight));
-		//System.out.println("ul: "+distanceUpperLeft+", ur: "+distanceUpperRight+", ll: "+distanceLowerLeft+", lr"+distanceLowerRight);
 		return dist;
 	}
 	
@@ -90,12 +89,6 @@ public class Predictor {
 			return viewport.goLeft();
 		}
 	}
-	
-	
-	/*public static void calculateAndSetLOD(Tile tile ,Viewport viewport){
-		Predictor.calculateAndSetLikelihood(tile,viewport);
-		Predictor.likelihoodToLOD(tile);
-	}*/
 	
 	public static int calculateLOD(Point point,Viewport viewport){
 		double likelihood = Predictor.calculateLikelihood(point,viewport);
@@ -174,7 +167,7 @@ public class Predictor {
 		double likelihood;
 		//System.out.println("distance "+distance);
 		if (PROBABILITY_CUTOFF >= distance){
-			likelihood = (6*probability + 4*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			likelihood = (2*probability + 8*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
 		}
 		else {
 			likelihood = 0;

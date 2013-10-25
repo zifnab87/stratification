@@ -266,14 +266,14 @@ public class EventHandler {
 		prefetchFragmentedTileThread.setPriority(1);
 		
 		
-		userMoveThread.start();
-		fetchThread.start();
-		prefetchThread.start();
+		//userMoveThread.start();
+		//fetchThread.start();
+		//prefetchThread.start();
 		
-		fetchTileThread.start();
-		fetchFragmentedTileThread.start();
-		prefetchTileThread.start();
-		prefetchFragmentedTileThread.start();
+		//fetchTileThread.start();
+		//fetchFragmentedTileThread.start();
+		//prefetchTileThread.start();
+		//prefetchFragmentedTileThread.start();
 		   
 		   
 		   

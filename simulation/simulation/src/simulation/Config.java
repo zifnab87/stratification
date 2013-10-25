@@ -5,19 +5,22 @@ public class Config {
 	public static boolean debug = false;
 	
 	public static boolean PREFETCH = true;
-	public static boolean FRAGMENT = true; 
+	public static boolean FRAGMENT = false; 
 	public final static String WORKLOAD_FILE = "workload_4.txt";
+	//CACHE (fragmentcount size)
+	public static final int CACHE_SIZE = 256;
+	
 	//DATABASE 
-	public static final int DATABASE_TILES_NUM = 64;//625;
-	public static final int DATABASE_WIDTH = 8;//25;
+	public static final int DATABASE_TILES_NUM = 625;//625;
+	public static final int DATABASE_WIDTH = 25;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
 	public static final int VIEWPORT_HEIGHT = 3;
 	public static final int VIEWPORT_WIDTH = 3;
 
 	//TILE
-	public final static int TILE_WIDTH = 256;
-	public final static int TILE_HEIGHT = 256;
+	public final static int TILE_WIDTH = 8; //256
+	public final static int TILE_HEIGHT = 8; //256
 	public final static int FRAGMENTS_PER_TILE = 8;
 	public final static int COLORS = 3;
 	

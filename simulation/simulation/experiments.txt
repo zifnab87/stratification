@@ -3,29 +3,29 @@ Starting Experiment
 Making a new Workload workload.txt
 prefetch: true
 fragment: false
-Total User Moves75
-fragmentCount 0
-databaseFragmentFetchCount 0
-cacheFragmentFetchCount 0
-tileCount 3191
-databaseTileFetchCount 286
-cacheTileFetchCount 2905
-Running time: 27.437632414
+Total User Moves :76
+fragmentCount :0
+databaseFragmentFetchCount :0
+cacheFragmentFetchCount :0
+tileCount :3216
+databaseTileFetchCount :286
+cacheTileFetchCount :2930
+cacheSpaceUsed :2288
+Running time: 18.072807512
 Simulated time: 915200.0
+2
 
-Initializing Database
-Starting Experiment
-Starting Workload Execution workload.txt
 prefetch: true
 fragment: true
-Total User Moves75
-fragmentCount 17748
-databaseFragmentFetchCount 1999
-cacheFragmentFetchCount 15749
-tileCount 730
-databaseTileFetchCount 13
-cacheTileFetchCount 717
-Running time: 61.520299003
+Total User Moves :76
+fragmentCount :16526
+databaseFragmentFetchCount :1999
+cacheFragmentFetchCount :14527
+tileCount :739
+databaseTileFetchCount :13
+cacheTileFetchCount :726
+cacheSpaceUsed :2103
+Running time: 17.350461235
 Simulated time: 841200.0
 
 -------------------------
@@ -35,14 +35,16 @@ Starting Experiment
 Making a new Workload workload_2.txt
 prefetch: true
 fragment: false
-Total User Moves83
-fragmentCount 0
-databaseFragmentFetchCount 0
-cacheFragmentFetchCount 0
-tileCount 3603
-databaseTileFetchCount 300
-cacheTileFetchCount 3303
-Running time: 38.539866137
+Total User Moves :84
+fragmentCount :0
+databaseFragmentFetchCount :0
+cacheFragmentFetchCount :0
+tileCount :3628
+databaseTileFetchCount :300
+cacheTileFetchCount :3328
+cacheSpaceUsed :2400
+Running time: 19.536133246
+Simulated time: 960000.0
 Simulated time: 960000.0
 
 Initializing Database
@@ -50,15 +52,18 @@ Starting Experiment
 Starting Workload Execution workload_2.txt
 prefetch: true
 fragment: true
-Total User Moves83
-fragmentCount 19512
-databaseFragmentFetchCount 2101
-cacheFragmentFetchCount 17411
-tileCount 887
-databaseTileFetchCount 13
-cacheTileFetchCount 874
-Running time: 78.039277955
+Total User Moves :84
+fragmentCount :18257
+databaseFragmentFetchCount :2101
+cacheFragmentFetchCount :16156
+tileCount :896
+databaseTileFetchCount :13
+cacheTileFetchCount :883
+cacheSpaceUsed :2205
+Running time: 18.867270244
 Simulated time: 882000.0
+TELOS
+
 
 ------------------------------
 

@@ -13,8 +13,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class Cache {
 	//tiles
 	//fragments
-	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
-	public PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
+	public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	private int SpaceBeingUsed = 0;
 	
 	public int howManyTiles(){
@@ -37,26 +37,15 @@ public class Cache {
 	public void makeConsistent(){
 		//changes fragment number based on LOD
 		Iterator<Tile> it = queue.iterator();
+		boolean found = false;
 		while (it.hasNext()){
 			
 			Tile tile = it.next();
-			int oldLOD = tile.lod;
+			//int oldLOD = tile.lod;
 			int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
-			if (oldLOD > newLOD){
-				Vector<Integer> fragmNums = Tile.getFragmentsToBeRemoved(oldLOD, newLOD);
-				
-				for (int fragmNum : fragmNums){
-					evictFragment(tile.id, fragmNum);
-				}
-				//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber()+" fragmentsRemoved "+fragmNums);
-			}
-			else if(oldLOD < newLOD){
-				//System.out.println(tile.point+" oldLOD "+oldLOD+" newLOD "+newLOD+"newLOD "+tile.getFragmentNumber());
-			}
-			/*if (tile.lod != tile.getFragmentNumber() || tile.lod != Predictor.likelihoodToLOD(tile.likelihood)){
-				System.out.println("INCONSISTENT~~~~~~~~~~~~~~~~~~~~~~~~~");
-			}*/
+			tile.lod = newLOD;		
 		}
+		
 	}
 	
 	public void refresh(Tile tile){
@@ -98,6 +87,11 @@ public class Cache {
 		if (!this.queue.contains(tileClone)){
 			this.queue.add(tileClone);
 		}
+		if (Main.cache.tiles.size()!=Main.cache.queue.size()){
+			System.out.println("cache sizes inconsistency from cacheFullTile in point "+tile.point);
+			System.exit(-1);
+		}
+		
 		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
 			cacheFragment(new Fragment(i,null),tileClone.point,tileClone.likelihood);
 		}
@@ -188,14 +182,20 @@ public class Cache {
 		if (fragmCount==0){
 			queue.remove(tile);
 			tiles.remove(tileId);
+			if (Main.cache.tiles.size()!=Main.cache.queue.size()){
+				System.out.println("cache sizes inconsistency from evictFragment "+fragmNumber+" in point "+tile.point);
+				System.exit(-1);
+			}
 		}
+		
+
 		
 	}
 	public void evictFragment(Point index,int fragmNumber){
 		evictFragment(index.hashCode(),fragmNumber);
 	}
 	
-	public void cacheFragment(Fragment fragm,Point point,double likelihood){
+	public void cacheFragment(Fragment fragm,Point point,double carriedLikelihood){
 		
 		Tile tile = tiles.get(point.hashCode());
 		if (tile==null){
@@ -204,17 +204,29 @@ public class Cache {
 			tile = tiles.get(point.hashCode());
 		}
 		if (tile!=null && fragm!=null){
+			if (tile.point.equals(new Point(2,2))){
+				System.out.println("2,2 add fragment "+fragm.num);
+			}
 			tile.addFragment(fragm);
-			if (tile.likelihood==-1){
-				tile.likelihood = likelihood;
-				
+			//HOTFIX
+
+			if (tile.likelihood == -1){
+				tile.likelihood = carriedLikelihood;
 			}
 			
-			
+			if (tile.point.equals(new Point(2,2))){
+				System.out.println("2,2 likelihood "+carriedLikelihood);
+			}
 			
 			//tile.lod = tile.getFragmentNumber();
 			refresh(tile);
+			
+			if (tile.point.equals(new Point(2,2))){
+				System.out.println("2,2 likelihood (ver b)"+tile.likelihood);
+			}
+			
 			increaseSpaceUsed(1);
+			
 		}
 	}
 	
@@ -233,15 +245,16 @@ public class Cache {
 	}
 	
 	
-	public void updateAllTileLikelihoods(Viewport currentViewport){
+	public synchronized void updateAllTileLikelihoods(Viewport currentViewport){
 		Iterator<Tile> it = queue.iterator();
 		while (it.hasNext()){
 			updateTileLikelihoodOfIndex(it.next().point,currentViewport);
 		}
+		this.makeConsistent();
 		
 	}
 	
-	private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
+	private synchronized void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
 		Tile tile = tiles.get(index.hashCode());
 		if (tileExists(index)){
 			double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
@@ -269,17 +282,20 @@ public class Cache {
 		    }
 		    result+="]\n";
 		}*/
-		Iterator<Tile> iter = queue.iterator();
-		Tile head = queue.peek();
-		if (head!=null){
-			result+="\nHEAD:"+head.toString()+": ("+head.getFragmentNumber()+"): fragments[";
-		    for(int index : head.fragments.keySet()){
-		    	result+=head.getFragment(index).num+",";
-		    }
-		    result+="]\n";
+		if (Main.cache.tiles.size()!=Main.cache.queue.size()){
+			
+			result+=" INCONSISTENT SIZES tiles/queue"+ Main.cache.tiles.size()+" vs "+Main.cache.queue.size();
 		}
+		Iterator<Tile> iter = queue.iterator();
 		while(iter.hasNext()){
 			Tile tile = iter.next();
+			System.out.println(Predictor.likelihoodToLOD(tile.likelihood));
+			if (tile.lod!=Predictor.likelihoodToLOD(tile.likelihood)){
+				
+				result+=" INCONSISTENT cached "+tile.lod+" vs based-on-likelihood"+Predictor.likelihoodToLOD(tile.likelihood)+" "+tile+" /INCONSISTENT\n";
+				//inconsistent = true;
+				//return result;
+			}
 			result+=tile.toString()+": ("+tile.getFragmentNumber()+"): fragments[";
 			Iterator<Integer> fragmIter = tile.fragments.keySet().iterator();
 			while(fragmIter.hasNext()){

@@ -20,6 +20,8 @@ public class UserMove extends Event {
 		this.movementType = viewport.resultOfMovement;
 	}
 	
+	
+	
 	public void action() throws Exception{
 		
 		Workload.writeMove(this);
@@ -31,9 +33,9 @@ public class UserMove extends Event {
 		if (isTerminal){
 			Event.sendEvent(new StopAll(Main.startTime));
 		}
-		if (debug){
+		//if (debug){
 			System.out.println("UserMove Event"+this.newMove.upperLeft);
-		}
+		//}
 
 		Event.sendEvent(new Fetch(this.newMove));
 		if (PREFETCH){

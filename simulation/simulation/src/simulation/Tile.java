@@ -58,8 +58,8 @@ public class Tile {
 	
 	public static Tile copyTile(Tile tile){
 		Tile newTile = new Tile(tile.point,tile.pixels);
-		newTile.likelihood = tile.likelihood;
-		newTile.lod = tile.lod;
+		//newTile.likelihood = tile.likelihood;
+		//newTile.lod = tile.lod;
 		return newTile; 
 	}
 	
@@ -128,9 +128,7 @@ public class Tile {
 	}
 	
 	public void removeFragment(int fragmNumber){
-		System.out.println("~~1~~ "+this.getFragmentNumber());
 		fragments.remove(fragmNumber);
-		System.out.println("~~2~~"+this.getFragmentNumber());
 		this.lod = this.getFragmentNumber();
 	}
 	

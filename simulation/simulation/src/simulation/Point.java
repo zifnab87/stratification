@@ -8,7 +8,7 @@ public class Point {
 	public int y;
 	public Vector<Integer> fragmentNums;
 	public double carriedLikeliood = 0.0d;
-	public int LOD = 0;
+	//public int LOD = 0;
 	public Point(int y, int x){
 		this.y = y;
 		this.x = x;
