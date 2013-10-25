@@ -46,7 +46,7 @@ public class TileFetch extends Event {
 	}
 	
 	public boolean equals(Object o){
-		System.out.println(this.pointToFetch+" vs "+((TileFetch)o).pointToFetch+"  "+this.pointToFetch.equals(((TileFetch)o).pointToFetch));
+		//System.out.println(this.pointToFetch+" vs "+((TileFetch)o).pointToFetch+"  "+this.pointToFetch.equals(((TileFetch)o).pointToFetch));
 		if (this.pointToFetch.equals(((TileFetch)o).pointToFetch)){
 			return true;
 		}

@@ -30,6 +30,7 @@ public class Tile {
 	public double likelihood = -1.0d;
 	public Point point; //index
 	public boolean cached = false;
+	public boolean beingLoaded = true;
 	
 	public  boolean equals(Object o){
 		if (this.point.equals(((Tile)o).point)){
@@ -44,7 +45,16 @@ public class Tile {
 	public static Comparator<Tile> likelihoodComparator = new Comparator<Tile>(){
 		@Override
 		public int compare(Tile t1, Tile t2) {
-		     if  (t1.likelihood > t2.likelihood){
+			 /*if  (t1.beingLoaded && !t2.beingLoaded){
+				 return 1;
+			 }
+			 else if (t2.beingLoaded && !t1.beingLoaded){
+				 return -1;
+			 }
+			 else if (t1.beingLoaded && t2.beingLoaded){
+				 return 0;
+			 }
+			 else*/ if  (t1.likelihood > t2.likelihood){
 		    	 return 1;
 		     }
 		     else if (t1.likelihood<t2.likelihood){
@@ -93,6 +103,7 @@ public class Tile {
 	public void setPixels(byte[][][] pixels){
 		this.pixels = pixels;
 	}
+	
 	
 	
 	

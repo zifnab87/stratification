@@ -18,25 +18,12 @@ import simulation.events.UserMove;
 
 public class Workload {
 	
-	public static void init(){
-		/*try {
-			File file = new File(WORKLOAD_FILE);
-			if (file.exists()){
-				Files.delete(new File(WORKLOAD_FILE).toPath());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			// TODO Auto-generated catch block
-
-		}*/
-	}
-	
 	
 	public static void writeMove(UserMove userMove) throws FileNotFoundException, UnsupportedEncodingException{
 		String movementType = userMove.movementType;
 		DataOutputStream writer = null;
 		try {
-		    writer = new DataOutputStream(new FileOutputStream(new File(WORKLOAD_FILE),true));
+		    writer = new DataOutputStream(new FileOutputStream(new File(WORKLOAD_FILE+".txt"),true));
 		    		 
 		    if (movementType != null){
 		    	writer.writeUTF(movementType);
@@ -52,7 +39,7 @@ public class Workload {
 	public static Vector<String> readMoves(){
 		DataInputStream reader;
 		try {
-			reader = new DataInputStream(new FileInputStream(WORKLOAD_FILE));
+			reader = new DataInputStream(new FileInputStream(WORKLOAD_FILE+".txt"));
 			Vector<String> moves = new Vector<String>();
 			while(true){		
 				String move;

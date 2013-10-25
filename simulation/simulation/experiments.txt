@@ -103,28 +103,44 @@ Starting Experiment
 Making a new Workload workload_4.txt
 prefetch: true
 fragment: false
-Total User Moves110
-fragmentCount 0
-databaseFragmentFetchCount 0
-cacheFragmentFetchCount 0
-tileCount 4665
-databaseTileFetchCount 285
-cacheTileFetchCount 4380
-Running time: 46.671091105
+Total User Moves :111
+fragmentCount :0
+databaseFragmentFetchCount :0
+cacheFragmentFetchCount :0
+tileCount :4690
+databaseTileFetchCount :285
+cacheTileFetchCount :4405
+cacheSpaceUsed :2280
+Running time: 20.707613623
 Simulated time: 912000.0
+
 
 Initializing Database
 Starting Experiment
 Starting Workload Execution workload_4.txt
 prefetch: true
 fragment: true
-Total User Moves110
-fragmentCount 27783
-databaseFragmentFetchCount 2016
-cacheFragmentFetchCount 25767
-tileCount 1196
-databaseTileFetchCount 13
-cacheTileFetchCount 1183
-Running time: 104.100173742
+Total User Moves :111
+fragmentCount :23432
+databaseFragmentFetchCount :2016
+cacheFragmentFetchCount :21416
+tileCount :1205
+databaseTileFetchCount :13
+cacheTileFetchCount :1192
+cacheSpaceUsed :2120
+Running time: 20.301487438
 Simulated time: 848000.0
 
+
+prefetch: true
+fragment: false
+Total User Moves :111
+fragmentCount :0
+databaseFragmentFetchCount :0
+cacheFragmentFetchCount :0
+tileCount :4690
+databaseTileFetchCount :947
+cacheTileFetchCount :3743
+cacheSpaceUsed :256
+Running time: 41.504657317
+Simulated time: 3030400.0

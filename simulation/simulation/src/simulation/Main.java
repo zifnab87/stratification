@@ -6,6 +6,9 @@ import static simulation.Config.WORKLOAD_FILE;
 import static simulation.Config.debug;
 
 import simulation.events.EventHandler;
+
+import java.io.File;
+import java.nio.file.Files;
 import java.util.Vector;
 
 import simulation.events.Event;
@@ -32,6 +35,8 @@ public class Main {
 	
 	
 	public static void main(String args[]) throws Exception{
+	
+		
 		System.out.println("Initializing Database");
 		db.init(DATABASE_TILES_NUM);
 		System.out.println("Starting Experiment");
@@ -58,18 +63,19 @@ public class Main {
 				viewport = Predictor.nextMove(viewport);
 				
 			}
-			if (debug){
+		//	if (debug){
 				System.out.println("UserMove "+viewport.upperLeft);
-			}
+		//	}
 			
 			
 			Monitor.userMove();
-			//if (debug){
+			if (debug){
 				if (Main.previousViewport!=null){
 					String cache = Main.cache.toString();
 					System.out.println("Cache After Move"+Main.previousViewport.upperLeft+":"+cache);
 				}
-			//}
+			}
+			System.out.println("Cache size being used: "+Main.cache.sizeBeingUsed());
 			Vector<Point> fetch = Main.db.viewportFetch(viewport);
 			Vector<Point> prefetch = Main.db.aroundViewportPrefetch(viewport);
 			
@@ -80,6 +86,7 @@ public class Main {
 				else{
 					new FragmentedTileFetch(p).action();
 				}
+				
 			}
 			
 			for(Point p : prefetch){
@@ -90,7 +97,7 @@ public class Main {
 					new FragmentedTilePrefetch(p).action();
 				}
 			}
-			
+			Monitor.writeToFile();
 			
 			
 			boolean isTerminal = viewport.upperLeft.x == DATABASE_WIDTH-1 && viewport.upperLeft.y == DATABASE_WIDTH-1;
@@ -102,6 +109,7 @@ public class Main {
 			Main.previousViewport = viewport;
 			//System.out.println("@@@@@@"+ObjectSizeFetcher.getObjectSize(Main.cache));
 			//System.out.println("@@@@@@"+ObjectSizeFetcher.getObjectSize(Main.db));
+			
 			Thread.sleep(100);
 			
 			//Main.cache.makeConsistent();

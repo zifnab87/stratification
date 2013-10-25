@@ -6,9 +6,9 @@ public class Config {
 	
 	public static boolean PREFETCH = true;
 	public static boolean FRAGMENT = false; 
-	public final static String WORKLOAD_FILE = "workload_4.txt";
+	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static final int CACHE_SIZE = 256;
+	public static final int CACHE_SIZE = Integer.MAX_VALUE;
 	
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;
