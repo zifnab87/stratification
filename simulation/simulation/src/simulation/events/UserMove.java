@@ -1,7 +1,7 @@
 package simulation.events;
 
 import static simulation.Config.DATABASE_WIDTH;
-import static simulation.Config.PREFETCH;
+//import static simulation.Config.PREFETCH;
 import static simulation.Config.debug;
 import simulation.monitor.Workload;
 import simulation.Main;
@@ -38,9 +38,10 @@ public class UserMove extends Event {
 		//}
 
 		Event.sendEvent(new Fetch(this.newMove));
-		if (PREFETCH){
+		/*if (PREFETCH){
 			Event.sendEvent(new Prefetch(this.newMove));
-		}
+		}*/
+		System.exit(3);
 		
 		Monitor.userMove();
 		

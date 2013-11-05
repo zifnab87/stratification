@@ -1,6 +1,6 @@
 package simulation.monitor;
 
-import static simulation.Config.PREFETCH;
+//import static simulation.Config.PREFETCH;
 import static simulation.Config.FRAGMENT;
 import static simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
 import static simulation.Config.DATABASE_TILE_FETCH_TIME;
@@ -76,7 +76,7 @@ public class Monitor {
 	public static void display(double starttime){
 		//System.out.println("Cache:"+Main.cache);
 		
-		System.out.println("prefetch: "+PREFETCH);
+		//System.out.println("prefetch: "+PREFETCH);
 		System.out.println("fragment: "+FRAGMENT);
 		System.out.println("Total User Moves :"+ userMoves);
 		System.out.println("fragmentCount :"+ fragmentCount);

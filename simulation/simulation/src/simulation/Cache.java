@@ -16,7 +16,7 @@ public class Cache {
 	//fragments
 	public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
-	private int SpaceBeingUsed = 0;
+	public int SpaceBeingUsed = 0;
 	
 	
 	public boolean isFull(){
@@ -76,6 +76,7 @@ public class Cache {
 			//int oldLOD = tile.lod;
 			int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
 			tile.lod = newLOD;		
+
 		}
 		
 	}
@@ -90,13 +91,13 @@ public class Cache {
 	public void cacheFullTile(Tile tile){
 		int counter = 0;
 		while(!this.hasAvailableSpace(FRAGMENTS_PER_TILE)){
-			int diff = makeSpaceAvailable(1,tile.point);
-			if (diff==0){
+			int diff = makeSpaceAvailable(FRAGMENTS_PER_TILE,tile.point);
+			/*if (diff==0){
 				counter++;
 			}
 			if (counter>5){
 				break;
-			}
+			}*/
 		}
 		Tile tileClone = Tile.copyTile(tile);
 		tileClone.setCached(true);
@@ -157,7 +158,7 @@ public class Cache {
 	}
 	
 
-	public void evictFullTile(Point index){
+	/*public void evictFullTile(Point index){
 		evictFullTile(index.hashCode());
 		
 	}
@@ -169,7 +170,7 @@ public class Cache {
 			queue.remove(tile);
 			decreaseSpaceUsed(FRAGMENTS_PER_TILE);
 		//}
-	}
+	}*/
 	
 	public void evictFragmentedTile(Point index){
 		evictFragmentedTile(index.hashCode());
@@ -191,7 +192,7 @@ public class Cache {
 	
 	public void evictFragment(int tileId,int fragmNumber){
 		//if (!this.hasAvailableSpace(availableSpace)){
-		makeConsistent();
+			makeConsistent();
 			Tile tile = this.tiles.get(tileId);
 			int fragmCount = tile.getFragmentNumber();
 			if (fragmCount>0){
@@ -321,7 +322,7 @@ public class Cache {
 			double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
 			//if likelihood became 0.0 (the only case that LOD=0)
 		    // then remove the tile 
-			if (newLikelihood == 0.0d){
+			if (newLikelihood == 0.0d && this.isFull()){
 				
 				evictFragmentedTile(index);
 			}

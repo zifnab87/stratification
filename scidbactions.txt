@@ -25,7 +25,7 @@ iquery -o csv -q "SELECT * FROM subarray(Michalis,0,0,100,100)"
 import subprocess 
 import time
 starttime = time.time()
-proc = subprocess.Popen(["/opt/scidb/13.3/bin/iquery","-o", "csv", "-q", "SELECT * FROM subarray(Michalis2,0,0,1024,1024)"], stdout = subprocess.PIPE)
+proc = subprocess.Popen(["/opt/scidb/13.3/bin/iquery","-o", "csv", "-q", "SELECT r,g,b FROM subarray(Michalis,0,0,1024,1024)"], stdout = subprocess.PIPE)
 out,err = proc.communicate()
 lines = out.split("\n")
 endtime = time.time()

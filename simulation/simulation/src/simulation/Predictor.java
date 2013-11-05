@@ -130,7 +130,7 @@ public class Predictor {
 		}
 		
 		if (position.equals("ul")){
-			probability = 0.1d;
+			probability = 0.01d;//0.1d;
 			//System.out.println("ul");
 		}
 		else if(position.equals("uc")){
@@ -138,7 +138,7 @@ public class Predictor {
 			//System.out.println("uc");
 		}
 		else if(position.equals("ur")){
-			probability = 0.2d;
+			probability = 0.03d;//0.2d;
 			//System.out.println("ur");
 		}
 		else if(position.equals("cl")){
@@ -150,7 +150,7 @@ public class Predictor {
 			//System.out.println("cr");
 		}
 		else if(position.equals("bl")){
-			probability = 0.3d;
+			probability = 0.05d;//0.3d;
 			//System.out.println("bl");
 		}
 		else if(position.equals("bc")){
@@ -158,7 +158,7 @@ public class Predictor {
 			//System.out.println("bc");
 		}
 		else if(position.equals("br")){
-			probability = 0.4d;
+			probability = 0.15d;//0.4d;
 			//System.out.println("br");
 		}
 		//System.out.println("probability "+probability);
@@ -167,7 +167,16 @@ public class Predictor {
 		double likelihood;
 		//System.out.println("distance "+distance);
 		if (PROBABILITY_CUTOFF >= distance){
-			likelihood = (4*probability + 6*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			
+			//likelihood = (1.0*probability + 0.0*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			//if (Main.cache.SpaceBeingUsed/Config.CACHE_SIZE*1.0d > 0.8d){ // more than 80% memory usage
+				likelihood = (0.9*probability + 0.1*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+			//}
+			//else {
+				//likelihood = probability;
+				//likelihood = 1.0;
+			//}
+					
 		}
 		else {
 			likelihood = 0;
