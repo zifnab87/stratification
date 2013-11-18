@@ -74,9 +74,9 @@ public class Cache {
 			
 			Tile tile = it.next();
 			//int oldLOD = tile.lod;
-			int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
-			tile.lod = newLOD;		
-
+			//int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
+			//tile.lod = newLOD;		
+			tile.lod = tile.getFragmentNumber();
 		}
 		
 	}
@@ -92,12 +92,12 @@ public class Cache {
 		int counter = 0;
 		while(!this.hasAvailableSpace(FRAGMENTS_PER_TILE)){
 			int diff = makeSpaceAvailable(FRAGMENTS_PER_TILE,tile.point);
-			/*if (diff==0){
+			if (diff==0){
 				counter++;
 			}
-			if (counter>5){
+			if (counter>8){
 				break;
-			}*/
+			}
 		}
 		Tile tileClone = Tile.copyTile(tile);
 		tileClone.setCached(true);
@@ -240,8 +240,15 @@ public class Cache {
 		if (fragments==1){
 			Tile lessLikelyTile = queue.peek();
 			int fragmNumber = lessLikelyTile.getFragmentNumber();
+			//remove only if the likelihood of the one removed is lower than the one to be inserted
+			//if (lessLikelyTile.likelihood < point.carriedLikeliood){
+
+				evictFragment(lessLikelyTile.point, fragmNumber);
+			//}
+			//else {
+			//	System.out.println(lessLikelyTile.likelihood+" "+point.carriedLikeliood);
+			//}
 			
-			evictFragment(lessLikelyTile.point, fragmNumber);
 		}
 		else {
 			Tile lessLikelyTile = queue.peek();

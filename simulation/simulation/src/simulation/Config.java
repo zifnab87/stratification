@@ -8,7 +8,7 @@ public class Config {
 	public static boolean FRAGMENT = true; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static final int CACHE_SIZE = 2048;//Integer.MAX_VALUE;
+	public static final int CACHE_SIZE = 128;
 	
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;
@@ -28,7 +28,7 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static int PREFETCH_DISTANCE = 2;  
+	public static int PREFETCH_DISTANCE = 4;  
 	public static int PROBABILITY_CUTOFF = 8;
 	
 	

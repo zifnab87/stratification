@@ -48,7 +48,12 @@ public class Database {
 					LOD = Predictor.likelihoodToLOD(likelihood);
 				}
 				else {
-					LOD = FRAGMENTS_PER_TILE;
+					if (likelihood >= 0.3){
+						LOD = FRAGMENTS_PER_TILE;
+					}
+					else {
+						LOD = 0;
+					}
 				}
 				
 				index.carriedLikeliood = likelihood;

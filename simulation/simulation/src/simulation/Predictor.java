@@ -170,7 +170,11 @@ public class Predictor {
 			
 			//likelihood = (1.0*probability + 0.0*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
 			//if (Main.cache.SpaceBeingUsed/Config.CACHE_SIZE*1.0d > 0.8d){ // more than 80% memory usage
-				likelihood = (0.9*probability + 0.1*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+				//likelihood = (9*probability + 1*(PROBABILITY_CUTOFF-distance+1)/(PROBABILITY_CUTOFF*1.0d))/10d;
+				likelihood = Math.pow(probability,distance);
+				if (likelihood <0.0000001){
+					likelihood = 0;
+				}
 			//}
 			//else {
 				//likelihood = probability;
