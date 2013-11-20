@@ -1,14 +1,15 @@
-package simulation.events;
+package depr.simulation.events;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
-import static simulation.Config.DATABASE_TILE_FETCH_TIME;
-import static simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
-import static simulation.Config.USER_MOVEMENT_TIME;
 
-import simulation.Main;
-import simulation.monitor.Monitor;
+import depr.simulation.Main;
+import depr.simulation.monitor.Monitor;
+import static depr.simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
+import static depr.simulation.Config.DATABASE_TILE_FETCH_TIME;
+import static depr.simulation.Config.USER_MOVEMENT_TIME;
+
 
 public class EventHandler {
 	

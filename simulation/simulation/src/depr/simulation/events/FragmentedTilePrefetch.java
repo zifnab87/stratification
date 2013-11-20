@@ -1,13 +1,14 @@
-package simulation.events;
+package depr.simulation.events;
 
 import java.util.Vector;
 
-import simulation.Fragment;
-import simulation.Main;
-import simulation.Point;
-import simulation.Tile;
-import simulation.monitor.Monitor;
-import static simulation.Config.debug;
+import depr.simulation.Fragment;
+import depr.simulation.Main;
+import depr.simulation.Point;
+import depr.simulation.Tile;
+import depr.simulation.monitor.Monitor;
+
+import static depr.simulation.Config.debug;
 
 public class FragmentedTilePrefetch extends Event {
 

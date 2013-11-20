@@ -1,4 +1,4 @@
-package simulation;
+package depr.simulation;
 
 public class ClientRequest {
 	//tiles

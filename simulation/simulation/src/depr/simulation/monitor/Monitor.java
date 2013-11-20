@@ -1,13 +1,13 @@
-package simulation.monitor;
+package depr.simulation.monitor;
 
 //import static simulation.Config.PREFETCH;
-import static simulation.Config.FRAGMENT;
-import static simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
-import static simulation.Config.DATABASE_TILE_FETCH_TIME;
-import static simulation.Config.SIMULATION_FACTOR;
-import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.WORKLOAD_FILE;
-import static simulation.Config.CACHE_SIZE;
+import static depr.simulation.Config.CACHE_SIZE;
+import static depr.simulation.Config.DATABASE_FRAGMENT_FETCH_TIME;
+import static depr.simulation.Config.DATABASE_TILE_FETCH_TIME;
+import static depr.simulation.Config.FRAGMENT;
+import static depr.simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.SIMULATION_FACTOR;
+import static depr.simulation.Config.WORKLOAD_FILE;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 
-import simulation.Main;
+import depr.simulation.Main;
+
 
 public class Monitor {
 	
@@ -97,7 +98,7 @@ public class Monitor {
 	
 	public static synchronized void databaseTileFetch(){
 		try {
-			Thread.sleep(simulation.Config.DATABASE_TILE_FETCH_TIME);
+			Thread.sleep(depr.simulation.Config.DATABASE_TILE_FETCH_TIME);
 			datbaseTileFetchCount++;
 			tileCount++;
 			databaseTotalFramgnetCount += FRAGMENTS_PER_TILE;
@@ -114,7 +115,7 @@ public class Monitor {
 	
 	public static synchronized void databaseFragmentFetch(){
 		try {
-			Thread.sleep(simulation.Config.DATABASE_FRAGMENT_FETCH_TIME);
+			Thread.sleep(depr.simulation.Config.DATABASE_FRAGMENT_FETCH_TIME);
 			databaseFragmentFetchCount++;
 			fragmentCount++;
 			databaseTotalFramgnetCount++;

@@ -1,27 +1,22 @@
-package simulation;
+package depr.simulation;
 
-import static simulation.Config.CACHE_SIZE;
-import static simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.CACHE_SIZE;
+import static depr.simulation.Config.FRAGMENT;
+import static depr.simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.debug;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import simulation.Fragment;
-import simulation.Main;
-import simulation.Point;
-import simulation.Tile;
-import simulation.Viewport;
-import simulation.events.UserMove;
-import simulation.predictor.Predictor;
-
 public class Cache {
+	//tiles
+	//fragments
 	public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	public int SpaceBeingUsed = 0;
-	
-	
 	
 	
 	public boolean isFull(){
@@ -120,62 +115,17 @@ public class Cache {
 		}
 	}
 	
-	
-	public Tile fetchTile(Tile tile,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits+=FRAGMENTS_PER_TILE;
-		return getTile(tile);
-	}
-	
-
 	public Tile getTile(Tile tile){
 		return this.tiles.get(tile.id);
 	}
-	
-	public Tile fetchTile(Point point,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits += FRAGMENTS_PER_TILE;
-		return getTile(point);
-	}
-	
 	
 	public Tile getTile(Point point){
 		return this.tiles.get(point.hashCode());
 	}
 	
-	public Tile fetchTile(int hash,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits+=FRAGMENTS_PER_TILE;
-		return getTile(hash);
-	}
-	
 	public Tile getTile(int hash){
 		return this.tiles.get(hash);
 	}
-	
-	
-	public Fragment fetchFragmentOfTile(int fragmentNumber,Point index,UserMove caller){
-		
-		caller.cacheHits+=1;
-		UserMove.totalCacheHits+=1;
-		return getFragmentOfTile(fragmentNumber,index);
-	}
-	
-	private Fragment getFragmentOfTile(int fragmentNumber,Point index){
-		
-		if (tileExists(index)){
-			Tile tile = getTile(index);
-		
-			return tile.getFragment(fragmentNumber);
-		}
-		else {
-			System.out.println("tile Doesn't exist for fragment");
-			return null;
-		}
-	}
-	
-	
-	
 	
 	public boolean tileExists(int tileId){
 		return tiles.containsKey(tileId);
@@ -376,8 +326,7 @@ public class Cache {
 	private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
 		Tile tile = tiles.get(index.hashCode());
 		if (tileExists(index)){
-			double newLikelihood = 1.0d;
-			//double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
+			double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
 			//if likelihood became 0.0 (the only case that LOD=0)
 		    // then remove the tile 
 			if (newLikelihood == 0.0d && this.isFull()){
@@ -433,4 +382,6 @@ public class Cache {
 			return false;
 		}
 	}
+
+	
 }

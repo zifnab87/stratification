@@ -1,4 +1,4 @@
-package simulation;
+package depr.simulation;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -7,12 +7,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
-import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.PREFETCH_DISTANCE;
-import static simulation.Config.PROBABILITY_CUTOFF;
-import static simulation.Config.VIEWPORT_HEIGHT;
-import static simulation.Config.VIEWPORT_WIDTH;
-import static simulation.Config.UPPER_LEFT_STARTING_POINT;
+import static depr.simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.PREFETCH_DISTANCE;
+import static depr.simulation.Config.PROBABILITY_CUTOFF;
+import static depr.simulation.Config.UPPER_LEFT_STARTING_POINT;
+import static depr.simulation.Config.VIEWPORT_HEIGHT;
+import static depr.simulation.Config.VIEWPORT_WIDTH;
 
 public class Predictor {
 	
@@ -242,7 +242,7 @@ public class Predictor {
 	}
 	
 	private static void spiralTrain(Database db){
-		int width = simulation.Config.DATABASE_WIDTH;
+		int width = depr.simulation.Config.DATABASE_WIDTH;
 		boolean horizontal = true;
 		int length = width;
 		boolean firsttime = true;

@@ -1,6 +1,4 @@
-package simulation;
-
-import simulation.Point;
+package depr.simulation;
 
 public class Config {
 	
@@ -17,8 +15,8 @@ public class Config {
 	public static final int DATABASE_WIDTH = 25;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
-	public static final int VIEWPORT_HEIGHT = 1;
-	public static final int VIEWPORT_WIDTH = 1;
+	public static final int VIEWPORT_HEIGHT = 3;
+	public static final int VIEWPORT_WIDTH = 3;
 
 	//TILE
 	public final static int TILE_WIDTH = 8; //256
@@ -30,10 +28,9 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static double PROBABILITY_CUTOFF = 0.20d;
+	public static int PREFETCH_DISTANCE = 4;  
+	public static int PROBABILITY_CUTOFF = 8;
 	
-	//USER
-	public static int THINK_TIME = 32;
 	
 	public final static double SIMULATION_FACTOR = 100d; // unsafe for values >400
 	public final static int RENDER_TIME = (int) Math.ceil(10 / SIMULATION_FACTOR);

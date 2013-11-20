@@ -1,8 +1,8 @@
-package simulation;
-import static simulation.Config.COLORS;
-import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.FRAGMENT_SIZE;
-import static simulation.Config.SEED;
+package depr.simulation;
+import static depr.simulation.Config.COLORS;
+import static depr.simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.FRAGMENT_SIZE;
+import static depr.simulation.Config.SEED;
 
 import java.util.Random;
 import java.util.Vector;

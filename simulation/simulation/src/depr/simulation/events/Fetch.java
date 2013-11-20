@@ -1,10 +1,11 @@
-package simulation.events;
+package depr.simulation.events;
 
 import java.util.Vector;
 
-import simulation.Main;
-import simulation.Point;
-import simulation.Viewport;
+import depr.simulation.Main;
+import depr.simulation.Point;
+import depr.simulation.Viewport;
+
 
 public class Fetch extends Event{
 	Viewport viewport;

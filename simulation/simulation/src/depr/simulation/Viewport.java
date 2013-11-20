@@ -1,4 +1,4 @@
-package simulation;
+package depr.simulation;
 
 
 public class Viewport {
@@ -58,6 +58,30 @@ public class Viewport {
 	}	
 	
 	
+	public Viewport goLeft(){
+		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
+		//System.out.println("left");
+		return new Viewport(this.height,this.width,newUpperLeft,"left");
+	}
+	
+	public Viewport goRight(){
+		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
+		//System.out.println("right");
+		return new Viewport(this.height,this.width,newUpperLeft,"right");
+	}
+	
+	public Viewport goDown(){
+		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
+		//System.out.println("down");
+		return new Viewport(this.height,this.width,newUpperLeft,"down");
+	}
+
+	public Viewport goUp(){
+		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
+		//System.out.println("try" + newUpperLeft);
+		//System.out.println("up");
+		return new Viewport(this.height,this.width,newUpperLeft,"up");
+	}
 	
 	
 

@@ -1,4 +1,4 @@
-package simulation.events;
+package depr.simulation.events;
 
 public class StopAll extends Event {
 	double startTime;

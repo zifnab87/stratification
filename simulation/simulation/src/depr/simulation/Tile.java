@@ -1,18 +1,20 @@
-package simulation;
+package depr.simulation;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import depr.simulation.monitor.Monitor;
 
-import static simulation.Config.COLORS;
-import static simulation.Config.DATABASE_WIDTH;
-import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.FRAGMENT_SIZE;
-import static simulation.Config.TILE_HEIGHT;
-import static simulation.Config.TILE_WIDTH;
-import static simulation.Config.debug;
+
+import static depr.simulation.Config.COLORS;
+import static depr.simulation.Config.DATABASE_WIDTH;
+import static depr.simulation.Config.FRAGMENTS_PER_TILE;
+import static depr.simulation.Config.FRAGMENT_SIZE;
+import static depr.simulation.Config.TILE_HEIGHT;
+import static depr.simulation.Config.TILE_WIDTH;
+import static depr.simulation.Config.debug;
 
 public class Tile {
 

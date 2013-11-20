@@ -1,4 +1,4 @@
-package simulation.events;
+package depr.simulation.events;
 
 import java.lang.reflect.Method;
 

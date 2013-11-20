@@ -1,10 +1,8 @@
-package simulation;
+package depr.simulation;
 
 import java.util.Vector;
 
-import simulation.events.UserMove;
-
-import static simulation.Config.DATABASE_WIDTH;
+import static depr.simulation.Config.DATABASE_WIDTH;
 
 public class Point {
 	public int x;
@@ -51,22 +49,6 @@ public class Point {
 		else if(this.y > DATABASE_WIDTH-1){
 			this.y = DATABASE_WIDTH-1;
 		}
-	}
-	
-	public Point goLeft(){
-		return new Point(this.y,this.x-1);
-	}
-	
-	public Point goRight(){
-		return new Point(this.y,this.x+1);
-	}
-	
-	public Point goDown(){
-		return new Point(this.y+1,this.x);
-	}
-
-	public Point goUp(){
-		return new Point(this.y-1,this.x);
 	}
 	
 }

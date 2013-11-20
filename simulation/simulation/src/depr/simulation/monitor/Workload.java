@@ -1,4 +1,4 @@
-package simulation.monitor;
+package depr.simulation.monitor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,11 +9,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.Vector;
 
-import simulation.events.UserMove;
+import depr.simulation.events.UserMove;
 
-import static simulation.Config.WORKLOAD_FILE;
+import static depr.simulation.Config.WORKLOAD_FILE;
 
 
 public class Workload {
