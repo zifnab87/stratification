@@ -35,6 +35,9 @@ public class Node {
 		vec.add(this.right);
 		
 	}
+	public int hashCode(){
+		return ((this.y+"-"+this.x).hashCode());
+	}
 	
 	public String toString(){
 		return "("+y+","+x+")"+likelihood+"";

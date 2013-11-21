@@ -15,10 +15,11 @@ import simulation.Viewport;
 import simulation.events.UserMove;
 
 import static simulation.Config.FRAGMENTS_PER_TILE;
-import static simulation.Config.PROBABILITY_CUTOFF;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
+import static simulation.Config.THINK_TIME;
+import static simulation.Config.MIN_CONFIDENCE;
 
 public class Predictor {
 	
@@ -83,8 +84,31 @@ public class Predictor {
 		}
 	}
 	
+	public static HashMap<Integer,Tuple<Double,Integer>> prepare(UserMove move){
+
+		//create the prediction tree 
+		LinkedList<Node> tree = createPredictorTree(move);
+		System.out.println(tree);
+		//make the nodes a single distribution
+		LinkedList<Node> normalizedTree = normalize(tree);
+		System.out.println(normalizedTree);
+		//add the likelihoods of duplicates
+		Vector<Node> regularized = regularize(normalizedTree);
+		System.out.println(regularized);
+		Node.sortDesc(regularized);
+		System.out.println(regularized);
+		Vector<java.lang.Integer> lods = calculateLODs(regularized);
+		
+		HashMap<Integer,Tuple<Double,Integer>> map = new HashMap<Integer,Tuple<Double,Integer>>();
+		for (int i=0; i<lods.size(); i++){
+			Tuple<Double,Integer> tuple = new Tuple(regularized.get(i).likelihood,lods.get(i));
+			map.put(regularized.get(i).hashCode(),tuple);
+		}
+		return map;
+	}
+	
 	//finds dublicate tiles and adds their probabilities (from different paths). This can be done because there were normalized and disjoint
-	public static Vector<Node> regularize(LinkedList<Node> list){
+	private static Vector<Node> regularize(LinkedList<Node> list){
 		HashMap<String,Node> toReturn = new HashMap<String,Node>();
 		for (int i=0; i<list.size(); i++){
 			
@@ -109,7 +133,7 @@ public class Predictor {
 	
 	
 	//divides the probabilities and makes them a distribution
-	public static LinkedList<Node> normalize(LinkedList<Node> list){
+	private static LinkedList<Node> normalize(LinkedList<Node> list){
 		Iterator<Node> iter = list.iterator();
 		double sum = 0;
 		while(iter.hasNext()){
@@ -125,8 +149,27 @@ public class Predictor {
 		return list;
 	}
 	
+	public static Vector<java.lang.Integer> calculateLODs(Vector<Node> vec) {
+		// TODO Auto-generated method stub
+		Vector<Integer> lods = new Vector<Integer>();
+		int thinkTimeAvailable = THINK_TIME;
+		for (Node node : vec){
+			int lod = Predictor.likelihoodToLOD(node.likelihood);
+			if (thinkTimeAvailable>lod){
+				lods.add(lod);
+				thinkTimeAvailable-=lod;
+			}
+			else if (thinkTimeAvailable>0) {
+				lods.add(thinkTimeAvailable);
+				thinkTimeAvailable=0;
+			}
+		}
+		return lods;
+	}
 	
-	public static LinkedList<Node> createPredictorTree(UserMove move,double minConfidence){
+	
+	public static LinkedList<Node> createPredictorTree(UserMove move){
+		double minConfidence = MIN_CONFIDENCE;
 		Node root = new Node(null,move.upperLeft.y,move.upperLeft.x,1.0d);
 		LinkedList<Node> list = new LinkedList<Node>();
 		LinkedList<Node> toReturn = new LinkedList<Node>();
@@ -304,13 +347,15 @@ public class Predictor {
 //			}
 //		}
 //		return Math.min(lod,FRAGMENTS_PER_TILE);
-		return (int)(Math.ceil(likelihood*FRAGMENTS_PER_TILE));
+		return Math.min((int)(Math.ceil(likelihood*THINK_TIME)),FRAGMENTS_PER_TILE);
 		
 	}
 	
 	public static void likelihoodToLOD(Tile tile){
 		tile.lod = Predictor.likelihoodToLOD(tile.likelihood);
 	}
+
+	
 	
 	/*private static float[] lodIntervals(int fragments){
 		DecimalFormat df = new DecimalFormat();

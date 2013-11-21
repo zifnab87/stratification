@@ -4,8 +4,12 @@ import static depr.simulation.Config.DATABASE_WIDTH;
 import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.WORKLOAD_FILE;
 
+
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
+
 
 
 
@@ -16,6 +20,7 @@ import simulation.events.UserMove;
 import simulation.monitor.Workload;
 import simulation.predictor.Node;
 import simulation.predictor.Predictor;
+import simulation.predictor.Tuple;
 
 public class Main {
 	public static Viewport previousViewport=null;
@@ -55,23 +60,43 @@ public class Main {
 				userMove = Predictor.nextMove(viewport);
 				
 			}
-			
 		//	if (debug){
 			
 		//	}
-			if (count==0){
+			//if (count==0){
 				//System.out.println("UserMove "+userMove);
-				LinkedList<Node> list = Predictor.normalize(Predictor.createPredictorTree(userMove, 0.05));
+				/*LinkedList<Node> list = Predictor.normalize(Predictor.createPredictorTree(userMove, 0.05));
 				
 				System.out.println(list);
-				Vector<Node> vec = Predictor.regularize(list);
-				System.out.println(vec);
+				Vector<Node> vec = Predictor.regularize(list);*/
+			    //System.out.println(vec);
 				//Node.sortDesc(vec);
+				//System.out.println(vec);*/
+				/*int thinkTimeAvailable = THINK_TIME;
+				
+				Vector<java.lang.Integer> lods = Predictor.calculateLODs(vec,thinkTimeAvailable);*/
+				if (count==0){
+					HashMap<Integer,Tuple<Double,Integer>> map = Predictor.prepare(userMove);
+					
+					Iterator<Integer> keys = map.keySet().iterator();
+					while (keys.hasNext()){
+						Integer key = keys.next();
+						Tuple<Double,Integer> tuple = map.get(key);
+						double likelihood = tuple.x;
+						int lod = tuple.y;
+						System.out.println(likelihood);
+						System.out.println(lod);
+					}
+				}
+				count++;
+				
+				//System.out.println(lods);
+
 				//System.out.println(vec);
 				//System.out.println(node);
 				//System.out.println(node.left);
-			}
-			count++;
+			//}
+			//count++;
 			
 			userMove.viewportFetch();
 			//userMove.prefetch();
@@ -82,7 +107,7 @@ public class Main {
 				break;
 			}
 			Main.previousViewport = viewport;
-			
+			break;
 			//System.out.println(UserMove.totalCacheHits+" "+UserMove.totalCacheMisses);
 		}
 	}
