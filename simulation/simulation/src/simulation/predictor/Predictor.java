@@ -20,6 +20,7 @@ import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.THINK_TIME;
 import static simulation.Config.MIN_CONFIDENCE;
+import static simulation.Config.FRAGMENT;
 
 public class Predictor {
 	
@@ -84,25 +85,25 @@ public class Predictor {
 		}
 	}
 	
-	public static HashMap<Integer,Tuple<Double,Integer>> prepare(UserMove move){
+	public static HashMap<Node,Tuple<Double,Integer>> prepare(UserMove move){
 
 		//create the prediction tree 
 		LinkedList<Node> tree = createPredictorTree(move);
-		System.out.println(tree);
+		//System.out.println(tree);
 		//make the nodes a single distribution
 		LinkedList<Node> normalizedTree = normalize(tree);
-		System.out.println(normalizedTree);
+		//System.out.println(normalizedTree);
 		//add the likelihoods of duplicates
 		Vector<Node> regularized = regularize(normalizedTree);
-		System.out.println(regularized);
+		//System.out.println(regularized);
 		Node.sortDesc(regularized);
-		System.out.println(regularized);
+		//System.out.println(regularized);
 		Vector<java.lang.Integer> lods = calculateLODs(regularized);
 		
-		HashMap<Integer,Tuple<Double,Integer>> map = new HashMap<Integer,Tuple<Double,Integer>>();
+		HashMap<Node,Tuple<Double,Integer>> map = new HashMap<Node,Tuple<Double,Integer>>();
 		for (int i=0; i<lods.size(); i++){
 			Tuple<Double,Integer> tuple = new Tuple(regularized.get(i).likelihood,lods.get(i));
-			map.put(regularized.get(i).hashCode(),tuple);
+			map.put(regularized.get(i),tuple);
 		}
 		return map;
 	}
@@ -154,7 +155,13 @@ public class Predictor {
 		Vector<Integer> lods = new Vector<Integer>();
 		int thinkTimeAvailable = THINK_TIME;
 		for (Node node : vec){
-			int lod = Predictor.likelihoodToLOD(node.likelihood);
+			int lod = 0;
+			if(FRAGMENT){
+				lod = Predictor.likelihoodToLOD(node.likelihood);
+			}
+			else {
+				lod = 8;
+			}
 			if (thinkTimeAvailable>lod){
 				lods.add(lod);
 				thinkTimeAvailable-=lod;
@@ -169,7 +176,8 @@ public class Predictor {
 	
 	
 	public static LinkedList<Node> createPredictorTree(UserMove move){
-		double minConfidence = MIN_CONFIDENCE;
+		double minConfidence = 0.01;
+		int maxDistance = 1;
 		Node root = new Node(null,move.upperLeft.y,move.upperLeft.x,1.0d);
 		LinkedList<Node> list = new LinkedList<Node>();
 		LinkedList<Node> toReturn = new LinkedList<Node>();
@@ -188,26 +196,41 @@ public class Predictor {
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
 				node.up = new Node(node,newY,newX,upLikelihood*node.likelihood);
-				list.addLast(node.up);
-				toReturn.addLast(node.up);
-				System.out.println(node.up);
+				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.up);
+					toReturn.addLast(node.up);
+				}
+				else {
+					System.out.println("prrrr"+node.up);
+					System.out.println("pprrd"+Predictor.distance(tempPoint,move.upperLeft));
+				}
+				//System.out.println(node.up);
 			}
 			if (downLikelihood*node.likelihood >= minConfidence){
 				Point tempPoint = newPoint.goDown();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
 				node.down = new Node(node,newY,newX,downLikelihood*node.likelihood);
-				list.addLast(node.down);
-				toReturn.addLast(node.down);
-				//System.out.println(node.down);
+				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.down);
+					toReturn.addLast(node.down);
+				}
+				else {
+					System.out.println("prrrr"+node.down);
+				}
 			}
 			if (leftLikelihood*node.likelihood >= minConfidence){
 				Point tempPoint = newPoint.goLeft();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
 				node.left = new Node(node,newY,newX,leftLikelihood*node.likelihood);
-				list.addLast(node.left);
-				toReturn.addLast(node.left);
+				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.left);
+					toReturn.addLast(node.left);
+				}
+				else {
+					System.out.println("prrrr"+node.left);
+				}
 				//System.out.println(node.left);
 			}
 			if (rightLikelihood*node.likelihood >= minConfidence){
@@ -215,8 +238,13 @@ public class Predictor {
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
 				node.right = new Node(node,newY,newX,rightLikelihood*node.likelihood);
-				list.addLast(node.right);
-				toReturn.addLast(node.right);
+				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.right);
+					toReturn.addLast(node.right);
+				}
+				else {
+					System.out.println("prrrr"+node.right);
+				}
 				//System.out.println(node.right);
 			}
 		}

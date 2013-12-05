@@ -30,7 +30,7 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static double MIN_CONFIDENCE = 0.05d;
+	public static double MIN_CONFIDENCE = 0.001d;
 	
 	//USER
 	public static int THINK_TIME = 32;

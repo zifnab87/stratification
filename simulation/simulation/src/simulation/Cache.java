@@ -14,7 +14,9 @@ import simulation.Point;
 import simulation.Tile;
 import simulation.Viewport;
 import simulation.events.UserMove;
+import simulation.predictor.Node;
 import simulation.predictor.Predictor;
+import simulation.predictor.Tuple;
 
 public class Cache {
 	public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
@@ -363,15 +365,40 @@ public class Cache {
 		
 	}
 	
+	public void updateAllTileLikelihoods(HashMap<Node,Tuple<Double,Integer>> map){
+		Iterator<Tile> it = queue.iterator();
+		while (it.hasNext()){
+			Tile tile = it.next();
+			//updateTileLikelihoodOfIndex(it.next().point,currentViewport);
+			if (map.containsKey(new Node(tile.point.y,tile.point.x))){
+				Tuple<Double,Integer> tuple = map.get(new Node(tile.point.y,tile.point.x));
+				double likelihood = tuple.x;
+				int lod = tuple.y;
+				tile.likelihood = likelihood;
+				if (this.isFull()){
+					int oldLOD = tile.lod;
+					tile.lod = lod;
+					if (oldLOD>lod){
+						//evict from that tile, since less information is needed
+					}
+					else { // lod < oldLOD
+						//evict from cache to put information to that tile
+					}
+					
+				}
+			}
+		}
+	}
 	
-	public void updateAllTileLikelihoods(Viewport currentViewport){
+	
+	/*public void updateAllTileLikelihoods(Viewport currentViewport){
 		Iterator<Tile> it = queue.iterator();
 		while (it.hasNext()){
 			updateTileLikelihoodOfIndex(it.next().point,currentViewport);
 		}
 		this.makeConsistent();
 		
-	}
+	}*/
 	
 	private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
 		Tile tile = tiles.get(index.hashCode());

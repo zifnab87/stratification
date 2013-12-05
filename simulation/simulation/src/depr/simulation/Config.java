@@ -5,7 +5,7 @@ public class Config {
 	public static boolean debug = false;
 	
 	//public static boolean PREFETCH = false;
-	public static boolean FRAGMENT = true; 
+	public static boolean FRAGMENT = false; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
 	public static final int CACHE_SIZE = 128;

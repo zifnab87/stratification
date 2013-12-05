@@ -23,6 +23,11 @@ public class Node {
 	
 	Vector<Node> vec = new Vector<Node>();
 	
+	public Node(int y,int x){ //carrier
+		this.y = y;
+		this.x = x;
+	}
+	
 	public Node(Node parent,int y, int x,double likelihood){
 		this.parent = parent;
 		this.y = y;
@@ -35,12 +40,16 @@ public class Node {
 		vec.add(this.right);
 		
 	}
+	public boolean equals(Object o){
+		return ((Node)o).hashCode() == this.hashCode();
+	}
+	
 	public int hashCode(){
 		return ((this.y+"-"+this.x).hashCode());
 	}
 	
 	public String toString(){
-		return "("+y+","+x+")"+likelihood+"";
+		return "("+y+","+x+")";
 	}
 	
 	//sort with ascending likelihood
