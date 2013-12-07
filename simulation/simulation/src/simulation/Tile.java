@@ -21,10 +21,13 @@ public class Tile {
 	
 	
 	public int id;
-	public byte[][][] pixels;
-	private static int tileIdCounter = 0;
-	private static int colCounter = 0;
-	private static int rowCounter = 0;
+	public int y;
+	public int x;
+	public Vector<String> data = new Vector<String>(FRAGMENTS_PER_TILE);
+
+	
+	
+	
 	public int lod;
 	public double likelihood = -1.0d;
 	public Point point; //index
@@ -65,27 +68,18 @@ public class Tile {
 		}
 	};
 	
-	public static Tile copyTile(Tile tile){
-		Tile newTile = new Tile(tile.point,tile.pixels);
-		//newTile.likelihood = tile.likelihood;
-		//newTile.lod = tile.lod;
-		return newTile; 
-	}
 	
 	public Tile(Point point){
 		this.point = point;
 		this.id = this.point.hashCode();
 	}
 	
-	
-	public Tile(Point point, byte[][][] pixels){
-		
-		this.pixels = pixels;
+	public Tile(Point point,Vector<String> data){
 		this.point = point;
 		this.id = this.point.hashCode();
-		
+		this.data = data;
 	}
-
+	
 	public int getFragmentNumber(){
 		return fragments.size();
 	}
@@ -99,43 +93,15 @@ public class Tile {
 		return this.cached;
 	}
 	
-	public void setPixels(byte[][][] pixels){
-		this.pixels = pixels;
-	}
 	
 	
 	
-	
-	
-	public static Tile randomizer(){
-		//int tileId = Tile.tileIdCounter++;
-		
-		if ((colCounter)%DATABASE_WIDTH == 0 && colCounter!=0){
-			rowCounter++;
-			colCounter=0;
-		}
 
-		byte[][][] pixels = new byte[TILE_HEIGHT][TILE_WIDTH][COLORS];
-		Tile toReturn = new Tile(new Point(rowCounter,colCounter++));
-		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){ //8
-			Fragment fragm = Fragment.randomizer(i);
-			//int[] pixelIndexesOfFragment = fragm.getPixelIndexesOfFragment();
-			/*for (int j=0; j<FRAGMENT_SIZE; j++){ 
-				int y = pixelIndexesOfFragment[j] % TILE_WIDTH;
-				int x = pixelIndexesOfFragment[j] / TILE_WIDTH;
-				pixels[y][x] = fragm.getPixel(j);
-			}*/
-			toReturn.addFragment(fragm);
-			
-		}
-		toReturn.setPixels(pixels);
-		return toReturn;
-	}
 	
-	public void addFragment(Fragment fragm){
+	/*public void addFragment(Fragment fragm){
 		fragments.put(fragm.num, fragm);	
 		this.lod = this.getFragmentNumber();
-	}
+	}*/
 	
 	public void removeFragment(int fragmNumber){
 		fragments.remove(fragmNumber);

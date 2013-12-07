@@ -106,7 +106,7 @@ public class Cache {
 				break;
 			}
 		}
-		Tile tileClone = Tile.copyTile(tile);
+		Tile tileClone = null;// Tile.copyTile(tile);
 		tileClone.setCached(true);
 		tileClone.likelihood = 1.0d;
 		tileClone.lod = FRAGMENTS_PER_TILE;
@@ -354,7 +354,7 @@ public class Cache {
 	
 	
 	private void addTile(Tile tile){
-		Tile tileClone = Tile.copyTile(tile);
+		Tile tileClone = null; //Tile.copyTile(tile);
 		tileClone.setCached(true);
 		if (!this.tiles.containsKey(tile.id)){
 			this.tiles.put(tileClone.id, tileClone);

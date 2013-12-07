@@ -3,6 +3,7 @@ package simulation;
 import static depr.simulation.Config.DATABASE_WIDTH;
 import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.WORKLOAD_FILE;
+import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 
 
 import java.util.HashMap;
@@ -30,11 +31,16 @@ public class Main {
 	
 	public static void main(String args[]){
 
+		
+		
+		
 		System.out.println("Initializing Database");
 		db.init(DATABASE_TILES_NUM);
+		db.clearCache();
 		System.out.println("Starting Experiment");
 		
 		
+
 		
 		//UserMove userMove;
 		Viewport viewport = null;
@@ -62,6 +68,11 @@ public class Main {
 				userMove = Predictor.nextMove(viewport);
 				
 			}
+			
+			Vector<Node> fragmNums = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),6,2,5); 
+			
+			System.out.println(fragmNums);
+			System.exit(0);
 			//if (count==0){
 				HashMap<Node,Tuple<Double,Integer>> map = Predictor.prepare(userMove);
 				

@@ -28,7 +28,133 @@ public class Predictor {
 	public static Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
 	
 	
+	private static HashMap<Integer,Node> createPredictorTree(Node node,int totalWaves){
+		node.likelihood = 1d;
+		LinkedList<Node> listNodes = createPredictorTreeHelper(node,1);
+		HashMap<Integer,Node> toReturn = new HashMap<Integer,Node>();
+		for(Node n : listNodes){
+			if (node.equals(n)){
+				continue;
+			}
+			if (!toReturn.containsKey(n.hashCode())){
+				toReturn.put(n.hashCode(), n);
+			}
+			else {
+				Node stored = toReturn.get(n.hashCode());
+				if (stored.waveNum == n.waveNum && stored.likelihood<n.likelihood){
+					toReturn.put(n.hashCode(), n);
+				}
+			}
+		}
+		
+		
+		for (int wave = 2; wave<=totalWaves; wave++){
+			listNodes = createPredictorTreeHelper(listNodes,wave);
+			for(Node n : listNodes){
+				if (node.equals(n)){
+					continue;
+				}
+				if (!toReturn.containsKey(n.hashCode())){
+					toReturn.put(n.hashCode(), n);
+				}
+				else {
+					Node stored = toReturn.get(n.hashCode());
+					if (stored.waveNum == n.waveNum && stored.likelihood<n.likelihood){
+						toReturn.put(n.hashCode(), n);
+					}
+				}
+			}
+		}
+		
+		return toReturn;
+		
+	}
+	
+	
+	private static LinkedList<Node> createPredictorTreeHelper(Node node,int wave){
+		LinkedList<Node> input = new LinkedList<Node>();
+		input.add(node);
+		return createPredictorTreeHelper(input,wave);
+	}
+	
+	
+	
+	private static LinkedList<Node> deriveOrder(HashMap<Integer,Node> map ,int wave){
+		//filter all the other waves
+		Iterator<Integer> iter = map.keySet().iterator();
+		LinkedList<Node> list = new LinkedList<Node>();
+		while(iter.hasNext()){
+			Integer hash = iter.next();
+			Node node = map.get(hash);
+			if (node.waveNum == wave){
+				list.add(node);
+			}
+		}
+		// make a list 
+		
+		
+		Node.sortDesc(list);
+		return  list;
+	}
+	
+	private static Object[] deriveFragmentNumbers(LinkedList<Node> list,int cutoff,Integer previousFrames,Double previousProb){
+		//if (previousFrames==null){
+			previousFrames = 8;
+		//}
+		//if (previousProb == null){
+			previousProb = 0.5d;
+		//}
+		Vector<Node> vec = new Vector<Node>();
+		Iterator<Node> iter = list.iterator();
+		int count=0;
+		while(iter.hasNext() && count<cutoff){
+			Node node = iter.next();
+			
+			previousFrames = Math.min((int) Math.ceil((node.likelihood/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
+			System.out.println(previousFrames);
+			if (previousFrames>0){
+				previousProb = node.likelihood;
+				node.lod = previousFrames;
+				vec.add(node);
+			}
+			else {
+				System.out.println("rejected");
+			}
+			count++;
+		}
+		
+		Object[] objArray = new Object[3];
+		objArray[0] = vec;
+		objArray[1] = previousProb;
+		objArray[2] = previousFrames;
+		return objArray;
+	}
 
+	
+	public static Vector<Node> preparePrefetching(Node node,int cutoff,int waveNeeded,int maxWaveNum){
+		
+		assert(waveNeeded<maxWaveNum);
+		HashMap<Integer,Node> list = Predictor.createPredictorTree(node,maxWaveNum); 
+		LinkedList<Node> orderedWave = Predictor.deriveOrder(list,waveNeeded);
+		Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, cutoff, null, null)[0]);
+		return fragmNums;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public static double distance(Viewport viewport, Point p){
 		double distanceUpperLeft = distance(viewport.upperLeft,p);
 		double distanceUpperRight = distance(viewport.upperRight,p);
@@ -173,6 +299,65 @@ public class Predictor {
 		}
 		return lods;
 	}
+	
+	
+	
+
+	
+	
+	public static LinkedList<Node> createPredictorTreeHelper(LinkedList<Node> listNodes,int wave){
+		
+		double upLikelihood = 0.1;
+		double downLikelihood = 0.5;
+		double leftLikelihood = 0.1;
+		double rightLikelihood = 0.3;
+		
+		LinkedList<Node> toReturn = new LinkedList<Node>();
+		for(Node node : listNodes){
+			Point newPoint = node.point;
+			//up
+			Point tempPoint = newPoint.goUp();
+			int newX = tempPoint.x;
+			int newY = tempPoint.y;
+			Node newNode = new Node(node,newY,newX,upLikelihood*node.likelihood); 
+			newNode.waveNum = wave;
+			toReturn.addLast(newNode);
+			
+			//down 
+			newPoint = node.point;
+			tempPoint = newPoint.goDown();
+			newX = tempPoint.x;
+			newY = tempPoint.y;
+			newNode = new Node(node,newY,newX,downLikelihood*node.likelihood);
+			newNode.waveNum = wave;
+			toReturn.addLast(newNode);
+			
+			//left 
+			newPoint = node.point;
+			tempPoint = newPoint.goLeft();
+			newX = tempPoint.x;
+			newY = tempPoint.y;
+			newNode = new Node(node,newY,newX,leftLikelihood*node.likelihood);
+			newNode.waveNum = wave;
+			toReturn.addLast(newNode);
+			
+			//right
+			newPoint = node.point;
+			tempPoint = newPoint.goRight();
+			newX = tempPoint.x;
+			newY = tempPoint.y;
+			newNode = new Node(node,newY,newX,rightLikelihood*node.likelihood);
+			newNode.waveNum = wave;
+			toReturn.addLast(newNode);
+		}
+		
+		return toReturn;
+	}
+	
+	
+	
+	
+	
 	
 	
 	public static LinkedList<Node> createPredictorTree(UserMove move){

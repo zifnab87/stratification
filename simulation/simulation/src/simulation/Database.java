@@ -1,7 +1,14 @@
 package simulation;
 
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
+
+import java.sql.Connection;
 
 import simulation.events.UserMove;
 
@@ -10,9 +17,10 @@ import simulation.Point;
 import simulation.Tile;
 import simulation.Viewport;
 import static simulation.Config.FRAGMENTS_PER_TILE;
-
+import static simulation.Config.FRAGMENT_SIZE;
+import static simulation.Config.DATABASE_WIDTH;;
 public class Database {
-	public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	//public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	public Viewport viewport;
 	
 	
@@ -28,25 +36,91 @@ public class Database {
 	}
 	
 	
-	
-	public void init(int numTiles){
-		for (int i=0; i<numTiles; i++){
-			Tile tile = Tile.randomizer();
-			putTile(tile);
+	public void clearCache(){
+		Connection conn = null;
+		try {
+		    // The newInstance() call is a work around for some
+		    // broken Java implementations
+		    Class.forName("com.mysql.jdbc.Driver").newInstance();
+		} catch (Exception ex) {
+		    // handle the error
+		}
+		 try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
+                     "user=root");
+			
+			Statement stmt = conn.createStatement();
+			 stmt = conn.createStatement();
+			 stmt.executeUpdate("RESET QUERY CACHE");
+			conn.close();
+	 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
-	public void putTile(Tile tile){
-		tiles.put(tile.id, tile);
+	
+	public void init(int numTiles){
+		/*for (int i=0; i<numTiles; i++){
+			Tile tile = Tile.randomizer();
+			putTile(tile);
+		}*/
+		Connection conn = null;
+		try {
+		    // The newInstance() call is a work around for some
+		    // broken Java implementations
+		    Class.forName("com.mysql.jdbc.Driver").newInstance();
+		} catch (Exception ex) {
+		    // handle the error
+		}
+		 try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
+                     "user=root");
+			/*String data = "[";
+			for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
+				data += "[255,255,0],";
+			}
+			data +="]";
+			for (int y=0; y<DATABASE_WIDTH; y++){
+				for (int x=0; x<DATABASE_WIDTH; x++){
+					for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
+						Statement stmt = conn.createStatement();
+						 stmt = conn.createStatement();
+						 stmt.executeUpdate("INSERT INTO fragment " + "VALUES ("+y+","+x+","+i+",'"+data+"')");
+					}
+				}
+			}*/
+			 
+			
+			
+		
+			
+			 conn.close();
+			 
+			 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		 
+		/* for (int i=0; i<numTiles; i++){
+				Tile tile = Tile.randomizer();
+				putTile(tile);
+		}*/
+		 
+		 
 	}
+	
 	
 	public boolean tileExists(Point index){
-		return tiles.containsKey(index.hashCode());
-	}
-	
-	private Tile getTile(Point index){
-		Tile tile = tiles.get(index.hashCode());
-		return tile;		
+		if (index.y >= 0 && index.y< DATABASE_WIDTH && index.x >= 0 && index.x < DATABASE_WIDTH){
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public Tile fetchTile(Point index,UserMove caller){
@@ -56,26 +130,75 @@ public class Database {
 		return getTile(index);
 	}
 	
-	
-	
-	private Fragment getFragmentOfTile(int fragmentNumber,Point index){
-		
-		if (tileExists(index)){
-			Tile tile = getTile(index);
-		
-			return tile.getFragment(fragmentNumber);
-		}
-		else {
-			System.out.println("tile Doesn't exist for fragment");
-			return null;
-		}
+	private Tile getTile(Point index){
+		return getTileWithFragmentRange(index, 1, FRAGMENTS_PER_TILE);
 	}
 	
-	public Fragment fetchFragmentOfTile(int fragmentNumber,Point index,UserMove caller){
+	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove caller){
 		
 		caller.cacheMisses+=1;
 		UserMove.totalCacheMisses+=1;
-		return getFragmentOfTile(fragmentNumber,index);
+		return getFragmentOfTile(index, fragmentNumber);
 	}
+
+	
+	
+	private Tile getFragmentOfTile(Point index,int fragmentNumber){
+		
+		return getTileWithFragmentRange(index, fragmentNumber, fragmentNumber);
+	}
+	
+	
+	private Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment){
+		Connection conn = null;
+		ResultSet results = null;
+		Tile tile = null;
+		try {
+		    // The newInstance() call is a work around for some
+		    // broken Java implementations
+		    Class.forName("com.mysql.jdbc.Driver").newInstance();
+		} catch (Exception ex) {
+		    // handle the error
+		}
+		 try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
+                     "user=root");
+			
+			Statement stmt = conn.createStatement();
+			stmt = conn.createStatement();
+			results = stmt.executeQuery("SELECT * FROM fragments WHERE y="+index.y+" AND y="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment);
+	
+			
+	
+			Vector<String> totalData = new Vector<String>(FRAGMENTS_PER_TILE);
+			while (results.next()){
+				int fragment_num = results.getInt("fragment_num");
+				totalData.set(fragment_num-1,results.getString("data"));
+			}
+			tile = new Tile(index,totalData);
+			
+			conn.close();
+	 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return tile;
+	}
+	
+	public Tile fetchTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove caller){
+		//fragments fetched
+		int num = lastFragment-firstFragment+1;
+		for (int i=0; i<num; i++){
+			caller.cacheMisses+=1;
+			UserMove.totalCacheMisses+=1;
+		}
+		return getTileWithFragmentRange(index, firstFragment, lastFragment);
+	}
+	
+	
+	
+	
+	
+
 	
 }

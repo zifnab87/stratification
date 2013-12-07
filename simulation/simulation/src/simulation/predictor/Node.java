@@ -20,19 +20,27 @@ public class Node {
 	public int hash;
 	
 	public double likelihood;
+	public int lod;
+	
+	public int waveNum; //for the prediction
+	
+	public Point point;
 	
 	Vector<Node> vec = new Vector<Node>();
 	
 	public Node(int y,int x){ //carrier
 		this.y = y;
 		this.x = x;
+		this.point = new Point(y,x);
 	}
 	
 	public Node(Node parent,int y, int x,double likelihood){
 		this.parent = parent;
 		this.y = y;
 		this.x = x;
-		this.hash = new Point(y,x).hashCode();
+		this.point = new Point(y,x);
+		this.hash = this.point.hashCode();
+
 		this.likelihood = likelihood;
 		vec.add(this.up);
 		vec.add(this.down);
@@ -49,7 +57,7 @@ public class Node {
 	}
 	
 	public String toString(){
-		return "("+y+","+x+")";
+		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+likelihood+",lod="+lod+")";
 	}
 	
 	//sort with ascending likelihood

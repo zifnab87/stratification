@@ -3,6 +3,7 @@ package simulation;
 import java.util.Vector;
 
 import simulation.events.UserMove;
+import simulation.predictor.Node;
 
 import static simulation.Config.DATABASE_WIDTH;
 
@@ -69,4 +70,8 @@ public class Point {
 		return new Point(this.y-1,this.x);
 	}
 	
+	
+	public Node createNode(){
+		return new Node(this.y,this.x);
+	}
 }
