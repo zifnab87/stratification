@@ -54,6 +54,11 @@ public class Point {
 		}
 	}
 	
+	public Object clone(){
+		return new Point(this.y,this.x);
+		
+	}
+	
 	public Point goLeft(){
 		return new Point(this.y,this.x-1);
 	}

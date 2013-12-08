@@ -19,7 +19,7 @@ import static simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static simulation.Config.VIEWPORT_HEIGHT;
 import static simulation.Config.VIEWPORT_WIDTH;
 import static simulation.Config.THINK_TIME;
-import static simulation.Config.MIN_CONFIDENCE;
+import static simulation.Config.CUTOFF;
 import static simulation.Config.FRAGMENT;
 
 public class Predictor {
@@ -97,7 +97,7 @@ public class Predictor {
 		return  list;
 	}
 	
-	private static Object[] deriveFragmentNumbers(LinkedList<Node> list,int cutoff,Integer previousFrames,Double previousProb){
+	private static Object[] deriveFragmentNumbers(LinkedList<Node> list,Integer previousFrames,Double previousProb){
 		//if (previousFrames==null){
 			previousFrames = 8;
 		//}
@@ -107,14 +107,14 @@ public class Predictor {
 		Vector<Node> vec = new Vector<Node>();
 		Iterator<Node> iter = list.iterator();
 		int count=0;
-		while(iter.hasNext() && count<cutoff){
+		while(iter.hasNext() && count<CUTOFF){
 			Node node = iter.next();
 			
 			previousFrames = Math.min((int) Math.ceil((node.likelihood/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
 			System.out.println(previousFrames);
 			if (previousFrames>0){
 				previousProb = node.likelihood;
-				node.lod = previousFrames;
+				node.fragmentsNeeded = previousFrames;
 				vec.add(node);
 			}
 			else {
@@ -131,12 +131,12 @@ public class Predictor {
 	}
 
 	
-	public static Vector<Node> preparePrefetching(Node node,int cutoff,int waveNeeded,int maxWaveNum){
+	public static Vector<Node> preparePrefetching(Node node,int waveNeeded,int maxWaveNum){
 		
-		assert(waveNeeded<maxWaveNum);
+		assert(waveNeeded<=maxWaveNum);
 		HashMap<Integer,Node> list = Predictor.createPredictorTree(node,maxWaveNum); 
 		LinkedList<Node> orderedWave = Predictor.deriveOrder(list,waveNeeded);
-		Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, cutoff, null, null)[0]);
+		Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, null, null)[0]);
 		return fragmNums;
 	}
 	
@@ -211,7 +211,7 @@ public class Predictor {
 		}
 	}
 	
-	public static HashMap<Node,Tuple<Double,Integer>> prepare(UserMove move){
+	/*public static HashMap<Node,Tuple<Double,Integer>> prepare(UserMove move){
 
 		//create the prediction tree 
 		LinkedList<Node> tree = createPredictorTree(move);
@@ -232,10 +232,10 @@ public class Predictor {
 			map.put(regularized.get(i),tuple);
 		}
 		return map;
-	}
+	}*/
 	
 	//finds dublicate tiles and adds their probabilities (from different paths). This can be done because there were normalized and disjoint
-	private static Vector<Node> regularize(LinkedList<Node> list){
+	/*private static Vector<Node> regularize(LinkedList<Node> list){
 		HashMap<String,Node> toReturn = new HashMap<String,Node>();
 		for (int i=0; i<list.size(); i++){
 			
@@ -256,11 +256,11 @@ public class Predictor {
 		}
 		return regularized;
 		
-	}
+	}*/
 	
 	
 	//divides the probabilities and makes them a distribution
-	private static LinkedList<Node> normalize(LinkedList<Node> list){
+	/*private static LinkedList<Node> normalize(LinkedList<Node> list){
 		Iterator<Node> iter = list.iterator();
 		double sum = 0;
 		while(iter.hasNext()){
@@ -298,7 +298,7 @@ public class Predictor {
 			}
 		}
 		return lods;
-	}
+	}*/
 	
 	
 	
@@ -543,7 +543,7 @@ public class Predictor {
 	}*/
 	
 
-	public static int likelihoodToLOD(double likelihood){
+	/*public static int likelihoodToLOD(double likelihood){
 //		int lod = 1;
 //		DecimalFormat df = new DecimalFormat();
 //		df.setMaximumFractionDigits(3);
@@ -562,11 +562,11 @@ public class Predictor {
 //		return Math.min(lod,FRAGMENTS_PER_TILE);
 		return Math.min((int)(Math.ceil(likelihood*THINK_TIME)),FRAGMENTS_PER_TILE);
 		
-	}
+	}*/
 	
-	public static void likelihoodToLOD(Tile tile){
+	/*public static void likelihoodToLOD(Tile tile){
 		tile.lod = Predictor.likelihoodToLOD(tile.likelihood);
-	}
+	}*/
 
 	
 	

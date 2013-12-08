@@ -20,7 +20,7 @@ public class Node {
 	public int hash;
 	
 	public double likelihood;
-	public int lod;
+	public int fragmentsNeeded;
 	
 	public int waveNum; //for the prediction
 	
@@ -57,7 +57,7 @@ public class Node {
 	}
 	
 	public String toString(){
-		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+likelihood+",lod="+lod+")";
+		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+likelihood+",fragmentsNeeded="+fragmentsNeeded+")";
 	}
 	
 	//sort with ascending likelihood

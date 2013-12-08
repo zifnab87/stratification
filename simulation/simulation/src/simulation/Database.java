@@ -166,14 +166,14 @@ public class Database {
 			
 			Statement stmt = conn.createStatement();
 			stmt = conn.createStatement();
-			results = stmt.executeQuery("SELECT * FROM fragments WHERE y="+index.y+" AND y="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment);
+			results = stmt.executeQuery("SELECT * FROM fragment WHERE y="+index.y+" AND y="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment);
 	
 			
 	
-			Vector<String> totalData = new Vector<String>(FRAGMENTS_PER_TILE);
+			String[] totalData = new String[FRAGMENTS_PER_TILE];
 			while (results.next()){
 				int fragment_num = results.getInt("fragment_num");
-				totalData.set(fragment_num-1,results.getString("data"));
+				totalData[fragment_num-1]=results.getString("data");
 			}
 			tile = new Tile(index,totalData);
 			

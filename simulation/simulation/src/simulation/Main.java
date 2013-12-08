@@ -32,7 +32,7 @@ public class Main {
 	public static void main(String args[]){
 
 		
-		
+
 		
 		System.out.println("Initializing Database");
 		db.init(DATABASE_TILES_NUM);
@@ -40,7 +40,7 @@ public class Main {
 		System.out.println("Starting Experiment");
 		
 		
-
+	
 		
 		//UserMove userMove;
 		Viewport viewport = null;
@@ -68,31 +68,34 @@ public class Main {
 				userMove = Predictor.nextMove(viewport);
 				
 			}
+			cache.cacheTileWithFragmentRange(db.fetchTileWithFragmentRange(userMove.upperLeft, 1, 1, userMove),2,2).data[1] = "dsadasds";
 			
-			Vector<Node> fragmNums = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),6,2,5); 
+			//System.out.println(cache);
 			
-			System.out.println(fragmNums);
-			System.exit(0);
+			//Vector<Node> tilesToPrefetch = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),2,5); 
+			
+			
+			//break;
+			//System.exit(0);
 			//if (count==0){
-				HashMap<Node,Tuple<Double,Integer>> map = Predictor.prepare(userMove);
-				
-				Main.cache.updateAllTileLikelihoods(map);
-				Iterator<Node> keys = map.keySet().iterator();
-				while (keys.hasNext()){
-					Node key = keys.next();
-					Tuple<Double,Integer> tuple = map.get(key);
-					double likelihood = tuple.x;
-					int lod = tuple.y;
-					System.out.println("~"+key);
-					System.out.println("~"+likelihood);
-					System.out.println("~"+lod);
-				}
+			Vector<Node> list = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),1,5); 
+			System.out.println(list);
+				//Main.cache.updateAllTileLikelihoods(map);
+				//Iterator<Node> iter = list.iterator();
+//				while (iter.hasNext()){
+//					Node node = iter.next();
+//					double likelihood = tuple.x;
+//					int lod = tuple.y;
+//					System.out.println("~"+key);
+//					System.out.println("~"+likelihood);
+//					System.out.println("~"+lod);
+//				}
 				System.out.println("~~~~~~~~~~~~~~~~~~");
 			//}
 			count++;
 			
 			userMove.viewportFetch();
-			userMove.prefetch(map);
+			userMove.prefetch(list);
 
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
@@ -103,7 +106,7 @@ public class Main {
 			//Main.previousViewport = viewport;
 			//break;
 			//System.out.println(UserMove.totalCacheHits+" "+UserMove.totalCacheMisses);
-			break;
+			//break;
 		}
 		System.out.println(UserMove.totalCacheMisses);
 		System.out.println(UserMove.totalCacheHits);

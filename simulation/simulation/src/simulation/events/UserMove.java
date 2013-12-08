@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import simulation.Cache;
+import simulation.CachedTile;
 import simulation.Database;
 import simulation.Fragment;
 import simulation.Main;
@@ -50,16 +51,14 @@ public class UserMove {
 		}
 	}
 	
-	public void prefetch(HashMap <Node, Tuple<Double,Integer>> map){
-		Iterator<Node> keys = map.keySet().iterator();
-		while (keys.hasNext()){
-			Node key = keys.next();
-			Tuple<Double,Integer> tuple = map.get(key);
-			double likelihood = tuple.x;
-			int LOD = tuple.y;
-			int index = key.hashCode();
-			Point point = new Point(key.y,key.x);
-			Vector<Integer> fragmentsNeeded;
+	public void prefetch(Vector<Node> toPrefetch){
+		Iterator<Node> iter = toPrefetch.iterator();
+		while (iter.hasNext()){
+			Node node = iter.next();
+			Point point = node.point;
+			int index = point.hashCode();
+			int LOD = node.fragmentsNeeded;
+			Vector<Integer> fragmentsToBePrefetched = null;
 			//index.LOD = LOD;
 			//System.out.println(LOD);
 			//if tile doesn't exist in cache
@@ -76,19 +75,18 @@ public class UserMove {
 				}
 				else if(Main.cache.tileExistsAndNotFull(index)){
 					//find what's missing
-					Tile cachedPartialTile = Main.cache.getTile(index);
-					int cachedLOD = cachedPartialTile.lod;
-					fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);
+					CachedTile cachedPartialTile = Main.cache.getTile(index);
+					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
+					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(cachedLOD);
+					int fragmCount = fragmentsToBePrefetched.size();
+					int firstFragment = fragmentsToBePrefetched.get(0);
+					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 					
-					for (int i=0; i<fragmentsNeeded.size(); i++){
-						Fragment fragment = Main.db.fetchFragmentOfTile(fragmentsNeeded.get(i), point, this);
-						Main.cache.cacheFragment(fragment, point,likelihood);
-					}
+					Tile tile = Main.db.fetchTileWithFragmentRange(point, firstFragment,lastFragment, this);
+					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
 					
 					//that many were cached
-					for (int i=1; i<cachedLOD; i++){
-						Main.cache.fetchFragmentOfTile(i, point, this);
-					}
+					//Main.cache.fetchTile(index, this);
 					
 
 				}
@@ -100,32 +98,36 @@ public class UserMove {
 			}
 			else if (LOD>0 && LOD<FRAGMENTS_PER_TILE){ //the tile doesn't need to be full
 				if (Main.cache.tileExists(index)){
-					Tile cachedPartialTile = Main.cache.getTile(index);
-					int cachedLOD = cachedPartialTile.lod;
-					if (cachedLOD <= LOD){
-						fragmentsNeeded = Tile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
-						for (int i=0; i<fragmentsNeeded.size(); i++){
-							Fragment fragment = Main.db.fetchFragmentOfTile(fragmentsNeeded.get(i), point, this);
-							Main.cache.cacheFragment(fragment, point, likelihood);
-						}
+					CachedTile cachedPartialTile = Main.cache.getTile(index);
+					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
+					if (cachedLOD < LOD){
+						fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
+						int fragmCount = fragmentsToBePrefetched.size();
+						int firstFragment = fragmentsToBePrefetched.get(0);
+						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
+						
+						Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
+						Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
+						
 						//that many were cached
-						for (int i=1; i<cachedLOD; i++){
-							Main.cache.fetchFragmentOfTile(i,  new Point(key.y,key.x), this);
-						}
+						//Main.cache.fetchTile(index, this);
+						
+						
 					}
 					else {// cachedLOD > LOD
 						//that many were needed and we had even more in the cache
-						for (int i=1; i<LOD; i++){
+						/*for (int i=1; i<LOD; i++){
 							Main.cache.fetchFragmentOfTile(i,  new Point(key.y,key.x), this);
-						}
+						}*/
 					}
 				}
 				else { //Tile doesn't exist and it is partially needed from Database
-					fragmentsNeeded = Tile.getMissingFragmentIdsTillLOD(0, LOD);
-					for (int i=0; i<fragmentsNeeded.size(); i++){
-						Fragment fragment = Main.db.fetchFragmentOfTile(fragmentsNeeded.get(i), new Point(key.y,key.x), this);
-						Main.cache.cacheFragment(fragment, point,likelihood);
-					}
+					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(0, LOD);
+					int fragmCount = fragmentsToBePrefetched.size();
+					int firstFragment = fragmentsToBePrefetched.get(0);
+					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
+					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
+					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
 				}
 			}
 			
@@ -169,18 +171,12 @@ public class UserMove {
 				//if tile partially exists request missing fragments
 				
 				else if(Main.cache.tileExistsAndNotFull(index)){
-					Tile cachedPartialTile = Main.cache.getTile(index);
-					int cachedLOD = cachedPartialTile.lod;
-					//fragmentsNeeded = Tile.getMissingFragmentIdsTillFull(cachedLOD);
-					//index.setFragmentNums(fragmentsNeeded);
-					//vec.add(index);
-					for (int i=1; i<=cachedLOD; i++){
-						Main.cache.fetchFragmentOfTile(i, index, this);
-					}
-					for (int i=cachedLOD+1; i<=FRAGMENTS_PER_TILE; i++){
-						Fragment fragment = Main.db.fetchFragmentOfTile(i, index, this);
-						Main.cache.cacheFragment(fragment, cachedPartialTile.point,cachedPartialTile.likelihood);
-					}
+					CachedTile cachedPartialTile = Main.cache.getTile(index);
+					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
+					//what was actually fetched to be viewed
+					Main.cache.fetchTile(index, this);
+					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,FRAGMENTS_PER_TILE,this);
+					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 				}
 				else { // tileExistsAndFull == true
 					Main.cache.fetchTile(index, this);

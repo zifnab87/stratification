@@ -6,6 +6,7 @@ import static simulation.Config.FRAGMENTS_PER_TILE;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import simulation.Fragment;
@@ -19,11 +20,54 @@ import simulation.predictor.Predictor;
 import simulation.predictor.Tuple;
 
 public class Cache {
-	public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
-	public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
+	//public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
+	//public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
+	
+	public volatile Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
+	public volatile PriorityBlockingQueue<CachedTile> queue = new PriorityBlockingQueue<CachedTile>(10,Tile.probabilityComparator);
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public int SpaceBeingUsed = 0;
 	
+	public CachedTile cacheFullTile(Tile tile){
+		return cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
+	}
 	
+	public CachedTile cacheFragment(Tile tile, int fragmentNum){
+		return cacheTileWithFragmentRange(tile, fragmentNum, fragmentNum);
+	}
+	
+	
+	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
+		int spaceNeeded = lastFragment - firstFragment + 1;
+		while(!this.hasAvailableSpace(spaceNeeded)){
+			int diff = makeSpaceAvailable(spaceNeeded,tile.point);
+			spaceNeeded -= diff;
+		}
+		String[] fragments = new String[FRAGMENTS_PER_TILE];
+		for (int i=firstFragment-1; i<=lastFragment-1;i++){
+			fragments[i] = tile.data[i];
+		}
+		CachedTile toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+		
+		if (!this.tiles.containsKey(toBeCached.id)){
+			this.tiles.put(toBeCached.id, toBeCached);
+		}
+		if (!this.queue.contains(toBeCached)){
+			this.queue.add(toBeCached);
+		}
+		return toBeCached;
+		
+	}
+	
+		
 	
 	
 	public boolean isFull(){
@@ -52,7 +96,7 @@ public class Cache {
 		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
 	}
 	
-	public void declareOccupied(Point point){
+	/*public void declareOccupied(Point point){
 		if (tileExists(point)){
 			Tile tile = getTile(point);
 			tile.beingLoaded =true;
@@ -73,90 +117,44 @@ public class Cache {
 	public void undeclareOccupied(Tile tile){
 		undeclareOccupied(tile.point);
 	}
+	*/
+
 	
-	public void makeConsistent(){
-		//changes fragment number based on LOD
-		Iterator<Tile> it = queue.iterator();
-		while (it.hasNext()){
-			
-			Tile tile = it.next();
-			//int oldLOD = tile.lod;
-			//int newLOD = Predictor.likelihoodToLOD(tile.likelihood);
-			//tile.lod = newLOD;		
-			tile.lod = tile.getFragmentNumber();
-		}
-		
-	}
-	
-	public void refresh(Tile tile){
+	public void refresh(CachedTile tile){
 		
 		//refresh repositions tile based on the new likelihood
 		queue.remove(tile);
 		queue.add(tile);
 	}
 	
-	public void cacheFullTile(Tile tile){
-		int counter = 0;
-		while(!this.hasAvailableSpace(FRAGMENTS_PER_TILE)){
-			int diff = makeSpaceAvailable(FRAGMENTS_PER_TILE,tile.point);
-			if (diff==0){
-				counter++;
-			}
-			if (counter>8){
-				break;
-			}
-		}
-		Tile tileClone = null;// Tile.copyTile(tile);
-		tileClone.setCached(true);
-		tileClone.likelihood = 1.0d;
-		tileClone.lod = FRAGMENTS_PER_TILE;
-		if (!this.tiles.containsKey(tileClone.id)){
-			this.tiles.put(tileClone.id, tileClone);
-		}
-		if (!this.queue.contains(tileClone)){
-			this.queue.add(tileClone);
-		}
-		
-		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
-			cacheFragment(new Fragment(i,null),tileClone.point,tileClone.likelihood);
-		}
-	}
 	
 	
-	public Tile fetchTile(Tile tile,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits+=FRAGMENTS_PER_TILE;
-		return getTile(tile);
-	}
 	
 
-	public Tile getTile(Tile tile){
-		return this.tiles.get(tile.id);
-	}
-	
-	public Tile fetchTile(Point point,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits += FRAGMENTS_PER_TILE;
-		return getTile(point);
+	public CachedTile fetchTile(Point point,UserMove caller){
+		return this.fetchTile(point.hashCode(),caller);
 	}
 	
 	
-	public Tile getTile(Point point){
+	public CachedTile getTile(Point point){
 		return this.tiles.get(point.hashCode());
 	}
 	
-	public Tile fetchTile(int hash,UserMove caller){
-		caller.cacheHits += FRAGMENTS_PER_TILE;
-		UserMove.totalCacheHits+=FRAGMENTS_PER_TILE;
+	public CachedTile fetchTile(int hash,UserMove caller){
+		CachedTile cachedTile = tiles.get(hash);
+		if (cachedTile!=null){
+			caller.cacheHits += cachedTile.getCachedFragmentsNum();
+			UserMove.totalCacheHits+=cachedTile.getCachedFragmentsNum();
+		}
 		return getTile(hash);
 	}
 	
-	public Tile getTile(int hash){
+	public CachedTile getTile(int hash){
 		return this.tiles.get(hash);
 	}
 	
 	
-	public Fragment fetchFragmentOfTile(int fragmentNumber,Point index,UserMove caller){
+	/*public Fragment fetchFragmentOfTile(int fragmentNumber,Point index,UserMove caller){
 		
 		caller.cacheHits+=1;
 		UserMove.totalCacheHits+=1;
@@ -174,7 +172,7 @@ public class Cache {
 			System.out.println("tile Doesn't exist for fragment");
 			return null;
 		}
-	}
+	}*/
 	
 	
 	
@@ -188,7 +186,7 @@ public class Cache {
 	}
 	
 	public boolean tileExistsAndFull(int tileId){
-		Tile tile = getTile(tileId);
+		CachedTile tile = getTile(tileId);
 		if (tile != null){
 			return tile.isFull();
 		}
@@ -201,7 +199,7 @@ public class Cache {
 	}
 	
 	public boolean tileExistsAndNotFull(int tileId){
-		Tile tile = getTile(tileId);
+		CachedTile tile = this.getTile(tileId);
 		return (tile!=null) && !tile.isFull();
 	}
 	
@@ -230,9 +228,9 @@ public class Cache {
 	
 	public void evictFragmentedTile(int tileId){
 		//if(this.isFull()){
-			Tile tile = this.tiles.get(tileId);
+			CachedTile tile = this.tiles.get(tileId);
 			if (tileExists(tileId)){
-				int fragmentCount = tile.getFragmentNumber();
+				int fragmentCount = tile.getCachedFragmentsNum();
 				tiles.remove(tileId);
 				queue.remove(tile);
 				decreaseSpaceUsed(fragmentCount);
@@ -244,9 +242,9 @@ public class Cache {
 	
 	public void evictFragment(int tileId,int fragmNumber){
 		//if (!this.hasAvailableSpace(availableSpace)){
-			makeConsistent();
-			Tile tile = this.tiles.get(tileId);
-			int fragmCount = tile.getFragmentNumber();
+			//makeConsistent();
+			CachedTile tile = this.tiles.get(tileId);
+			int fragmCount = tile.getCachedFragmentsNum();
 			if (fragmCount>0){
 				//HOTFIX BECAUSE OF MISSED FRAGMENTS 1,2,3,4,5, 7 6 is missing so we get the max all the time! 
 				int maxFragm = 0;
@@ -262,14 +260,13 @@ public class Cache {
 					decreaseSpaceUsed(1);
 				}
 				
-				fragmCount = tile.getFragmentNumber();
+				fragmCount = tile.getCachedFragmentsNum();
 				//in case that was the last fragment of the tile
 				if (fragmCount==0){
 					queue.remove(tile);
 					tiles.remove(tileId);
 				}
 			}
-			makeConsistent();
 		//}
 	}
 	public void evictFragment(Point index,int fragmNumber){
@@ -278,24 +275,24 @@ public class Cache {
 	
 	
 	public int makeSpaceAvailable(int fragments,Point point){
-		makeConsistent();
-		Tile dontTouchTile = null;
+		//makeConsistent();
+		CachedTile dontTouchTile = null;
 		double oldLikelihood = -1.0;
 		if (tileExists(point)){
 			dontTouchTile = tiles.get(point.hashCode());
-			oldLikelihood = dontTouchTile.likelihood;
-			dontTouchTile.likelihood = 2.0;
-			refresh(dontTouchTile);
+			oldLikelihood = dontTouchTile.probability;
+			dontTouchTile.probability = 2.0;
+			//refresh(dontTouchTile);
 		}
 		
 		int sizeBefore = this.SpaceBeingUsed;
 		if (fragments==1){
-			Tile lessLikelyTile = queue.peek();
-			int fragmNumber = lessLikelyTile.getFragmentNumber();
+			CachedTile lessLikelyTile = queue.peek();
+			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
 			//remove only if the likelihood of the one removed is lower than the one to be inserted
 			//if (lessLikelyTile.likelihood < point.carriedLikeliood){
 
-				evictFragment(lessLikelyTile.point, fragmNumber);
+				this.evictFragment(lessLikelyTile.point, fragmNumber);
 			//}
 			//else {
 			//	System.out.println(lessLikelyTile.likelihood+" "+point.carriedLikeliood);
@@ -303,26 +300,26 @@ public class Cache {
 			
 		}
 		else {
-			Tile lessLikelyTile = queue.peek();
-			int fragmNumber = lessLikelyTile.getFragmentNumber();
+			CachedTile lessLikelyTile = queue.peek();
+			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
 			for (int i=0; i<fragmNumber; i++){
-				evictFragment(lessLikelyTile.point, i);
+				this.evictFragment(lessLikelyTile.point, i);
 			}
 			
 		}
 		int sizeAfter = this.SpaceBeingUsed;
 		if (tileExists(point)){
-			dontTouchTile.likelihood = oldLikelihood;
+			dontTouchTile.probability = oldLikelihood;
 		}
-		makeConsistent();
+		//makeConsistent();
 		return sizeBefore - sizeAfter;
 	}
 	
 	
-	public void cacheFragment(Fragment fragm,Point point,double carriedLikelihood){
+	/*public void cacheFragment(Tile tile,double carriedLikelihood){
 		int counter = 0;
 		while(!this.hasAvailableSpace(1)){
-			int diff = makeSpaceAvailable(1,point);
+			int diff = makeSpaceAvailable(1,new Point());
 			System.out.println(this.SpaceBeingUsed);
 			System.out.println(this);
 
@@ -349,23 +346,12 @@ public class Cache {
 			
 		}
 		
-	}
+	}*/
 	
 	
+
 	
-	private void addTile(Tile tile){
-		Tile tileClone = null; //Tile.copyTile(tile);
-		tileClone.setCached(true);
-		if (!this.tiles.containsKey(tile.id)){
-			this.tiles.put(tileClone.id, tileClone);
-		}
-		if (!this.queue.contains(tile)){
-			this.queue.add(tileClone);
-		}
-		
-	}
-	
-	public void updateAllTileLikelihoods(HashMap<Node,Tuple<Double,Integer>> map){
+	/*public void updateAllTileLikelihoods(HashMap<Node,Tuple<Double,Integer>> map){
 		Iterator<Tile> it = queue.iterator();
 		while (it.hasNext()){
 			Tile tile = it.next();
@@ -388,7 +374,7 @@ public class Cache {
 				}
 			}
 		}
-	}
+	}*/
 	
 	
 	/*public void updateAllTileLikelihoods(Viewport currentViewport){
@@ -400,7 +386,7 @@ public class Cache {
 		
 	}*/
 	
-	private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
+	/*private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
 		Tile tile = tiles.get(index.hashCode());
 		if (tileExists(index)){
 			double newLikelihood = 1.0d;
@@ -416,7 +402,8 @@ public class Cache {
 				refresh(tile);
 			}
 		}
-	}
+	}*/
+	
 	
 	
 	
@@ -433,21 +420,17 @@ public class Cache {
 			
 			result+=" INCONSISTENT SIZES tiles/queue"+ Main.cache.tiles.size()+" vs "+Main.cache.queue.size();
 		}
-		Iterator<Tile> iter = queue.iterator();
+		Iterator<CachedTile> iter = queue.iterator();
 		while(iter.hasNext()){
-			Tile tile = iter.next();
-			if (tile.lod!=Predictor.likelihoodToLOD(tile.likelihood)){
+			CachedTile tile = iter.next();
+		/*	if (tile.lod!=Predictor.likelihoodToLOD(tile.likelihood)){
 				
 				result+=" INCONSISTENT cached "+tile.lod+" vs based-on-likelihood"+Predictor.likelihoodToLOD(tile.likelihood)+" "+tile+" /INCONSISTENT\n";
 				//inconsistent = true;
 				//return result;
-			}
-			result+=tile.toString()+": ("+tile.getFragmentNumber()+"): fragments[";
-			Iterator<Integer> fragmIter = tile.fragments.keySet().iterator();
-			while(fragmIter.hasNext()){
-		    	result+=tile.getFragment(fragmIter.next()).num+",";
-		    }
-		    result+="]\n";
+			}*/
+			result+=tile.toString()+": ("+tile.getCachedFragmentsNum()+"): fragments";
+			result+=tile.fragmentsToString();
 		}
 		return result;
 	}

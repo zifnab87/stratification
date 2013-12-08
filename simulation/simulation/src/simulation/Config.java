@@ -30,7 +30,8 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static double MIN_CONFIDENCE = 0.001d;
+	public static double CUTOFF = 4; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
+	// small numbers -> aggressive
 	
 	//USER
 	public static int THINK_TIME = 32;
