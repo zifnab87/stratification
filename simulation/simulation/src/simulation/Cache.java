@@ -474,6 +474,26 @@ public class Cache {
 	
 	//update cache probability based on the prediction tree
 	public void updateProbabilities(Vector<Node> list,Point currentPosition){
+		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
+		while (mapIter.hasNext()){
+			CachedTile cTile = this.tiles.get(mapIter.next());
+			//IMPORTANT remove before the equality is busted because of change in probability
+			this.queue.remove(cTile);
+			//we make probabilities zero so only the ones that will be updated by the 
+			//prediction tree will have probability less than zero
+			//if it is current we give it a probability of 1.0d
+			if (currentPosition.equals(cTile.point)){
+				cTile.probability = 1.0d;
+			}
+			else {
+				cTile.probability = 0.0d;
+			}
+			cTile.distance = Predictor.distance(cTile.point, currentPosition);
+			this.queue.add(cTile);
+		}
+		
+		
+		
 		Iterator<Node> iter = list.iterator();
 		while(iter.hasNext()){
 			Node node = iter.next();
@@ -482,21 +502,14 @@ public class Cache {
 				//IMPORTANT remove before the equality is busted because of change in probability
 				this.queue.remove(cTile);
 				cTile.probability = node.probability;
-				cTile.distance = 10000;
+				//cTile.distance = Predictor.distance(cTile.point, currentPosition);
 				//cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
 				this.queue.add(cTile);
 			}	
 		}
 		
 		
-		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
-		while (mapIter.hasNext()){
-			CachedTile cTile = this.tiles.get(mapIter.next());
-			//IMPORTANT remove before the equality is busted because of change in probability
-			this.queue.remove(cTile);
-			cTile.distance = Predictor.distance(cTile.point, currentPosition);
-			this.queue.add(cTile);
-		}
+
 		System.out.println("Updated Memory because of Prediction"+this.queue);
 	}
 }
