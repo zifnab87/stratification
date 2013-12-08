@@ -109,7 +109,12 @@ public class Main {
 			Main.cache.updateProbabilities(list,currentNode.point);
 			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
 			System.out.println("~~~~~~~~~~~~~~~~~~");
-			//System.out.println("Memory3 "+Main.cache.tiles.size());
+			System.out.println("Memory2 "+Main.cache.queue.size());
+			System.out.println("Memory3 "+Main.cache.tiles.size());
+			if (Main.cache.tiles.size()!=Main.cache.queue.size()){
+				System.err.println("Error");
+				break;
+			}
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
 			if (isTerminal || moves.size()==0){

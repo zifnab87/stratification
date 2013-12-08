@@ -117,11 +117,21 @@ public class CachedTile extends Tile {
 		    	return 1;
 		    }
 		    else if (t1.probability == t2.probability &&
-		    		 t1.id < t2.id ) {
+		    		 t1.distance < t2.distance ) {
+		    	return 1;
+		    }
+		    else if (t1.probability == t2.probability &&
+		    		 t1.distance > t2.distance) {
 		    	return -1;
 		    }
 		    else if (t1.probability == t2.probability &&
-		    		 t1.id > t2.id ) {
+		    		t1.distance == t2.distance && t1.id < t2.id)
+		    {
+		    	return -1;
+		    }
+		    else if (t1.probability == t2.probability &&
+		    		t1.distance == t2.distance && t1.id > t2.id)
+		    {
 		    	return 1;
 		    }
 		    else {

@@ -64,6 +64,16 @@ public class Cache {
 			this.tiles.put(toBeCached.id, toBeCached);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
+		if (!queueContains(toBeCached)){
+			this.queue.add(toBeCached);
+		}
+		
+		increaseSpaceUsed(lastFragment-firstFragment+1);
+		return toBeCached;
+		
+	}
+
+	private boolean queueContains(CachedTile toBeCached) {
 		boolean found = false;
 		Iterator<CachedTile> iter = this.queue.iterator();
 		while(iter.hasNext()){
@@ -73,14 +83,7 @@ public class Cache {
 				break;
 			}
 		}
-		
-		if (!found){
-			this.queue.add(toBeCached);
-		}
-		
-		increaseSpaceUsed(lastFragment-firstFragment+1);
-		return toBeCached;
-		
+		return found;
 	}
 	
 		
@@ -489,7 +492,9 @@ public class Cache {
 				cTile.probability = 0.0d;
 			}
 			cTile.distance = Predictor.distance(cTile.point, currentPosition);
-			this.queue.add(cTile);
+			if (!queueContains(cTile)){
+				this.queue.add(cTile);
+			}
 		}
 		
 		
@@ -504,7 +509,9 @@ public class Cache {
 				cTile.probability = node.probability;
 				//cTile.distance = Predictor.distance(cTile.point, currentPosition);
 				//cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
-				this.queue.add(cTile);
+				if (!queueContains(cTile)){
+					this.queue.add(cTile);
+				}
 			}	
 		}
 		
