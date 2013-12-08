@@ -473,19 +473,29 @@ public class Cache {
 	}
 	
 	//update cache probability based on the prediction tree
-	public void updateProbabilities(Vector<Node> list){
+	public void updateProbabilities(Vector<Node> list,Point currentPosition){
 		Iterator<Node> iter = list.iterator();
 		while(iter.hasNext()){
 			Node node = iter.next();
 			if (this.tiles.containsKey(node.point.hashCode())){
 				CachedTile cTile = this.tiles.get(node.point.hashCode());
-				//remove before the equality is busted because of change in probability
+				//IMPORTANT remove before the equality is busted because of change in probability
 				this.queue.remove(cTile);
 				cTile.probability = node.probability;
-				cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
+				cTile.distance = 10000;
+				//cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
 				this.queue.add(cTile);
 			}	
-			
+		}
+		
+		
+		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
+		while (mapIter.hasNext()){
+			CachedTile cTile = this.tiles.get(mapIter.next());
+			//IMPORTANT remove before the equality is busted because of change in probability
+			this.queue.remove(cTile);
+			cTile.distance = Predictor.distance(cTile.point, currentPosition);
+			this.queue.add(cTile);
 		}
 		System.out.println("Updated Memory because of Prediction"+this.queue);
 	}

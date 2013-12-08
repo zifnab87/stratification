@@ -23,6 +23,7 @@ public class Tile {
 	
 	
 	public double carryingProbability;
+	public int carryingDistance;
 	
 	public Point point; //index
 	

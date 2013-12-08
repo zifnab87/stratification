@@ -165,9 +165,9 @@ public class Predictor {
 		return dist;
 	}
 	
-	public static double distance(Point a, Point b){
+	public static int distance(Point a, Point b){
 		double dist = Math.sqrt(Math.pow(a.y-b.y,2)+Math.pow(a.x-b.x,2));
-		return Math.floor(dist);
+		return (int)Math.ceil(dist);
 	}
 	public static double distance(Tile tile,Viewport viewport){
 		Point currentCenterIndex = viewport.center;

@@ -7,8 +7,8 @@ import static simulation.Config.FRAGMENTS_PER_TILE;
 public class CachedTile extends Tile {
 
 	
-	//public int cachedFragments=0; //number of fragments it has cached
 	public double probability;
+	public int distance;
 	
 	public int getCachedFragmentsNum(){
 		int count = 0;
@@ -101,7 +101,7 @@ public class CachedTile extends Tile {
 	
 	public String toString(){
 		String str;
-		str = "CachedTile("+this.point.y+","+this.point.x+",lod="+this.getCachedFragmentsNum()+",Probability="+this.probability+")";
+		str = "CachedTile("+this.point.y+","+this.point.x+",lod="+this.getCachedFragmentsNum()+",Probability="+this.probability+",Distance="+this.distance+")";
 		return str;
 	}
 	

@@ -79,14 +79,16 @@ public class Main {
 			//System.exit(0);
 			//if (count==0){
 			System.out.println("Memory "+Main.cache.queue);
-			Vector<Node> list = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),1,1); 
+			Node currentNode = userMove.viewport.upperLeft.createNode();
+			System.out.println("Current Position "+currentNode.point);
+			Vector<Node> list = Predictor.preparePrefetching(currentNode,1,1); 
 			
 			System.out.println("List To Be Prefetched: "+list);
 			if (Main.cache.queue.size()>0){
 				//Main.cache.queue.first().data=new String[]{"da","dasd",null,null,null,null,null,null};
 			}
 			//System.out.println("Udadasd Memory "+Main.cache.queue);
-			Main.cache.updateProbabilities(list);
+			
 				//Main.cache.updateAllTileLikelihoods(map);
 				//Iterator<Node> iter = list.iterator();
 //				while (iter.hasNext()){
@@ -97,14 +99,16 @@ public class Main {
 //					System.out.println("~"+likelihood);
 //					System.out.println("~"+lod);
 //				}
-				System.out.println("~~~~~~~~~~~~~~~~~~");
+				
 			//}
 			count++;
 			
 			userMove.viewportFetch();
 			userMove.prefetch(list);
-			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
 			
+			Main.cache.updateProbabilities(list,currentNode.point);
+			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
+			System.out.println("~~~~~~~~~~~~~~~~~~");
 			//System.out.println("Memory3 "+Main.cache.tiles.size());
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
