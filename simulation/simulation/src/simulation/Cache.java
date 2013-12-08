@@ -6,6 +6,7 @@ import static simulation.Config.FRAGMENTS_PER_TILE;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -23,9 +24,9 @@ public class Cache {
 	//public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	//public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	
-	public volatile Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
-	public volatile PriorityBlockingQueue<CachedTile> queue = new PriorityBlockingQueue<CachedTile>(10,Tile.probabilityComparator);
-	
+	public  Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
+	//public volatile LinkedList<CachedTile> queue = new PriorityBlockingQueue<CachedTile>(10,Tile.probabilityComparator);
+	public TreeSet<CachedTile> queue = new TreeSet<CachedTile>(CachedTile.probabilityComparator);
 	
 	
 	
@@ -44,11 +45,13 @@ public class Cache {
 		return cacheTileWithFragmentRange(tile, fragmentNum, fragmentNum);
 	}
 	
+	public static int add = 0;
+	public static int put = 0;
 	
 	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
 		while(!this.hasAvailableSpace(spaceNeeded)){
-			int diff = makeSpaceAvailable(spaceNeeded,tile.point);
+			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
 		}
 		String[] fragments = new String[FRAGMENTS_PER_TILE];
@@ -59,10 +62,17 @@ public class Cache {
 		
 		if (!this.tiles.containsKey(toBeCached.id)){
 			this.tiles.put(toBeCached.id, toBeCached);
+			put++;
 		}
+		System.out.println(toBeCached);
 		if (!this.queue.contains(toBeCached)){
 			this.queue.add(toBeCached);
+			add++;
+			
 		}
+		System.out.println("queue size"+this.queue.size());
+		System.out.println(put+"~~~~"+add);
+		increaseSpaceUsed(lastFragment-firstFragment+1);
 		return toBeCached;
 		
 	}
@@ -207,6 +217,16 @@ public class Cache {
 		return tileExistsAndNotFull(index.hashCode());
 	}
 	
+	public int makeSpaceAvailable(int fragmentsNeeded,Point currentPoint){
+		//System.out.println("I need"+fragmentsNeeded);
+		CachedTile lessLikelyTile = queue.pollFirst();
+		//System.out.println(queue);
+		return 0;
+	}
+	
+	
+	
+	
 
 	/*public void evictFullTile(Point index){
 		evictFullTile(index.hashCode());
@@ -222,98 +242,99 @@ public class Cache {
 		//}
 	}*/
 	
-	public void evictFragmentedTile(Point index){
-		evictFragmentedTile(index.hashCode());
-	}
+//	public void evictFragmentedTile(Point index){
+//		evictFragmentedTile(index.hashCode());
+//	}
+//	
+//	public void evictFragmentedTile(int tileId){
+//		//if(this.isFull()){
+//			CachedTile tile = this.tiles.get(tileId);
+//			if (tileExists(tileId)){
+//				int fragmentCount = tile.getCachedFragmentsNum();
+//				tiles.remove(tileId);
+//				queue.remove(tile);
+//				decreaseSpaceUsed(fragmentCount);
+//			}
+//		//}
+//			
+//	}
 	
-	public void evictFragmentedTile(int tileId){
-		//if(this.isFull()){
-			CachedTile tile = this.tiles.get(tileId);
-			if (tileExists(tileId)){
-				int fragmentCount = tile.getCachedFragmentsNum();
-				tiles.remove(tileId);
-				queue.remove(tile);
-				decreaseSpaceUsed(fragmentCount);
-			}
-		//}
-			
-	}
-	
-	
-	public void evictFragment(int tileId,int fragmNumber){
-		//if (!this.hasAvailableSpace(availableSpace)){
-			//makeConsistent();
-			CachedTile tile = this.tiles.get(tileId);
-			int fragmCount = tile.getCachedFragmentsNum();
-			if (fragmCount>0){
-				//HOTFIX BECAUSE OF MISSED FRAGMENTS 1,2,3,4,5, 7 6 is missing so we get the max all the time! 
-				int maxFragm = 0;
-				for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
-					if (maxFragm<i && tile.containsFragment(i)){
-						maxFragm = i;
-					}
-				}
-				
-				
-				if (tile.containsFragment(maxFragm)){
-					tile.removeFragment(maxFragm);
-					decreaseSpaceUsed(1);
-				}
-				
-				fragmCount = tile.getCachedFragmentsNum();
-				//in case that was the last fragment of the tile
-				if (fragmCount==0){
-					queue.remove(tile);
-					tiles.remove(tileId);
-				}
-			}
-		//}
-	}
-	public void evictFragment(Point index,int fragmNumber){
-		evictFragment(index.hashCode(),fragmNumber);
-	}
-	
-	
-	public int makeSpaceAvailable(int fragments,Point point){
-		//makeConsistent();
-		CachedTile dontTouchTile = null;
-		double oldLikelihood = -1.0;
-		if (tileExists(point)){
-			dontTouchTile = tiles.get(point.hashCode());
-			oldLikelihood = dontTouchTile.probability;
-			dontTouchTile.probability = 2.0;
-			//refresh(dontTouchTile);
-		}
-		
-		int sizeBefore = this.SpaceBeingUsed;
-		if (fragments==1){
-			CachedTile lessLikelyTile = queue.peek();
-			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
-			//remove only if the likelihood of the one removed is lower than the one to be inserted
-			//if (lessLikelyTile.likelihood < point.carriedLikeliood){
-
-				this.evictFragment(lessLikelyTile.point, fragmNumber);
-			//}
-			//else {
-			//	System.out.println(lessLikelyTile.likelihood+" "+point.carriedLikeliood);
-			//}
-			
-		}
-		else {
-			CachedTile lessLikelyTile = queue.peek();
-			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
-			for (int i=0; i<fragmNumber; i++){
-				this.evictFragment(lessLikelyTile.point, i);
-			}
-			
-		}
-		int sizeAfter = this.SpaceBeingUsed;
-		if (tileExists(point)){
-			dontTouchTile.probability = oldLikelihood;
-		}
-		//makeConsistent();
-		return sizeBefore - sizeAfter;
-	}
+//	
+//	public void evictFragment(int tileId,int fragmNumber){
+//		//if (!this.hasAvailableSpace(availableSpace)){
+//			//makeConsistent();
+//			CachedTile tile = this.tiles.get(tileId);
+//			int fragmCount = tile.getCachedFragmentsNum();
+//			if (fragmCount>0){
+//				//HOTFIX BECAUSE OF MISSED FRAGMENTS 1,2,3,4,5, 7 6 is missing so we get the max all the time! 
+//				int maxFragm = 1;
+//				for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
+//					if (maxFragm<i && tile.containsFragment(i)){
+//						maxFragm = i;
+//					}
+//				}
+//				
+//				
+//				if (tile.containsFragment(maxFragm)){
+//					tile.removeFragment(maxFragm);
+//					decreaseSpaceUsed(1);
+//				}
+//				
+//				fragmCount = tile.getCachedFragmentsNum();
+//				//in case that was the last fragment of the tile
+//				if (fragmCount==0){
+//					queue.remove(tile);
+//					tiles.remove(tileId);
+//				}
+//			}
+//		//}
+//	}
+//	public void evictFragment(Point index,int fragmNumber){
+//		evictFragment(index.hashCode(),fragmNumber);
+//	}
+//	
+//	
+//	public int makeSpaceAvailable(int fragments,Point point){
+//		//makeConsistent();
+//		CachedTile dontTouchTile = null;
+//		double oldLikelihood = -1.0;
+//		if (tileExists(point)){
+//			dontTouchTile = tiles.get(point.hashCode());
+//			oldLikelihood = dontTouchTile.probability;
+//			dontTouchTile.probability = 2.0;
+//			//refresh(dontTouchTile);
+//		}
+//		
+//		int sizeBefore = this.SpaceBeingUsed;
+//		if (fragments==1){
+//			CachedTile lessLikelyTile = queue.pollFirst();
+//			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
+//			//remove only if the likelihood of the one removed is lower than the one to be inserted
+//			//if (lessLikelyTile.likelihood < point.carriedLikeliood){
+//
+//				this.evictFragment(lessLikelyTile.point, fragmNumber);
+//			//}
+//			//else {
+//			//	System.out.println(lessLikelyTile.likelihood+" "+point.carriedLikeliood);
+//			//}
+//			
+//		}
+//		else {
+//			System.out.println("aaaa"+queue.size());
+//			CachedTile lessLikelyTile = queue.pollFirst();
+//			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
+//			for (int i=0; i<fragmNumber; i++){
+//				this.evictFragment(lessLikelyTile.point, i);
+//			}
+//			
+//		}
+//		int sizeAfter = this.SpaceBeingUsed;
+//		if (tileExists(point)){
+//			dontTouchTile.probability = oldLikelihood;
+//		}
+//		//makeConsistent();
+//		return sizeBefore - sizeAfter;
+//	}
 	
 	
 	/*public void cacheFragment(Tile tile,double carriedLikelihood){
@@ -437,6 +458,7 @@ public class Cache {
 	
 	public boolean hasAvailableSpace(int fragments){
 		if ((CACHE_SIZE-SpaceBeingUsed)>=fragments){
+			
 			return true;
 		}
 		else {

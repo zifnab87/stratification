@@ -1,5 +1,6 @@
 package simulation;
 
+import java.util.Comparator;
 import java.util.Vector;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 
@@ -103,6 +104,31 @@ public class CachedTile extends Tile {
 		str = "CachedTile("+this.point.y+","+this.point.x+",LOD="+this.getCachedFragmentsNum()+",Probability="+this.probability+")";
 		return str;
 	}
+	
+	
+	
+	public static Comparator<CachedTile> probabilityComparator = new Comparator<CachedTile>(){
+		@Override
+		public int compare(CachedTile t1, CachedTile t2) {
+		    if (t1.probability > t2.probability ){
+		    	return -1;
+		    }
+		    else if (t1.probability < t2.probability  ){
+		    	return 1;
+		    }
+		    else if (t1.probability == t2.probability &&
+		    		 t1.id < t2.id ) {
+		    	return -1;
+		    }
+		    else if (t1.probability == t2.probability &&
+		    		 t1.id > t2.id ) {
+		    	return 1;
+		    }
+		    else {
+		    	return 0;
+		    }
+		}
+	};
 	
 	
 }

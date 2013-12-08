@@ -68,7 +68,7 @@ public class Main {
 				userMove = Predictor.nextMove(viewport);
 				
 			}
-			cache.cacheTileWithFragmentRange(db.fetchTileWithFragmentRange(userMove.upperLeft, 1, 1, userMove),2,2).data[1] = "dsadasds";
+			//cache.cacheTileWithFragmentRange(db.fetchTileWithFragmentRange(userMove.upperLeft, 1, 1, userMove),2,2).data[1] = "dsadasds";
 			
 			//System.out.println(cache);
 			
@@ -78,8 +78,8 @@ public class Main {
 			//break;
 			//System.exit(0);
 			//if (count==0){
-			Vector<Node> list = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),1,5); 
-			System.out.println(list);
+			Vector<Node> list = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),1,1); 
+			//System.out.println(list);
 				//Main.cache.updateAllTileLikelihoods(map);
 				//Iterator<Node> iter = list.iterator();
 //				while (iter.hasNext()){
@@ -95,8 +95,10 @@ public class Main {
 			count++;
 			
 			userMove.viewportFetch();
-			userMove.prefetch(list);
-
+			//userMove.prefetch(list);
+			System.out.println("Memory "+Main.cache.SpaceBeingUsed);
+			System.out.println("Memory2 "+Main.cache.queue);
+			System.out.println("Memory3 "+Main.cache.tiles.size());
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
 			if (isTerminal || moves.size()==0){
@@ -110,5 +112,6 @@ public class Main {
 		}
 		System.out.println(UserMove.totalCacheMisses);
 		System.out.println(UserMove.totalCacheHits);
+		
 	}
 }

@@ -37,29 +37,7 @@ public class Tile {
 	}
 	
 	
-	public static Comparator<CachedTile> probabilityComparator = new Comparator<CachedTile>(){
-		@Override
-		public int compare(CachedTile t1, CachedTile t2) {
-			 /*if  (t1.beingLoaded && !t2.beingLoaded){
-				 return 1;
-			 }
-			 else if (t2.beingLoaded && !t1.beingLoaded){
-				 return -1;
-			 }
-			 else if (t1.beingLoaded && t2.beingLoaded){
-				 return 0;
-			 }
-			 else*/ if  (t1.probability > t2.probability){
-		    	 return 1;
-		     }
-		     else if (t1.probability<t2.probability){
-		    	 return -1;
-		     }
-		     else {
-		    	 return 0;
-		     }
-		}
-	};
+	
 	
 	
 	public Tile(Point point){
