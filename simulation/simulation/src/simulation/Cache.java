@@ -3,6 +3,7 @@ package simulation;
 import static simulation.Config.CACHE_SIZE;
 import static simulation.Config.FRAGMENTS_PER_TILE;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -76,6 +77,7 @@ public class Cache {
 		if (!found){
 			this.queue.add(toBeCached);
 		}
+		
 		increaseSpaceUsed(lastFragment-firstFragment+1);
 		return toBeCached;
 		
@@ -477,19 +479,14 @@ public class Cache {
 			Node node = iter.next();
 			if (this.tiles.containsKey(node.point.hashCode())){
 				CachedTile cTile = this.tiles.get(node.point.hashCode());
-				cTile.probability = node.probability;
-				cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};
-				//remove and put it back so it updates the sorting
-				System.out.println(this.queue.size());
+				//remove before the equality is busted because of change in probability
 				this.queue.remove(cTile);
-				System.out.println(this.queue.size());
+				cTile.probability = node.probability;
+				cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
 				this.queue.add(cTile);
-				System.out.println(this.queue.size());
-				System.out.println(cTile);
-				System.out.println("Bika");
 			}	
 			
 		}
-		System.out.println("Updated Memory"+this.queue);
+		System.out.println("Updated Memory because of Prediction"+this.queue);
 	}
 }
