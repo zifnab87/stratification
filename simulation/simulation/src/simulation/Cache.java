@@ -51,11 +51,13 @@ public class Cache {
 			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
 		}
+				
 		String[] fragments = new String[FRAGMENTS_PER_TILE];
 		for (int i=firstFragment-1; i<=lastFragment-1;i++){
 			fragments[i] = tile.data[i];
 		}
 		CachedTile toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+		
 		toBeCached.probability = tile.carryingProbability;
 		if (!this.tiles.containsKey(toBeCached.id)){
 			this.tiles.put(toBeCached.id, toBeCached);

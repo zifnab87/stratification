@@ -166,9 +166,7 @@ public class Database {
 			
 			Statement stmt = conn.createStatement();
 			stmt = conn.createStatement();
-			results = stmt.executeQuery("SELECT * FROM fragment WHERE y="+index.y+" AND y="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment);
-	
-			
+			results = stmt.executeQuery("SELECT * FROM fragment WHERE y="+index.y+" AND x="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment);
 	
 			String[] totalData = new String[FRAGMENTS_PER_TILE];
 			while (results.next()){
