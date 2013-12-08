@@ -54,8 +54,8 @@ public class Main {
 		}
 		int count=0;
 		UserMove userMove = null;
-		while (true){
-			//for (int i=0; i<4; i++){	
+		//while (true){
+		for (int i=0; i<4; i++){	
 			
 			
 			/*if (Main.previousViewport!=null){
@@ -80,7 +80,13 @@ public class Main {
 			//if (count==0){
 			System.out.println("Memory "+Main.cache.queue);
 			Vector<Node> list = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),1,1); 
+			
 			System.out.println("List To Be Prefetched: "+list);
+			if (Main.cache.queue.size()>0){
+				//Main.cache.queue.first().data=new String[]{"da","dasd",null,null,null,null,null,null};
+			}
+			//System.out.println("Udadasd Memory "+Main.cache.queue);
+			Main.cache.updateProbabilities(list);
 				//Main.cache.updateAllTileLikelihoods(map);
 				//Iterator<Node> iter = list.iterator();
 //				while (iter.hasNext()){

@@ -111,7 +111,7 @@ public class Predictor {
 			Node node = iter.next();
 			
 			previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
-			System.out.println(previousFrames);
+			//System.out.println(previousFrames);
 			if (previousFrames>0){
 				previousProb = node.probability;
 				node.fragmentsNeeded = previousFrames;

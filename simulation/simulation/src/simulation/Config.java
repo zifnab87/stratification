@@ -10,7 +10,7 @@ public class Config {
 	public static boolean FRAGMENT = true; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static final int CACHE_SIZE = 128;
+	public static final int CACHE_SIZE = 1024;
 	
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;

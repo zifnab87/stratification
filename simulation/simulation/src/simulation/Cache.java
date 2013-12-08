@@ -62,7 +62,18 @@ public class Cache {
 		if (!this.tiles.containsKey(toBeCached.id)){
 			this.tiles.put(toBeCached.id, toBeCached);
 		}
-		if (!this.queue.contains(toBeCached)){
+		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
+		boolean found = false;
+		Iterator<CachedTile> iter = this.queue.iterator();
+		while(iter.hasNext()){
+			CachedTile cTile = iter.next();
+			if (cTile.id == toBeCached.id){
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found){
 			this.queue.add(toBeCached);
 		}
 		increaseSpaceUsed(lastFragment-firstFragment+1);
@@ -457,5 +468,28 @@ public class Cache {
 		else {
 			return false;
 		}
+	}
+	
+	//update cache probability based on the prediction tree
+	public void updateProbabilities(Vector<Node> list){
+		Iterator<Node> iter = list.iterator();
+		while(iter.hasNext()){
+			Node node = iter.next();
+			if (this.tiles.containsKey(node.point.hashCode())){
+				CachedTile cTile = this.tiles.get(node.point.hashCode());
+				cTile.probability = node.probability;
+				cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};
+				//remove and put it back so it updates the sorting
+				System.out.println(this.queue.size());
+				this.queue.remove(cTile);
+				System.out.println(this.queue.size());
+				this.queue.add(cTile);
+				System.out.println(this.queue.size());
+				System.out.println(cTile);
+				System.out.println("Bika");
+			}	
+			
+		}
+		System.out.println("Updated Memory"+this.queue);
 	}
 }
