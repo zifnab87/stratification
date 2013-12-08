@@ -45,9 +45,6 @@ public class Cache {
 		return cacheTileWithFragmentRange(tile, fragmentNum, fragmentNum);
 	}
 	
-	public static int add = 0;
-	public static int put = 0;
-	
 	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
 		while(!this.hasAvailableSpace(spaceNeeded)){
@@ -59,19 +56,13 @@ public class Cache {
 			fragments[i] = tile.data[i];
 		}
 		CachedTile toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-		
+		toBeCached.probability = tile.carryingProbability;
 		if (!this.tiles.containsKey(toBeCached.id)){
 			this.tiles.put(toBeCached.id, toBeCached);
-			put++;
 		}
-		System.out.println(toBeCached);
 		if (!this.queue.contains(toBeCached)){
 			this.queue.add(toBeCached);
-			add++;
-			
 		}
-		System.out.println("queue size"+this.queue.size());
-		System.out.println(put+"~~~~"+add);
 		increaseSpaceUsed(lastFragment-firstFragment+1);
 		return toBeCached;
 		

@@ -8,7 +8,7 @@ public class CachedTile extends Tile {
 
 	
 	//public int cachedFragments=0; //number of fragments it has cached
-	public double probability = -1.0d;
+	public double probability;
 	
 	public int getCachedFragmentsNum(){
 		int count = 0;
@@ -101,7 +101,7 @@ public class CachedTile extends Tile {
 	
 	public String toString(){
 		String str;
-		str = "CachedTile("+this.point.y+","+this.point.x+",LOD="+this.getCachedFragmentsNum()+",Probability="+this.probability+")";
+		str = "CachedTile("+this.point.y+","+this.point.x+",lod="+this.getCachedFragmentsNum()+",Probability="+this.probability+")";
 		return str;
 	}
 	

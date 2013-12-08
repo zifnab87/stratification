@@ -83,6 +83,8 @@ public class UserMove {
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 					
 					Tile tile = Main.db.fetchTileWithFragmentRange(point, firstFragment,lastFragment, this);
+					
+					tile.carryingProbability = node.probability; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
 					
 					//that many were cached
@@ -93,6 +95,7 @@ public class UserMove {
 				else { //tile doesn't exist in Cache
 					// full Database Fetch
 					Tile tile = Main.db.fetchTile(point, this);
+					tile.carryingProbability = node.probability;
 					Main.cache.cacheFullTile(tile);
 				}
 			}
@@ -107,6 +110,7 @@ public class UserMove {
 						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 						
 						Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
+						tile.carryingProbability = node.probability; // carry it to the cache
 						Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
 						
 						//that many were cached
@@ -127,6 +131,7 @@ public class UserMove {
 					int firstFragment = fragmentsToBePrefetched.get(0);
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
+					tile.carryingProbability = node.probability; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
 				}
 			}
@@ -165,8 +170,9 @@ public class UserMove {
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
 					// full Database Fetch
-					Tile tileFetched = Main.db.fetchTile(index, this);
-					Main.cache.cacheFullTile(tileFetched);
+					Tile tile = Main.db.fetchTile(index, this);
+					tile.carryingProbability = 1.0d; // carry it to the cache
+					Main.cache.cacheFullTile(tile);
 				}
 				//if tile partially exists request missing fragments
 				
@@ -176,6 +182,7 @@ public class UserMove {
 					//what was actually fetched to be viewed
 					Main.cache.fetchTile(index, this);
 					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,FRAGMENTS_PER_TILE,this);
+					tile.carryingProbability = 1.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 				}
 				else { // tileExistsAndFull == true

@@ -29,7 +29,7 @@ public class Predictor {
 	
 	
 	private static HashMap<Integer,Node> createPredictorTree(Node node,int totalWaves){
-		node.likelihood = 1d;
+		node.probability = 1d;
 		LinkedList<Node> listNodes = createPredictorTreeHelper(node,1);
 		HashMap<Integer,Node> toReturn = new HashMap<Integer,Node>();
 		for(Node n : listNodes){
@@ -41,7 +41,7 @@ public class Predictor {
 			}
 			else {
 				Node stored = toReturn.get(n.hashCode());
-				if (stored.waveNum == n.waveNum && stored.likelihood<n.likelihood){
+				if (stored.waveNum == n.waveNum && stored.probability < n.probability){
 					toReturn.put(n.hashCode(), n);
 				}
 			}
@@ -59,7 +59,7 @@ public class Predictor {
 				}
 				else {
 					Node stored = toReturn.get(n.hashCode());
-					if (stored.waveNum == n.waveNum && stored.likelihood<n.likelihood){
+					if (stored.waveNum == n.waveNum && stored.probability < n.probability){
 						toReturn.put(n.hashCode(), n);
 					}
 				}
@@ -110,10 +110,10 @@ public class Predictor {
 		while(iter.hasNext() && count<CUTOFF){
 			Node node = iter.next();
 			
-			previousFrames = Math.min((int) Math.ceil((node.likelihood/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
+			previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
 			System.out.println(previousFrames);
 			if (previousFrames>0){
-				previousProb = node.likelihood;
+				previousProb = node.probability;
 				node.fragmentsNeeded = previousFrames;
 				vec.add(node);
 			}
@@ -134,6 +134,7 @@ public class Predictor {
 	public static Vector<Node> preparePrefetching(Node node,int waveNeeded,int maxWaveNum){
 		
 		assert(waveNeeded<=maxWaveNum);
+		node.probability = 1.0; //root
 		HashMap<Integer,Node> list = Predictor.createPredictorTree(node,maxWaveNum); 
 		LinkedList<Node> orderedWave = Predictor.deriveOrder(list,waveNeeded);
 		Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, null, null)[0]);
@@ -319,7 +320,7 @@ public class Predictor {
 			Point tempPoint = newPoint.goUp();
 			int newX = tempPoint.x;
 			int newY = tempPoint.y;
-			Node newNode = new Node(node,newY,newX,upLikelihood*node.likelihood); 
+			Node newNode = new Node(node,newY,newX,upLikelihood*node.probability); 
 			newNode.waveNum = wave;
 			toReturn.addLast(newNode);
 			
@@ -328,7 +329,7 @@ public class Predictor {
 			tempPoint = newPoint.goDown();
 			newX = tempPoint.x;
 			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,downLikelihood*node.likelihood);
+			newNode = new Node(node,newY,newX,downLikelihood*node.probability);
 			newNode.waveNum = wave;
 			toReturn.addLast(newNode);
 			
@@ -337,7 +338,7 @@ public class Predictor {
 			tempPoint = newPoint.goLeft();
 			newX = tempPoint.x;
 			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,leftLikelihood*node.likelihood);
+			newNode = new Node(node,newY,newX,leftLikelihood*node.probability);
 			newNode.waveNum = wave;
 			toReturn.addLast(newNode);
 			
@@ -346,7 +347,7 @@ public class Predictor {
 			tempPoint = newPoint.goRight();
 			newX = tempPoint.x;
 			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,rightLikelihood*node.likelihood);
+			newNode = new Node(node,newY,newX,rightLikelihood*node.probability);
 			newNode.waveNum = wave;
 			toReturn.addLast(newNode);
 		}
@@ -360,7 +361,7 @@ public class Predictor {
 	
 	
 	
-	public static LinkedList<Node> createPredictorTree(UserMove move){
+	/*public static LinkedList<Node> createPredictorTree(UserMove move){
 		double minConfidence = 0.01;
 		int maxDistance = 1;
 		Node root = new Node(null,move.upperLeft.y,move.upperLeft.x,1.0d);
@@ -376,11 +377,11 @@ public class Predictor {
 			double downLikelihood = 0.5;
 			double leftLikelihood = 0.1;
 			double rightLikelihood = 0.3;
-			if (upLikelihood*node.likelihood >= minConfidence){
+			if (upLikelihood*node.probability >= minConfidence){
 				Point tempPoint = newPoint.goUp();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
-				node.up = new Node(node,newY,newX,upLikelihood*node.likelihood);
+				node.up = new Node(node,newY,newX,upLikelihood*node.probability);
 				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
 					list.addLast(node.up);
 					toReturn.addLast(node.up);
@@ -391,11 +392,11 @@ public class Predictor {
 				}
 				//System.out.println(node.up);
 			}
-			if (downLikelihood*node.likelihood >= minConfidence){
+			if (downLikelihood*node.probability >= minConfidence){
 				Point tempPoint = newPoint.goDown();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
-				node.down = new Node(node,newY,newX,downLikelihood*node.likelihood);
+				node.down = new Node(node,newY,newX,downLikelihood*node.probability);
 				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
 					list.addLast(node.down);
 					toReturn.addLast(node.down);
@@ -404,11 +405,11 @@ public class Predictor {
 					System.out.println("prrrr"+node.down);
 				}
 			}
-			if (leftLikelihood*node.likelihood >= minConfidence){
+			if (leftLikelihood*node.probability >= minConfidence){
 				Point tempPoint = newPoint.goLeft();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
-				node.left = new Node(node,newY,newX,leftLikelihood*node.likelihood);
+				node.left = new Node(node,newY,newX,leftLikelihood*node.probability);
 				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
 					list.addLast(node.left);
 					toReturn.addLast(node.left);
@@ -418,11 +419,11 @@ public class Predictor {
 				}
 				//System.out.println(node.left);
 			}
-			if (rightLikelihood*node.likelihood >= minConfidence){
+			if (rightLikelihood*node.probability >= minConfidence){
 				Point tempPoint = newPoint.goRight();
 				int newX = tempPoint.x;
 				int newY = tempPoint.y;
-				node.right = new Node(node,newY,newX,rightLikelihood*node.likelihood);
+				node.right = new Node(node,newY,newX,rightLikelihood*node.probability);
 				if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
 					list.addLast(node.right);
 					toReturn.addLast(node.right);
@@ -437,7 +438,7 @@ public class Predictor {
 		return toReturn;
 		
 		
-	}
+	}*/
 	
 	/*public static int calculateLOD(Point point,Viewport viewport){
 		double likelihood = Predictor.calculateLikelihood(point,viewport);

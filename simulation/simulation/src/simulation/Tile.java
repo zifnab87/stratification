@@ -22,7 +22,7 @@ public class Tile {
 	
 	
 	
-	//public int lod;
+	public double carryingProbability;
 	
 	public Point point; //index
 	

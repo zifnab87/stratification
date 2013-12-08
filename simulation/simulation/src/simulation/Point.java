@@ -10,8 +10,7 @@ import static simulation.Config.DATABASE_WIDTH;
 public class Point {
 	public int x;
 	public int y;
-	public Vector<Integer> fragmentNums;
-	public double carriedLikeliood = 0.0d;
+	
 	//public int LOD = 0;
 	public Point(int y, int x){
 		this.y = y;
@@ -22,9 +21,6 @@ public class Point {
 		return ((this.y+"-"+this.x).hashCode());
 	}
 	
-	public void setFragmentNums(Vector<Integer> fragmentNums){
-		this.fragmentNums = fragmentNums;
-	}
 	
 	public String toString(){
 		return "("+y+","+x+")";

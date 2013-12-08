@@ -19,7 +19,7 @@ public class Node {
 	public int x;
 	public int hash;
 	
-	public double likelihood;
+	public double probability;
 	public int fragmentsNeeded;
 	
 	public int waveNum; //for the prediction
@@ -34,14 +34,14 @@ public class Node {
 		this.point = new Point(y,x);
 	}
 	
-	public Node(Node parent,int y, int x,double likelihood){
+	public Node(Node parent,int y, int x,double probability){
 		this.parent = parent;
 		this.y = y;
 		this.x = x;
 		this.point = new Point(y,x);
 		this.hash = this.point.hashCode();
 
-		this.likelihood = likelihood;
+		this.probability = probability;
 		vec.add(this.up);
 		vec.add(this.down);
 		vec.add(this.left);
@@ -57,7 +57,7 @@ public class Node {
 	}
 	
 	public String toString(){
-		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+likelihood+",fragmentsNeeded="+fragmentsNeeded+")";
+		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+probability+",fragmentsNeeded="+fragmentsNeeded+")";
 	}
 	
 	//sort with ascending likelihood
@@ -65,10 +65,10 @@ public class Node {
 	    Collections.sort(itemLocationList, new Comparator<Node>() {
 	        @Override
 	        public int compare(Node o1, Node o2) {
-	            if (o1.likelihood > o2.likelihood){
+	            if (o1.probability > o2.probability){
 	            	return -1;
 	            }
-	            else if(o1.likelihood < o2.likelihood){
+	            else if(o1.probability < o2.probability){
 	            	return 1;
 	            }
 	            else {
