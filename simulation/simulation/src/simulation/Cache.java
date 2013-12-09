@@ -52,6 +52,7 @@ public class Cache {
 			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
 		}
+		System.out.println("spaceNeeded"+spaceNeeded);
 		int index = tile.point.hashCode();
 		CachedTile toBeCached = this.tiles.get(index);
 	
@@ -69,7 +70,7 @@ public class Cache {
 					fragments[i]=toBeCached.data[i];
 				}
 			}
-			System.out.println(toBeCached.fragmentsToString());
+			
 		}
 		
 		
@@ -77,6 +78,7 @@ public class Cache {
 		if (toBeCached==null){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			this.tiles.put(index,toBeCached);
+			increaseSpaceUsed(spaceNeeded);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
 		if (!queueContains(toBeCached)){
@@ -101,7 +103,7 @@ public class Cache {
 		
 	
 		
-		//increaseSpaceUsed(lastFragment-firstFragment+1);
+		
 		return toBeCached;
 		
 	}

@@ -109,8 +109,12 @@ public class Predictor {
 		int count=0;
 		while(iter.hasNext() && count<CUTOFF){
 			Node node = iter.next();
-			
-			previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
+			if (!FRAGMENT){
+				previousFrames = 8;
+			}
+			else {
+				previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
+			}
 			//System.out.println(previousFrames);
 			if (previousFrames>0){
 				previousProb = node.probability;
