@@ -52,23 +52,56 @@ public class Cache {
 			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
 		}
-				
+		int index = tile.point.hashCode();
+		CachedTile toBeCached = this.tiles.get(index);
+	
 		String[] fragments = new String[FRAGMENTS_PER_TILE];
 		for (int i=firstFragment-1; i<=lastFragment-1;i++){
-			fragments[i] = tile.data[i];
+			//if (fragments[i]== null){
+				fragments[i] = tile.data[i];
+			//}
 		}
-		CachedTile toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+		if (toBeCached!=null){
+			//already stored data..
+			
+			for (int i=0; i <toBeCached.data.length; i++){
+				if (toBeCached.data[i]!=null){
+					fragments[i]=toBeCached.data[i];
+				}
+			}
+			System.out.println(toBeCached.fragmentsToString());
+		}
 		
-		toBeCached.probability = tile.carryingProbability;
-		if (!this.tiles.containsKey(toBeCached.id)){
-			this.tiles.put(toBeCached.id, toBeCached);
+		
+		
+		if (toBeCached==null){
+			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+			this.tiles.put(index,toBeCached);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
 		if (!queueContains(toBeCached)){
+			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+			//System.out.println(toBeCached.fragmentsToString());
+			toBeCached.probability = tile.carryingProbability;
+			this.queue.add(toBeCached);
+		}
+		else {
+			//System.out.println("bika");
+			CachedTile cTile = this.tiles.get(index);
+			//System.out.println(cTile);
+			//System.out.println(this.queue.size());
+			queueRemove(cTile);
+			//System.out.println(this.queue.size());
+			System.out.println(cTile.fragmentsToString());
+			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
+			toBeCached.probability = tile.carryingProbability;
+			System.out.println(toBeCached.fragmentsToString());
 			this.queue.add(toBeCached);
 		}
 		
-		increaseSpaceUsed(lastFragment-firstFragment+1);
+	
+		
+		//increaseSpaceUsed(lastFragment-firstFragment+1);
 		return toBeCached;
 		
 	}
@@ -84,6 +117,16 @@ public class Cache {
 			}
 		}
 		return found;
+	}
+	
+	private void queueRemove(CachedTile toBeCached){
+		Iterator<CachedTile> iter = this.queue.iterator();
+		while(iter.hasNext()){
+			CachedTile cTile = iter.next();
+			if (cTile.id == toBeCached.id){
+				iter.remove();
+			}
+		}
 	}
 	
 		
@@ -156,7 +199,11 @@ public class Cache {
 	
 	
 	public CachedTile getTile(Point point){
-		return this.tiles.get(point.hashCode());
+		double start = System.currentTimeMillis();
+		CachedTile cTile = this.getTile(point.hashCode());
+		double total = System.currentTimeMillis() - start;
+		System.out.println("Cache: "+total+" msecs");
+		return cTile;
 	}
 	
 	public CachedTile fetchTile(int hash,UserMove caller){
@@ -168,7 +215,7 @@ public class Cache {
 		return getTile(hash);
 	}
 	
-	public CachedTile getTile(int hash){
+	private CachedTile getTile(int hash){
 		return this.tiles.get(hash);
 	}
 	
@@ -446,10 +493,6 @@ public class Cache {
 		    }
 		    result+="]\n";
 		}*/
-		if (Main.cache.tiles.size()!=Main.cache.queue.size()){
-			
-			result+=" INCONSISTENT SIZES tiles/queue"+ Main.cache.tiles.size()+" vs "+Main.cache.queue.size();
-		}
 		Iterator<CachedTile> iter = queue.iterator();
 		while(iter.hasNext()){
 			CachedTile tile = iter.next();

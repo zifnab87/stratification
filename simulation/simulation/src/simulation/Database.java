@@ -150,6 +150,7 @@ public class Database {
 	
 	
 	private Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment){
+		double start = System.currentTimeMillis();
 		Connection conn = null;
 		ResultSet results = null;
 		Tile tile = null;
@@ -174,7 +175,8 @@ public class Database {
 				totalData[fragment_num-1]=results.getString("data");
 			}
 			tile = new Tile(index,totalData);
-			
+			double end = System.currentTimeMillis() - start;
+			System.out.println(end+" msecs");
 			conn.close();
 	 
 		} catch (SQLException e) {
