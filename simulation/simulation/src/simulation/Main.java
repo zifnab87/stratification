@@ -55,7 +55,7 @@ public class Main {
 		int count=0;
 		UserMove userMove = null;
 		while (true){
-		//for (int i=0; i<10; i++){	
+		//for (int i=0; i<; i++){	
 			
 			
 			/*if (Main.previousViewport!=null){
@@ -102,21 +102,40 @@ public class Main {
 			
 			
 			double start = System.currentTimeMillis();
-			Vector<Node> list = Predictor.preparePrefetching(currentNode,1,1); 
-			System.out.println("List To Be Prefetched: "+list);	
+			
+			
+			
+			
 			/*Vector<Node> list2 = Predictor.preparePrefetching(currentNode,2,2); 
 			System.out.println("List2 To Be Prefetched: "+list2);
 			Vector<Node> list3 = Predictor.preparePrefetching(currentNode,3,3); 
 			System.out.println("List3 To Be Prefetched: "+list3);
 			double total = System.currentTimeMillis() - start;
 			System.out.println("Prediction:"+total+" msecs");*/
-			System.out.println("Memory Space Used before Prefetch "+Main.cache.SpaceBeingUsed);
-			userMove.prefetch(list);
-			System.out.println("Memory after Prefetch:"+Main.cache.queue);
+	
+			int wave=1;
+			while (userMove.thinkTime>0 && wave<=5){
+				System.out.println("wave"+wave);
+				Vector<Node> list = Predictor.preparePrefetching(currentNode,wave,5);
+				wave++;
+				if (list.size()==0)
+					continue;
+				System.out.println("List To Be Prefetched: "+list);
+				
+				System.out.println("Memory Space Used before Prefetch "+Main.cache.SpaceBeingUsed);
+				System.out.println("before thinkTime:"+ userMove.thinkTime);
+				userMove.prefetch(list);
+				Main.cache.updateProbabilities(list,currentNode.point);
+				System.out.println("after thinkTime:"+ userMove.thinkTime);
+				System.out.println("Memory after Prefetch:"+Main.cache.queue);
+				
+			}
+			
+			
 			/*userMove.prefetch(list2);
 			userMove.prefetch(list3);*/
-			Main.cache.updateProbabilities(list,currentNode.point);
-			System.out.println("#Total Cache Misses during Fetches: "+userMove.cacheMissesDuringFetch);
+			
+			System.out.println("#Cache Misses during Move: "+userMove.cacheMissesDuringFetch);
 			System.out.println("#Disk Fetched Fragments during Move: "+userMove.cacheMisses);
 			
 			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
@@ -126,7 +145,7 @@ public class Main {
 				System.err.println("Error");
 				break;
 			}
-			System.out.println("~~~~~~~~~~~~~~~~~~");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
 			if (isTerminal || moves.size()==0){
@@ -140,5 +159,6 @@ public class Main {
 		}
 		System.out.println("#Total Cache Misses during Fetches: "+UserMove.totalCacheMissesDuringFetch);
 		System.out.println("#Total Disk Fetched Fragments: "+UserMove.totalCacheMisses);
+		System.out.println("#Total Cache Fetched Fragments: "+UserMove.totalCacheHits);
 	}
 }

@@ -37,7 +37,7 @@ public class UserMove {
 	public int cacheMissesDuringFetch = 0;
 	public static int totalCacheMissesDuringFetch = 0;
 	
-	public int thinkTime = 15;
+	public int thinkTime = 32;
 	
 	public UserMove(Viewport viewport){
 		this.upperLeft = viewport.upperLeft;
@@ -60,7 +60,7 @@ public class UserMove {
 		}
 		Iterator<Node> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
-		do{
+		while (iter.hasNext() && availThinkTime>0){
 			Node node = iter.next();
 			Point point = node.point;
 			int index = point.hashCode();
@@ -87,7 +87,7 @@ public class UserMove {
 					
 					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(cachedLOD);
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-						return;
+						continue;
 					}
 					int fragmCount = fragmentsToBePrefetched.size();
 					int firstFragment = fragmentsToBePrefetched.get(0);
@@ -106,7 +106,7 @@ public class UserMove {
 				else { //tile doesn't exist in Cache
 					// full Database Fetch
 					if (availThinkTime-FRAGMENTS_PER_TILE<0){
-						return;
+						continue;
 					}
 					Tile tile = Main.db.fetchTile(point, this);
 					availThinkTime-=FRAGMENTS_PER_TILE;
@@ -124,7 +124,7 @@ public class UserMove {
 						int firstFragment = fragmentsToBePrefetched.get(0);
 						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 						if (availThinkTime-fragmentsToBePrefetched.size()<0){
-							return;
+							continue;
 						}
 						
 						Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
@@ -149,7 +149,7 @@ public class UserMove {
 					int firstFragment = fragmentsToBePrefetched.get(0);
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-						return;
+						continue;
 					}
 					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
 					tile.carryingProbability = node.probability; // carry it to the cache
@@ -176,7 +176,8 @@ public class UserMove {
 			
 			
 		}
-		while (iter.hasNext() && availThinkTime>0);
+		
+		this.thinkTime = availThinkTime;
 	}
 	
 	

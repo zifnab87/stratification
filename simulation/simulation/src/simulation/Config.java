@@ -6,7 +6,7 @@ public class Config {
 	
 	public static boolean debug = false;
 	
-	//public static boolean PREFETCH = false;
+	public static boolean PREFETCH = false;
 	public static boolean FRAGMENT = false; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
@@ -30,7 +30,7 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static double CUTOFF = 5; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
+	public static double CUTOFF = 4; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
 	// small numbers -> aggressive
 	
 	//USER
