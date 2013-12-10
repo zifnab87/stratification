@@ -102,14 +102,14 @@ public class Predictor {
 			previousFrames = 8;
 		//}
 		//if (previousProb == null){
-			previousProb = 0.5d;
+			previousProb = 0.25d;
 		//}
 		Vector<Node> vec = new Vector<Node>();
 		Iterator<Node> iter = list.iterator();
 		int count=0;
 		while(iter.hasNext() && count<CUTOFF){
 			Node node = iter.next();
-			if (!FRAGMENT){
+			if (!FRAGMENT || count==0){
 				previousFrames = 8;
 			}
 			else {

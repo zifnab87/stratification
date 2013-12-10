@@ -55,7 +55,7 @@ public class Main {
 		int count=0;
 		UserMove userMove = null;
 		while (true){
-		//for (int i=0; i<; i++){	
+		//for (int i=0; i<5; i++){	
 			
 			
 			/*if (Main.previousViewport!=null){
@@ -73,7 +73,7 @@ public class Main {
 			//System.out.println(cache);
 			
 			//Vector<Node> tilesToPrefetch = Predictor.preparePrefetching(userMove.viewport.upperLeft.createNode(),2,5); 
-			
+			UserMove.totoalMoves+=1;
 			
 			//break;
 			//System.exit(0);
@@ -114,9 +114,9 @@ public class Main {
 			System.out.println("Prediction:"+total+" msecs");*/
 	
 			int wave=1;
-			while (userMove.thinkTime>0 && wave<=5){
-				System.out.println("wave"+wave);
-				Vector<Node> list = Predictor.preparePrefetching(currentNode,wave,5);
+			while (userMove.thinkTime>0 && wave<=7){
+				System.out.println("wave:"+wave);
+				Vector<Node> list = Predictor.preparePrefetching(currentNode,wave,7);
 				wave++;
 				if (list.size()==0)
 					continue;
@@ -124,8 +124,8 @@ public class Main {
 				
 				System.out.println("Memory Space Used before Prefetch "+Main.cache.SpaceBeingUsed);
 				System.out.println("before thinkTime:"+ userMove.thinkTime);
-				userMove.prefetch(list);
 				Main.cache.updateProbabilities(list,currentNode.point);
+				userMove.prefetch(list);
 				System.out.println("after thinkTime:"+ userMove.thinkTime);
 				System.out.println("Memory after Prefetch:"+Main.cache.queue);
 				
@@ -135,7 +135,7 @@ public class Main {
 			/*userMove.prefetch(list2);
 			userMove.prefetch(list3);*/
 			
-			System.out.println("#Cache Misses during Move: "+userMove.cacheMissesDuringFetch);
+			System.out.println("#Cache Misses during Fetch in a Move: "+userMove.cacheMissesDuringFetch);
 			System.out.println("#Disk Fetched Fragments during Move: "+userMove.cacheMisses);
 			
 			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
@@ -157,6 +157,7 @@ public class Main {
 			//System.out.println(UserMove.totalCacheHits+" "+UserMove.totalCacheMisses);
 			//break;
 		}
+		System.out.println("#Total Moves: "+UserMove.totoalMoves);
 		System.out.println("#Total Cache Misses during Fetches: "+UserMove.totalCacheMissesDuringFetch);
 		System.out.println("#Total Disk Fetched Fragments: "+UserMove.totalCacheMisses);
 		System.out.println("#Total Cache Fetched Fragments: "+UserMove.totalCacheHits);

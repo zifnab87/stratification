@@ -12,7 +12,6 @@ import java.sql.Connection;
 
 import simulation.events.UserMove;
 
-import simulation.Fragment;
 import simulation.Point;
 import simulation.Tile;
 import simulation.Viewport;
@@ -135,7 +134,6 @@ public class Database {
 	}
 	
 	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove caller){
-		
 		caller.cacheMisses+=1;
 		UserMove.totalCacheMisses+=1;
 		return getFragmentOfTile(index, fragmentNumber);

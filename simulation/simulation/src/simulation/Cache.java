@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import simulation.Fragment;
 import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
@@ -81,7 +80,7 @@ public class Cache {
 			increaseSpaceUsed(spaceNeeded);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
-		if (!queueContains(toBeCached)){
+		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//System.out.println(toBeCached.fragmentsToString());
 			toBeCached.probability = tile.carryingProbability;
@@ -98,7 +97,9 @@ public class Cache {
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			toBeCached.probability = tile.carryingProbability;
 			System.out.println(toBeCached.fragmentsToString());
-			this.queue.add(toBeCached);
+			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
+				this.queue.add(toBeCached);
+			}
 		}
 		
 	
@@ -222,26 +223,6 @@ public class Cache {
 	}
 	
 	
-	/*public Fragment fetchFragmentOfTile(int fragmentNumber,Point index,UserMove caller){
-		
-		caller.cacheHits+=1;
-		UserMove.totalCacheHits+=1;
-		return getFragmentOfTile(fragmentNumber,index);
-	}
-	
-	private Fragment getFragmentOfTile(int fragmentNumber,Point index){
-		
-		if (tileExists(index)){
-			Tile tile = getTile(index);
-		
-			return tile.getFragment(fragmentNumber);
-		}
-		else {
-			System.out.println("tile Doesn't exist for fragment");
-			return null;
-		}
-	}*/
-	
 	
 	
 	
@@ -277,212 +258,45 @@ public class Cache {
 	
 	public int makeSpaceAvailable(int fragmentsNeeded,Point currentPoint){
 		//System.out.println("I need"+fragmentsNeeded);
-		CachedTile lessLikelyTile = queue.pollFirst();
-		//System.out.println(queue);
-		return 0;
-	}
-	
-	
-	
-	
-
-	/*public void evictFullTile(Point index){
-		evictFullTile(index.hashCode());
-		
-	}
-	
-	public void evictFullTile(int tileId){
-		//if (this.isFull()){
-			Tile tile = this.tiles.get(tileId);
-			tiles.remove(tileId);
-			queue.remove(tile);
-			decreaseSpaceUsed(FRAGMENTS_PER_TILE);
-		//}
-	}*/
-	
-//	public void evictFragmentedTile(Point index){
-//		evictFragmentedTile(index.hashCode());
-//	}
-//	
-//	public void evictFragmentedTile(int tileId){
-//		//if(this.isFull()){
-//			CachedTile tile = this.tiles.get(tileId);
-//			if (tileExists(tileId)){
-//				int fragmentCount = tile.getCachedFragmentsNum();
-//				tiles.remove(tileId);
-//				queue.remove(tile);
-//				decreaseSpaceUsed(fragmentCount);
-//			}
-//		//}
-//			
-//	}
-	
-//	
-//	public void evictFragment(int tileId,int fragmNumber){
-//		//if (!this.hasAvailableSpace(availableSpace)){
-//			//makeConsistent();
-//			CachedTile tile = this.tiles.get(tileId);
-//			int fragmCount = tile.getCachedFragmentsNum();
-//			if (fragmCount>0){
-//				//HOTFIX BECAUSE OF MISSED FRAGMENTS 1,2,3,4,5, 7 6 is missing so we get the max all the time! 
-//				int maxFragm = 1;
-//				for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
-//					if (maxFragm<i && tile.containsFragment(i)){
-//						maxFragm = i;
-//					}
-//				}
-//				
-//				
-//				if (tile.containsFragment(maxFragm)){
-//					tile.removeFragment(maxFragm);
-//					decreaseSpaceUsed(1);
-//				}
-//				
-//				fragmCount = tile.getCachedFragmentsNum();
-//				//in case that was the last fragment of the tile
-//				if (fragmCount==0){
-//					queue.remove(tile);
-//					tiles.remove(tileId);
-//				}
-//			}
-//		//}
-//	}
-//	public void evictFragment(Point index,int fragmNumber){
-//		evictFragment(index.hashCode(),fragmNumber);
-//	}
-//	
-//	
-//	public int makeSpaceAvailable(int fragments,Point point){
-//		//makeConsistent();
-//		CachedTile dontTouchTile = null;
-//		double oldLikelihood = -1.0;
-//		if (tileExists(point)){
-//			dontTouchTile = tiles.get(point.hashCode());
-//			oldLikelihood = dontTouchTile.probability;
-//			dontTouchTile.probability = 2.0;
-//			//refresh(dontTouchTile);
-//		}
-//		
-//		int sizeBefore = this.SpaceBeingUsed;
-//		if (fragments==1){
-//			CachedTile lessLikelyTile = queue.pollFirst();
-//			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
-//			//remove only if the likelihood of the one removed is lower than the one to be inserted
-//			//if (lessLikelyTile.likelihood < point.carriedLikeliood){
-//
-//				this.evictFragment(lessLikelyTile.point, fragmNumber);
-//			//}
-//			//else {
-//			//	System.out.println(lessLikelyTile.likelihood+" "+point.carriedLikeliood);
-//			//}
-//			
-//		}
-//		else {
-//			System.out.println("aaaa"+queue.size());
-//			CachedTile lessLikelyTile = queue.pollFirst();
-//			int fragmNumber = lessLikelyTile.getCachedFragmentsNum();
-//			for (int i=0; i<fragmNumber; i++){
-//				this.evictFragment(lessLikelyTile.point, i);
-//			}
-//			
-//		}
-//		int sizeAfter = this.SpaceBeingUsed;
-//		if (tileExists(point)){
-//			dontTouchTile.probability = oldLikelihood;
-//		}
-//		//makeConsistent();
-//		return sizeBefore - sizeAfter;
-//	}
-	
-	
-	/*public void cacheFragment(Tile tile,double carriedLikelihood){
-		int counter = 0;
-		while(!this.hasAvailableSpace(1)){
-			int diff = makeSpaceAvailable(1,new Point());
-			System.out.println(this.SpaceBeingUsed);
-			System.out.println(this);
-
-			
-		}
-		
-		Tile tile = tiles.get(point.hashCode());
-		if (tile==null){
-			//add a new empty tile if there is not one already //warning with the pixels
-			this.addTile(new Tile(new Point(point.y,point.x)));
-			tile = tiles.get(point.hashCode());
-		}
-		if (tile!=null && fragm!=null){
-			tile.addFragment(fragm);
-			//HOTFIX
-
-			if (tile.likelihood == -1){
-				tile.likelihood = carriedLikelihood;
+		Iterator<CachedTile> iter = this.queue.iterator();
+		int evictedFragments = 0;
+		while(iter.hasNext() && evictedFragments<fragmentsNeeded){
+			CachedTile lessLikelyTile = iter.next();
+			//if it is the same that we are currentlyPrefetching 
+			if (lessLikelyTile.point.equals(currentPoint)){
+				System.err.println("ELEOS to idio");
 			}
-			//tile.lod = tile.getFragmentNumber();
-			refresh(tile);
-			
-			increaseSpaceUsed(1);
-			
-		}
-		
-	}*/
-	
-	
-
-	
-	/*public void updateAllTileLikelihoods(HashMap<Node,Tuple<Double,Integer>> map){
-		Iterator<Tile> it = queue.iterator();
-		while (it.hasNext()){
-			Tile tile = it.next();
-			//updateTileLikelihoodOfIndex(it.next().point,currentViewport);
-			if (map.containsKey(new Node(tile.point.y,tile.point.x))){
-				Tuple<Double,Integer> tuple = map.get(new Node(tile.point.y,tile.point.x));
-				double likelihood = tuple.x;
-				int lod = tuple.y;
-				tile.likelihood = likelihood;
-				if (this.isFull()){
-					int oldLOD = tile.lod;
-					tile.lod = lod;
-					if (oldLOD>lod){
-						//evict from that tile, since less information is needed
-					}
-					else { // lod < oldLOD
-						//evict from cache to put information to that tile
-					}
-					
+			CachedTile toBeCached = this.tiles.get(currentPoint.hashCode());
+			if (toBeCached!=null){ //if already cached 
+				if (toBeCached.probability < lessLikelyTile.probability){  //and has less probability than the anything in the cache
+					System.err.println("ELEOS cache degradation");
+				
 				}
 			}
+			int fragmentsEvicted = evictTile(lessLikelyTile,iter);
+			evictedFragments+=fragmentsEvicted;
+			
+			
 		}
-	}*/
+		//System.out.println(queue);
+		return evictedFragments;
+	}
 	
 	
-	/*public void updateAllTileLikelihoods(Viewport currentViewport){
-		Iterator<Tile> it = queue.iterator();
-		while (it.hasNext()){
-			updateTileLikelihoodOfIndex(it.next().point,currentViewport);
-		}
-		this.makeConsistent();
-		
-	}*/
 	
-	/*private void updateTileLikelihoodOfIndex(Point index,Viewport currentViewport){
-		Tile tile = tiles.get(index.hashCode());
-		if (tileExists(index)){
-			double newLikelihood = 1.0d;
-			//double newLikelihood =  Predictor.calculateLikelihood(index, currentViewport);
-			//if likelihood became 0.0 (the only case that LOD=0)
-		    // then remove the tile 
-			if (newLikelihood == 0.0d && this.isFull()){
-				
-				evictFragmentedTile(index);
-			}
-			else {
-				tile.likelihood = newLikelihood;
-				refresh(tile);
-			}
-		}
-	}*/
 	
+	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
+		this.tiles.remove(cTile.point.hashCode());
+		iter.remove();
+		int numFragmentsCached = cTile.getCachedFragmentsNum();
+		decreaseSpaceUsed(numFragmentsCached);
+		return numFragmentsCached;
+	}
+	
+	
+	
+
+
 	
 	
 	
@@ -526,7 +340,7 @@ public class Cache {
 		while (mapIter.hasNext()){
 			CachedTile cTile = this.tiles.get(mapIter.next());
 			//IMPORTANT remove before the equality is busted because of change in probability
-			this.queue.remove(cTile);
+			queueRemove(cTile);
 			//we make probabilities zero so only the ones that will be updated by the 
 			//prediction tree will have probability less than zero
 			//if it is current we give it a probability of 1.0d
@@ -537,7 +351,7 @@ public class Cache {
 				cTile.probability = 0.0d;
 			}
 			cTile.distance = Predictor.distance(cTile.point, currentPosition);
-			if (!queueContains(cTile)){
+			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
 				this.queue.add(cTile);
 			}
 		}
@@ -550,11 +364,12 @@ public class Cache {
 			if (this.tiles.containsKey(node.point.hashCode())){
 				CachedTile cTile = this.tiles.get(node.point.hashCode());
 				//IMPORTANT remove before the equality is busted because of change in probability
-				this.queue.remove(cTile);
+				//this.queue.remove(cTile);
+				queueRemove(cTile);
 				cTile.probability = node.probability;
 				//cTile.distance = Predictor.distance(cTile.point, currentPosition);
 				//cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
-				if (!queueContains(cTile)){
+				if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode()) ){
 					this.queue.add(cTile);
 				}
 			}	

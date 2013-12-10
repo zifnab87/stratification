@@ -14,7 +14,6 @@ import java.util.Vector;
 import simulation.Cache;
 import simulation.CachedTile;
 import simulation.Database;
-import simulation.Fragment;
 import simulation.Main;
 import simulation.Point;
 import simulation.Tile;
@@ -37,7 +36,8 @@ public class UserMove {
 	public int cacheMissesDuringFetch = 0;
 	public static int totalCacheMissesDuringFetch = 0;
 	
-	public int thinkTime = 32;
+	public static int totoalMoves = 0;
+	public int thinkTime = 1;
 	
 	public UserMove(Viewport viewport){
 		this.upperLeft = viewport.upperLeft;
@@ -58,6 +58,7 @@ public class UserMove {
 		if (toPrefetch.size()==0){
 			return;
 		}
+		System.out.println("prefetching!");
 		Iterator<Node> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		while (iter.hasNext() && availThinkTime>0){
@@ -86,7 +87,10 @@ public class UserMove {
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					
 					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(cachedLOD);
+					System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
+						System.out.println(point+" skipped");
+						System.err.println("aaaa");
 						continue;
 					}
 					int fragmCount = fragmentsToBePrefetched.size();
@@ -105,7 +109,10 @@ public class UserMove {
 				}
 				else { //tile doesn't exist in Cache
 					// full Database Fetch
+					System.out.println(availThinkTime+"-"+FRAGMENTS_PER_TILE);
 					if (availThinkTime-FRAGMENTS_PER_TILE<0){
+						System.out.println(point+" skipped");
+						System.err.println("aaaa");
 						continue;
 					}
 					Tile tile = Main.db.fetchTile(point, this);
@@ -123,7 +130,10 @@ public class UserMove {
 						int fragmCount = fragmentsToBePrefetched.size();
 						int firstFragment = fragmentsToBePrefetched.get(0);
 						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
+						System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 						if (availThinkTime-fragmentsToBePrefetched.size()<0){
+							System.out.println(point+" skipped");
+							System.err.println("aaaa");
 							continue;
 						}
 						
@@ -148,7 +158,10 @@ public class UserMove {
 					int fragmCount = fragmentsToBePrefetched.size();
 					int firstFragment = fragmentsToBePrefetched.get(0);
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
+					System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
+						System.out.println(point+" skipped");
+						System.err.println("aaaa");
 						continue;
 					}
 					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
