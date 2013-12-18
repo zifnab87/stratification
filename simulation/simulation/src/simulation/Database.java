@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 
 import java.sql.Connection;
@@ -76,14 +77,18 @@ public class Database {
 		 try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
                      "user=root");
-			/*String data = "[";
-			for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
-				data += "[255,255,0],";
-			}
-			data +="]";
-			for (int y=0; y<DATABASE_WIDTH; y++){
+			
+			/*for (int y=0; y<DATABASE_WIDTH; y++){
 				for (int x=0; x<DATABASE_WIDTH; x++){
 					for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
+						String data = "[";
+						for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
+							int red = new Random().nextInt(255);
+							int green = new Random().nextInt(255);
+							int blue = new Random().nextInt(255);
+							data += "["+red+","+green+","+blue+"],";
+						}
+						data +="]";
 						Statement stmt = conn.createStatement();
 						 stmt = conn.createStatement();
 						 stmt.executeUpdate("INSERT INTO fragment " + "VALUES ("+y+","+x+","+i+",'"+data+"')");

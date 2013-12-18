@@ -2,11 +2,13 @@ package simulation;
 
 import static simulation.Config.CACHE_SIZE;
 import static simulation.Config.FRAGMENTS_PER_TILE;
+import static simulation.Config.FRAGMENT_SIZE;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -37,13 +39,44 @@ public class Cache {
 	
 	public int SpaceBeingUsed = 0;
 	
-	public CachedTile cacheFullTile(Tile tile){
-		return cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
+	public void warmUp(){
+		
+		int start = 10000;
+		int count = 0;
+		while(CACHE_SIZE!=this.sizeBeingUsed()){
+			String data[] = new String[FRAGMENTS_PER_TILE];
+			
+			for(int j=0; j<Math.min(FRAGMENTS_PER_TILE,(CACHE_SIZE-this.sizeBeingUsed())); j++){
+				String datum = "[";
+				for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
+					int red = new Random().nextInt(255);
+					int green = new Random().nextInt(255);
+					int blue = new Random().nextInt(255);
+					datum += "["+red+","+green+","+blue+"],";
+				}
+				datum +="]";
+				data[j]=datum;
+			}
+			Point point  = new Point((start+count),(start+count),true);
+			CachedTile cTile = new CachedTile(point, data);
+			cTile.distance =  10000;
+			tiles.put(point.hashCode(), cTile);
+			queue.add(cTile);
+			//increaseSpaceUsed(FRAGMENTS_PER_TILE);
+			count++;
+		}
+		
 	}
 	
-	public CachedTile cacheFragment(Tile tile, int fragmentNum){
+//	public CachedTile cacheFullTile(Tile tile){
+//		return cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
+//	}
+	
+	/*public CachedTile cacheFragment(Tile tile, int fragmentNum){
 		return cacheTileWithFragmentRange(tile, fragmentNum, fragmentNum);
-	}
+	}*/
+	
+	
 	
 	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
@@ -137,7 +170,7 @@ public class Cache {
 	
 	public boolean isFull(){
 
-		if (SpaceBeingUsed >= CACHE_SIZE ){
+		if (sizeBeingUsed() >= CACHE_SIZE ){
 			return true;
 		}
 		else {
@@ -149,8 +182,15 @@ public class Cache {
 		return tiles.size();
 	}
 	
-	public int sizeBeingUsed(){
-		return SpaceBeingUsed;
+	public int sizeBeingUsed() {
+		Iterator<Integer> iterKeys = this.tiles.keySet().iterator();
+		int total = 0;
+		while(iterKeys.hasNext()){
+			CachedTile cTile = this.tiles.get(iterKeys.next());
+			int fragm = cTile.getCachedFragmentsNum();
+			total+=fragm;
+		}
+		return total;
 	}
 	
 	public synchronized void increaseSpaceUsed(int numOfFragments){
@@ -325,7 +365,7 @@ public class Cache {
 	}
 	
 	public boolean hasAvailableSpace(int fragments){
-		if ((CACHE_SIZE-SpaceBeingUsed)>=fragments){
+		if ((CACHE_SIZE-sizeBeingUsed())>=fragments){
 			
 			return true;
 		}
@@ -362,6 +402,7 @@ public class Cache {
 		while(iter.hasNext()){
 			Node node = iter.next();
 			if (this.tiles.containsKey(node.point.hashCode())){
+				
 				CachedTile cTile = this.tiles.get(node.point.hashCode());
 				//IMPORTANT remove before the equality is busted because of change in probability
 				//this.queue.remove(cTile);

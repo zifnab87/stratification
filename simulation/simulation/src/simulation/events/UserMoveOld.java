@@ -26,7 +26,7 @@ import simulation.predictor.Predictor;
 import simulation.predictor.Tuple;
 import static simulation.Config.THINK_TIME;
 
-public class UserMove {
+public class UserMoveOld {
 	public Point  upperLeft;
 	public Viewport viewport;
 	public String movementType;
@@ -44,7 +44,7 @@ public class UserMove {
 	
 	public static Vector<Integer> misses = new Vector<Integer>();
 	
-	public UserMove(Viewport viewport){
+	public UserMoveOld(Viewport viewport){
 		this.upperLeft = viewport.upperLeft;
 		this.viewport = viewport;
 		this.movementType = viewport.resultOfMovement;
@@ -93,17 +93,15 @@ public class UserMove {
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					
 					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(cachedLOD);
-					if (FRAGMENT){
-						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-						}
-						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-					}
-					
-					//System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
+					System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-						return ;
+						if (SKIP_PREDICTIONS){
+							continue;
+						}
+						else {
+							this.thinkTime = availThinkTime;
+							return;
+						}
 					}
 					int fragmCount = fragmentsToBePrefetched.size();
 					int firstFragment = fragmentsToBePrefetched.get(0);
@@ -121,26 +119,18 @@ public class UserMove {
 				}
 				else { //tile doesn't exist in Cache
 					// full Database Fetch
-					
-					prefetched  = true;
-					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(0);
-					if (FRAGMENT){
-						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
+					if (availThinkTime-FRAGMENTS_PER_TILE<0){
+						if (SKIP_PREDICTIONS){
+							continue;
 						}
-						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
+						else {
+							this.thinkTime = availThinkTime;
+							return;
+						}
 					}
-					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-						this.thinkTime = availThinkTime;
-						return;
-					}
-					
-					int fragmCount = fragmentsToBePrefetched.size();
-					int firstFragment = fragmentsToBePrefetched.get(0);
-					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-					Tile tile = Main.db.fetchTileWithFragmentRange(point, firstFragment,lastFragment, this);
-					availThinkTime-=fragmCount;
+					Tile tile = Main.db.fetchTile(point, this);
+					prefetched  = true;
+					availThinkTime-=FRAGMENTS_PER_TILE;
 					tile.carryingProbability = node.probability;
 					Main.cache.cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
 				}
@@ -150,22 +140,19 @@ public class UserMove {
 					CachedTile cachedPartialTile = Main.cache.getTile(point);
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					if (cachedLOD < LOD){
-						
-						if (FRAGMENT){
-							fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
-							Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-							for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-								fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-							}
-							fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-						}
+						fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
 						int fragmCount = fragmentsToBePrefetched.size();
 						int firstFragment = fragmentsToBePrefetched.get(0);
 						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 						System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 						if (availThinkTime-fragmentsToBePrefetched.size()<0){
-							this.thinkTime = availThinkTime;
-							return ;
+							if (SKIP_PREDICTIONS){
+								continue;
+							}
+							else {
+								this.thinkTime = availThinkTime;
+								return;
+							}
 						}
 						
 						Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
@@ -187,20 +174,18 @@ public class UserMove {
 				}
 				else { //Tile doesn't exist and it is partially needed from Database
 					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(0, LOD);
-					if (FRAGMENT){
-						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-						}
-						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-					}
 					int fragmCount = fragmentsToBePrefetched.size();
 					int firstFragment = fragmentsToBePrefetched.get(0);
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
 					System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-						this.thinkTime = availThinkTime;
-						return ;
+						if (SKIP_PREDICTIONS){
+							continue;
+						}
+						else {
+							this.thinkTime = availThinkTime;
+							return;
+						}
 					}
 					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
 					prefetched  = true;
@@ -249,7 +234,7 @@ public class UserMove {
 					tile.carryingProbability = 1.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
-					UserMove.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
+					UserMoveOld.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
 				}
 				//if tile partially exists request missing fragments
 				
@@ -264,7 +249,7 @@ public class UserMove {
 					int misses = (FRAGMENTS_PER_TILE-cachedPartialTile.getCachedFragmentsNum());
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch += misses;
-					UserMove.totalCacheMissesDuringFetch += misses;
+					UserMoveOld.totalCacheMissesDuringFetch += misses;
 				}
 				else { // tileExistsAndFull == true
 					Main.cache.fetchTile(index, this);
@@ -280,7 +265,7 @@ public class UserMove {
 	}
 	
 	
-	public UserMove nextMove(String move){
+	public UserMoveOld nextMove(String move){
 		if (move.equals("up")){
 			return this.goUp();
 		}
@@ -300,29 +285,29 @@ public class UserMove {
 	}
 	
 	
-	public UserMove goLeft(){
+	public UserMoveOld goLeft(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
 		//System.out.println("left");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"));
+		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"));
 	}
 	
-	public UserMove goRight(){
+	public UserMoveOld goRight(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
 		//System.out.println("right");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"));
+		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"));
 	}
 	
-	public UserMove goDown(){
+	public UserMoveOld goDown(){
 		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
 		//System.out.println("down");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"));
+		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"));
 	}
 
-	public UserMove goUp(){
+	public UserMoveOld goUp(){
 		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
 		//System.out.println("try" + newUpperLeft);
 		//System.out.println("up");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"));
+		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"));
 	}
 	
 	

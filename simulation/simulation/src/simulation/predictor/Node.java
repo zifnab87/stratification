@@ -60,7 +60,7 @@ public class Node {
 		return "(y="+y+",x="+x+",wave="+waveNum+",probability="+probability+",fragmentsNeeded="+fragmentsNeeded+")";
 	}
 	
-	//sort with ascending likelihood
+	//sort with ascending probability
 	public static void sortDesc(List<Node> itemLocationList) {
 	    Collections.sort(itemLocationList, new Comparator<Node>() {
 	        @Override

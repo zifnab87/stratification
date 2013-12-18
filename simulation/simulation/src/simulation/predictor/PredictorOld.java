@@ -22,128 +22,15 @@ import static simulation.Config.THINK_TIME;
 import static simulation.Config.CUTOFF;
 import static simulation.Config.FRAGMENT;
 
-public class Predictor {
+public class PredictorOld {
 	
 	//public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
 	public static Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
 	
 	
-	private static HashMap<Integer,Node> createPredictorTree(Node node,int totalWaves){
-		node.probability = 1d;
-		LinkedList<Node> listNodes = createPredictorTreeHelper(node,1);
-		HashMap<Integer,Node> toReturn = new HashMap<Integer,Node>();
-		for(Node n : listNodes){
-			if (node.equals(n)){
-				continue;
-			}
-			if (!toReturn.containsKey(n.hashCode())){
-				toReturn.put(n.hashCode(), n);
-			}
-			else {
-				Node stored = toReturn.get(n.hashCode());
-				if (stored.waveNum == n.waveNum && stored.probability < n.probability){
-					toReturn.put(n.hashCode(), n);
-				}
-			}
-		}
-		
-		
-		for (int wave = 2; wave<=totalWaves; wave++){
-			listNodes = createPredictorTreeHelper(listNodes,wave);
-			for(Node n : listNodes){
-				if (node.equals(n)){
-					continue;
-				}
-				if (!toReturn.containsKey(n.hashCode())){
-					toReturn.put(n.hashCode(), n);
-				}
-				else {
-					Node stored = toReturn.get(n.hashCode());
-					if (stored.waveNum == n.waveNum && stored.probability < n.probability){
-						toReturn.put(n.hashCode(), n);
-					}
-				}
-			}
-		}
-		
-		return toReturn;
-		
-	}
 	
-	
-	private static LinkedList<Node> createPredictorTreeHelper(Node node,int wave){
-		LinkedList<Node> input = new LinkedList<Node>();
-		input.add(node);
-		return createPredictorTreeHelper(input,wave);
-	}
-	
-	
-	
-	private static LinkedList<Node> deriveOrder(HashMap<Integer,Node> map ,int wave){
-		//filter all the other waves
-		Iterator<Integer> iter = map.keySet().iterator();
-		LinkedList<Node> list = new LinkedList<Node>();
-		while(iter.hasNext()){
-		Integer hash = iter.next();
-			Node node = map.get(hash);
-			if (node.waveNum == wave){
-				list.add(node);
-			}
-		}
-		// make a list 
-		
-		
-		Node.sortDesc(list);
-		return  list;
-	}
-	
-	private static Object[] deriveFragmentNumbers(LinkedList<Node> list,Integer previousFrames,Double previousProb){
-		if (previousFrames==null){
-			previousFrames = 8;
-		}
-		Vector<Node> vec = new Vector<Node>();
-		Iterator<Node> iter = list.iterator();
-		int count=0;
-		while(iter.hasNext() && count<CUTOFF){
-			Node node = iter.next();
-			if (!FRAGMENT || count==0){
-				previousFrames = 8;
-				previousProb = node.probability;
-			}
-			else {
-				previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
-			}
-			//System.out.println(previousFrames);
-			if (previousFrames>0){
-				previousProb = node.probability;
-				node.fragmentsNeeded = previousFrames;
-				vec.add(node);
-			}
-			else {
-				System.out.println("rejected");
-			}
-			count++;
-		}
-		
-		Object[] objArray = new Object[3];
-		objArray[0] = vec;
-		objArray[1] = previousProb;
-		objArray[2] = previousFrames;
-		return objArray;
-	}
 
-	
-	public static Object[] preparePrefetching(Node node,int waveNeeded,int maxWaveNum,Integer previousFrames,Double previousProb){
-		
-		assert(waveNeeded<=maxWaveNum);
-		node.probability = 1.0; //root
-		HashMap<Integer,Node> list = Predictor.createPredictorTree(node,maxWaveNum); 
-		LinkedList<Node> orderedWave = Predictor.deriveOrder(list,waveNeeded);
-		return Predictor.deriveFragmentNumbers(orderedWave, previousFrames, previousProb);
-		//Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, previousFrames, previousProb)[0]);
-		
-	}
-	
+
 	
 	
 	
@@ -185,41 +72,75 @@ public class Predictor {
 	
 	
 	
-	public static UserMove nextMoveFromWorkload(UserMove previousMove,Vector<String> moves){
-		if (previousMove == null){
-			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null));
-		}
-		String move = moves.remove(0);
-		return  previousMove.nextMove(move);			
+	
+	public static Vector<Node> prepare(UserMove move){
+
+		//create the prediction tree 
+		LinkedList<Node> tree = createPredictorTree(move);
+		System.out.println(tree);
+		//System.out.println(tree);
+		//make the nodes a single distribution
+		LinkedList<Node> normalizedTree = normalize(tree);
+		//System.out.println(normalizedTree);
+		//add the likelihoods of duplicates
+		Vector<Node> regularized = regularize(normalizedTree);
+		Node.sortDesc(regularized);
+		System.out.println("!!!!"+regularized);
+		Vector<Node> lods = deriveFragmentNums(regularized);
+		System.out.println("!!!!"+lods);
+		
+		return lods;
 	}
 	
-
-	
-	
-	public static UserMove nextMove(Viewport viewport){
-		if (viewport == null){
-			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null));
+	//finds dublicate tiles and adds their probabilities (from different paths). This can be done because there were normalized and disjoint
+	private static Vector<Node> regularize(LinkedList<Node> list){
+		HashMap<String,Node> toReturn = new HashMap<String,Node>();
+		for (int i=0; i<list.size(); i++){
+			
+			Node toCheck = list.get(i);
+			
+			if (!toReturn.containsKey(toCheck.y+" "+toCheck.x)){
+				toReturn.put(toCheck.y+" "+toCheck.x,toCheck);
+			}
+			else{
+				Node stored = toReturn.get(toCheck.y+" "+toCheck.x);
+				stored.probability+=toCheck.probability;			
+			}
 		}
-		double random = Math.random();
-		if (random<=0.1d){
-			return new UserMove(viewport).goUp();
+		Vector<Node> regularized = new Vector<Node>();
+		Iterator iter = toReturn.keySet().iterator();
+		while(iter.hasNext()){
+			regularized.add(toReturn.get(iter.next()));
 		}
-		else if (random>0.1d && random<=0.4d){
-			return new UserMove(viewport).goRight();
-		}
-		else if (random>0.40d && random<=0.9d){
-			return new UserMove(viewport).goDown();
-		}
-		else {
-			return new UserMove(viewport).goLeft();
-		}
+		return regularized;
+		
 	}
 	
-
-
+	
+	//divides the probabilities and makes them a distribution
+	private static LinkedList<Node> normalize(LinkedList<Node> list){
+		Iterator<Node> iter = list.iterator();
+		double sum = 0;
+		while(iter.hasNext()){
+			Node node = iter.next();
+			sum += node.probability;
+		}
+		
+		iter = list.iterator();
+		while(iter.hasNext()){
+			Node node = iter.next();
+			node.probability = node.probability/sum;
+		}
+		return list;
+	}
 	
 	
-	public static LinkedList<Node> createPredictorTreeHelper(LinkedList<Node> listNodes,int wave){
+	
+	
+	
+	public static LinkedList<Node> createPredictorTree(UserMove move){
+		double minConfidence = 0.01;
+		
 //		PERFECT
 		double upLikelihood = 0.1;
 		double downLikelihood = 0.5;
@@ -231,55 +152,112 @@ public class Predictor {
 //		double leftLikelihood = 0.25;
 //		double rightLikelihood = 0.25;
 		
+		//int maxDistance = 1;
+		Node root = new Node(null,move.upperLeft.y,move.upperLeft.x,1.0d);
+		LinkedList<Node> list = new LinkedList<Node>();
 		LinkedList<Node> toReturn = new LinkedList<Node>();
-		for(Node node : listNodes){
-			Point newPoint = node.point;
-			//up
-			Point tempPoint = newPoint.goUp();
-			int newX = tempPoint.x;
-			int newY = tempPoint.y;
-			Node newNode = new Node(node,newY,newX,upLikelihood*node.probability); 
-			newNode.waveNum = wave;
-			toReturn.addLast(newNode);
-			
-			//down 
-			newPoint = node.point;
-			tempPoint = newPoint.goDown();
-			newX = tempPoint.x;
-			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,downLikelihood*node.probability);
-			newNode.waveNum = wave;
-			toReturn.addLast(newNode);
-			
-			//left 
-			newPoint = node.point;
-			tempPoint = newPoint.goLeft();
-			newX = tempPoint.x;
-			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,leftLikelihood*node.probability);
-			newNode.waveNum = wave;
-			toReturn.addLast(newNode);
-			
-			//right
-			newPoint = node.point;
-			tempPoint = newPoint.goRight();
-			newX = tempPoint.x;
-			newY = tempPoint.y;
-			newNode = new Node(node,newY,newX,rightLikelihood*node.probability);
-			newNode.waveNum = wave;
-			toReturn.addLast(newNode);
+		list.addLast(root);
+		//toReturn.addLast(root);
+		while(list.size()>0){
+			Node node = list.removeFirst();
+			Point newPoint = new Point(node.y,node.x);
+			//up 0.1, down 0.5, left 0.1, right,0.3
+			if (upLikelihood*node.probability >= minConfidence){
+				Point tempPoint = newPoint.goUp();
+				int newX = tempPoint.x;
+				int newY = tempPoint.y;
+				node.up = new Node(node,newY,newX,upLikelihood*node.probability);
+				//if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.up);
+					toReturn.addLast(node.up);
+				/*}
+				else {
+					System.out.println("prrrr"+node.up);
+					System.out.println("pprrd"+Predictor.distance(tempPoint,move.upperLeft));
+				}*/
+				//System.out.println(node.up);
+			}
+			if (downLikelihood*node.probability >= minConfidence){
+				Point tempPoint = newPoint.goDown();
+				int newX = tempPoint.x;
+				int newY = tempPoint.y;
+				node.down = new Node(node,newY,newX,downLikelihood*node.probability);
+				//if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.down);
+					toReturn.addLast(node.down);
+				//}
+				//else {
+					//System.out.println("prrrr"+node.down);
+				//}
+			}
+			if (leftLikelihood*node.probability >= minConfidence){
+				Point tempPoint = newPoint.goLeft();
+				int newX = tempPoint.x;
+				int newY = tempPoint.y;
+				node.left = new Node(node,newY,newX,leftLikelihood*node.probability);
+				//if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.left);
+					toReturn.addLast(node.left);
+				//}
+				//else {
+					//System.out.println("prrrr"+node.left);
+				//}
+				//System.out.println(node.left);
+			}
+			if (rightLikelihood*node.probability >= minConfidence){
+				Point tempPoint = newPoint.goRight();
+				int newX = tempPoint.x;
+				int newY = tempPoint.y;
+				node.right = new Node(node,newY,newX,rightLikelihood*node.probability);
+				//if (Predictor.distance(tempPoint,move.upperLeft)<= maxDistance){
+					list.addLast(node.right);
+					toReturn.addLast(node.right);
+				//}
+				//else {
+					//System.out.println("prrrr"+node.right);
+				//}
+				//System.out.println(node.right);
+			}
+			//in case was added 
+			toReturn.remove(root);
 		}
 		
+		
 		return toReturn;
+		
 	}
 	
 	
 	
+	public static Vector<Node> deriveFragmentNums(Vector<Node> nodes){
+		int fragmentsNeeded = FRAGMENTS_PER_TILE;
+		int diff=1;
+		for (Node node : nodes){
+			node.fragmentsNeeded = fragmentsNeeded;
+			
+			if (FRAGMENT){
+				fragmentsNeeded-=diff;
+				fragmentsNeeded=(int)(Math.max(fragmentsNeeded,1));
+			}
+		}
+		
+//		int count = 1;
+//		int diff=1;
+//		for (Node node : nodes){
+//			
+//			node.fragmentsNeeded = fragmentsNeeded;
+//			if (!FRAGMENT || count<=3){
+//				node.fragmentsNeeded = 8;
+//			}
+//			else {
+//				fragmentsNeeded -= diff;
+//				fragmentsNeeded = Math.max(fragmentsNeeded, 0);
+//			}
+//			count++;
+//		}
+		return nodes;
+	}
 	
-	
-	
-	
-
 	/*public static int calculateLOD(Point point,Viewport viewport){
 		double likelihood = Predictor.calculateLikelihood(point,viewport);
 		int lod = Predictor.likelihoodToLOD(likelihood);

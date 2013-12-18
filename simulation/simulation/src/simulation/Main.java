@@ -1,10 +1,12 @@
 package simulation;
 
-import static depr.simulation.Config.DATABASE_WIDTH;
+import static simulation.Config.DATABASE_WIDTH;
 import static simulation.Config.DATABASE_TILES_NUM;
 import static simulation.Config.WORKLOAD_FILE;
 import static simulation.Config.UPPER_LEFT_STARTING_POINT;
-
+import static simulation.Config.WAVES;
+import static simulation.Config.CACHE_SIZE;
+import static simulation.Config.THINK_TIME;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +23,9 @@ import simulation.events.UserMove;
 import simulation.monitor.Workload;
 import simulation.predictor.Node;
 import simulation.predictor.Predictor;
+import simulation.predictor.PredictorOld;
 import simulation.predictor.Tuple;
+import util.Util;
 
 public class Main {
 	//public static Viewport previousViewport=null;
@@ -38,7 +42,7 @@ public class Main {
 		db.init(DATABASE_TILES_NUM);
 		db.clearCache();
 		System.out.println("Starting Experiment");
-		
+		cache.warmUp();
 		
 	
 		
@@ -55,7 +59,7 @@ public class Main {
 		int count=0;
 		UserMove userMove = null;
 		while (true){
-		//for (int i=0; i<5; i++){	
+		//for (int i=0; i<4; i++){	
 			
 			
 			/*if (Main.previousViewport!=null){
@@ -68,6 +72,13 @@ public class Main {
 				userMove = Predictor.nextMove(viewport);
 				
 			}
+			
+			System.out.println("Test the other tree");
+			
+			
+			
+			
+			
 			//cache.cacheTileWithFragmentRange(db.fetchTileWithFragmentRange(userMove.upperLeft, 1, 1, userMove),2,2).data[1] = "dsadasds";
 			
 			//System.out.println(cache);
@@ -82,7 +93,7 @@ public class Main {
 			Node currentNode = userMove.viewport.upperLeft.createNode();
 			System.out.println("Current Position we just moved: "+currentNode.point);
 			
-			//System.out.println("Udadasd Memory "+Main.cache.queue);
+			
 			
 				//Main.cache.updateAllTileLikelihoods(map);
 				//Iterator<Node> iter = list.iterator();
@@ -104,45 +115,58 @@ public class Main {
 			double start = System.currentTimeMillis();
 			
 			
+			//OLD PREDICTOR
+//			Vector<Node> list = PredictorOld.prepare(userMove);
+//			System.out.println("List To Be Prefetched: "+list);
+//			
+//			System.out.println("Memory Space Used before Prefetch "+Main.cache.sizeBeingUsed());
+//			System.out.println("before thinkTime:"+ userMove.thinkTime);
+//			userMove.prefetch(list);
+//			Main.cache.updateProbabilities(list,currentNode.point);
+//			System.out.println("after thinkTime:"+ userMove.thinkTime);
+//			System.out.println("Memory after Prefetch:"+Main.cache.queue);
 			
 			
-			/*Vector<Node> list2 = Predictor.preparePrefetching(currentNode,2,2); 
-			System.out.println("List2 To Be Prefetched: "+list2);
-			Vector<Node> list3 = Predictor.preparePrefetching(currentNode,3,3); 
-			System.out.println("List3 To Be Prefetched: "+list3);
-			double total = System.currentTimeMillis() - start;
-			System.out.println("Prediction:"+total+" msecs");*/
+
 	
-			int wave=1;
-			while (userMove.thinkTime>0 && wave<=7){
+		//PREDICTOR
+		  int wave=1;
+			Vector<Node> totalList = new Vector<Node>();
+			Double previousProb = null;
+			Integer previousFrames = null;
+			while (THINK_TIME>0 && wave<=WAVES){
 				System.out.println("wave:"+wave);
-				Vector<Node> list = Predictor.preparePrefetching(currentNode,wave,7);
+				Object[] objArray = Predictor.preparePrefetching(currentNode,wave,3,previousFrames,previousProb);
+				previousProb=(Double)objArray[1];
+				previousFrames= (Integer)objArray[2];
+				objArray[2] = previousFrames;
+				Vector<Node>list = (Vector<Node>)objArray[0];
+				totalList.addAll(list);
 				wave++;
 				if (list.size()==0)
 					continue;
 				System.out.println("List To Be Prefetched: "+list);
 				
-				System.out.println("Memory Space Used before Prefetch "+Main.cache.SpaceBeingUsed);
+				System.out.println("Memory Space Used before Prefetch "+Main.cache.sizeBeingUsed());
 				System.out.println("before thinkTime:"+ userMove.thinkTime);
-				Main.cache.updateProbabilities(list,currentNode.point);
+				Main.cache.updateProbabilities(totalList,currentNode.point);
 				userMove.prefetch(list);
 				System.out.println("after thinkTime:"+ userMove.thinkTime);
 				System.out.println("Memory after Prefetch:"+Main.cache.queue);
 				
 			}
 			
-			
-			/*userMove.prefetch(list2);
-			userMove.prefetch(list3);*/
-			
+		
 			System.out.println("#Cache Misses during Fetch in a Move: "+userMove.cacheMissesDuringFetch);
+			UserMove.misses.add(userMove.cacheMissesDuringFetch);
 			System.out.println("#Disk Fetched Fragments during Move: "+userMove.cacheMisses);
 			
 			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
 			
-			System.out.println("Memory Space Used after Prefetch "+Main.cache.SpaceBeingUsed);
-			if (Main.cache.tiles.size()!=Main.cache.queue.size()){
-				System.err.println("Error");
+			System.out.println("Memory Space Used after Prefetch "+Main.cache.sizeBeingUsed());
+			if (Main.cache.tiles.size()!=Main.cache.queue.size() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
+				System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
+				System.err.println("Memory Inconsistency Error");
 				break;
 			}
 			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -157,6 +181,10 @@ public class Main {
 			//System.out.println(UserMove.totalCacheHits+" "+UserMove.totalCacheMisses);
 			//break;
 		}
+		
+		
+		System.out.println("All Misses Mean: "+ Util.average(UserMove.misses));
+		System.out.println("All Misses Variance: "+ Util.variance(UserMove.misses));
 		System.out.println("#Total Moves: "+UserMove.totoalMoves);
 		System.out.println("#Total Cache Misses during Fetches: "+UserMove.totalCacheMissesDuringFetch);
 		System.out.println("#Total Disk Fetched Fragments: "+UserMove.totalCacheMisses);

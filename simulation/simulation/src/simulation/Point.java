@@ -17,6 +17,11 @@ public class Point {
 		this.x = x;
 		this.validate();
 	}
+	
+	public Point(int y, int x,boolean dummy){
+		this.y = y;
+		this.x = x;
+	}
 	public int hashCode(){
 		return ((this.y+"-"+this.x).hashCode());
 	}
