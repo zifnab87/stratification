@@ -106,7 +106,7 @@ public class Predictor {
 		int count=0;
 		while(iter.hasNext() && count<CUTOFF){
 			Node node = iter.next();
-			if (!FRAGMENT || count==0){
+			if (/*!FRAGMENT || count==0*/ 1==1){
 				previousFrames = 8;
 				previousProb = node.probability;
 			}

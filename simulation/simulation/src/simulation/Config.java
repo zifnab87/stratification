@@ -8,9 +8,9 @@ public class Config {
 	public static boolean PREFETCH = true;
 	
 	//USER
-	public static int THINK_TIME = 32;
+	public static int THINK_TIME = 1;
 
-	public static boolean FRAGMENT = false; 
+	public static boolean FRAGMENT = true; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
 	public static final int CACHE_SIZE = 64;
@@ -34,8 +34,8 @@ public class Config {
 	
 	//PREDICTOR
 	public static boolean SKIP_PREDICTIONS = false;
-	public static double CUTOFF = 20; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
-	public static int WAVES = 3;
+	public static double CUTOFF = 4; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
+	public static int WAVES = 1;
 	// small numbers -> aggressive
 	
 	

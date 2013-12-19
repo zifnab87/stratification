@@ -379,16 +379,25 @@ public class Cache {
 		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
 		while (mapIter.hasNext()){
 			CachedTile cTile = this.tiles.get(mapIter.next());
+			
+			if (currentPosition.equals(cTile.point)){
+				
+				continue;
+			}
+			
 			//IMPORTANT remove before the equality is busted because of change in probability
+			
 			queueRemove(cTile);
 			//we make probabilities zero so only the ones that will be updated by the 
 			//prediction tree will have probability less than zero
 			//if it is current we give it a probability of 1.0d
 			if (currentPosition.equals(cTile.point)){
 				cTile.probability = 1.0d;
+				//cTile.data = data;
 			}
 			else {
 				cTile.probability = 0.0d;
+				//cTile.data = data;
 			}
 			cTile.distance = Predictor.distance(cTile.point, currentPosition);
 			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
@@ -397,7 +406,7 @@ public class Cache {
 		}
 		
 		
-		
+		//from the predictor
 		Iterator<Node> iter = list.iterator();
 		while(iter.hasNext()){
 			Node node = iter.next();
