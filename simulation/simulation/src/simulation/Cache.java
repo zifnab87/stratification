@@ -81,10 +81,11 @@ public class Cache {
 	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
 		while(!this.hasAvailableSpace(spaceNeeded)){
+			System.out.println("space still Needed "+spaceNeeded);
 			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
+			
 		}
-		System.out.println("spaceNeeded"+spaceNeeded);
 		int index = tile.point.hashCode();
 		CachedTile toBeCached = this.tiles.get(index);
 	
@@ -121,7 +122,7 @@ public class Cache {
 		}
 		else {
 			//System.out.println("bika");
-			CachedTile cTile = this.tiles.get(index);
+			CachedTile cTile = queueFind(index);
 			//System.out.println(cTile);
 			//System.out.println(this.queue.size());
 			queueRemove(cTile);
@@ -141,6 +142,19 @@ public class Cache {
 		return toBeCached;
 		
 	}
+	private CachedTile queueFind(int hashCode) {
+		boolean found = false;
+		Iterator<CachedTile> iter = this.queue.iterator();
+		while(iter.hasNext()){
+			CachedTile cTile = iter.next();
+			if (cTile.id == hashCode){
+				found = true;
+				return cTile;
+			}
+		}
+		return null;
+	}
+	
 
 	private boolean queueContains(CachedTile toBeCached) {
 		boolean found = false;
@@ -183,13 +197,25 @@ public class Cache {
 	}
 	
 	public int sizeBeingUsed() {
-		Iterator<Integer> iterKeys = this.tiles.keySet().iterator();
+		if (this.tiles.size()!=this.queue.size()){
+			System.err.println("memory inconsistency");
+		}
+		/*Iterator<Integer> iterKeys = this.tiles.keySet().iterator();
 		int total = 0;
 		while(iterKeys.hasNext()){
 			CachedTile cTile = this.tiles.get(iterKeys.next());
 			int fragm = cTile.getCachedFragmentsNum();
 			total+=fragm;
+		}*/
+		int total = 0;
+		Iterator<CachedTile> iter = this.queue.iterator();
+		while (iter.hasNext()){
+			//CachedTile cTile = this.tiles.get(iter.next().point.hashCode());
+			CachedTile cTile = iter.next();
+			int fragm = cTile.getCachedFragmentsNum();
+			total+=fragm;
 		}
+		
 		return total;
 	}
 	
@@ -250,7 +276,7 @@ public class Cache {
 	}
 	
 	public CachedTile fetchTile(int hash,UserMove caller){
-		CachedTile cachedTile = tiles.get(hash);
+		CachedTile cachedTile = queueFind(hash);
 		if (cachedTile!=null){
 			caller.cacheHits += cachedTile.getCachedFragmentsNum();
 			UserMove.totalCacheHits+=cachedTile.getCachedFragmentsNum();
@@ -259,7 +285,7 @@ public class Cache {
 	}
 	
 	private CachedTile getTile(int hash){
-		return this.tiles.get(hash);
+		return queueFind(hash);
 	}
 	
 	
@@ -306,7 +332,7 @@ public class Cache {
 			if (lessLikelyTile.point.equals(currentPoint)){
 				System.err.println("ELEOS to idio");
 			}
-			CachedTile toBeCached = this.tiles.get(currentPoint.hashCode());
+			CachedTile toBeCached = queueFind(currentPoint.hashCode());
 			if (toBeCached!=null){ //if already cached 
 				if (toBeCached.probability < lessLikelyTile.probability){  //and has less probability than the anything in the cache
 					System.err.println("ELEOS cache degradation");
@@ -326,9 +352,11 @@ public class Cache {
 	
 	
 	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
+		
 		this.tiles.remove(cTile.point.hashCode());
 		iter.remove();
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
+		System.out.println("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
 		decreaseSpaceUsed(numFragmentsCached);
 		return numFragmentsCached;
 	}
@@ -376,14 +404,15 @@ public class Cache {
 	
 	//update cache probability based on the prediction tree
 	public void updateProbabilities(Vector<Node> list,Point currentPosition){
+		int size0 = this.sizeBeingUsed();
 		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
 		while (mapIter.hasNext()){
-			CachedTile cTile = this.tiles.get(mapIter.next());
-			
-			if (currentPosition.equals(cTile.point)){
+			CachedTile cTile = queueFind(mapIter.next());
+			String[] data = cTile.data;
+			/*if (currentPosition.equals(cTile.point)){
 				
 				continue;
-			}
+			}*/
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
 			
@@ -393,40 +422,39 @@ public class Cache {
 			//if it is current we give it a probability of 1.0d
 			if (currentPosition.equals(cTile.point)){
 				cTile.probability = 1.0d;
-				//cTile.data = data;
+				
 			}
 			else {
 				cTile.probability = 0.0d;
-				//cTile.data = data;
 			}
 			cTile.distance = Predictor.distance(cTile.point, currentPosition);
 			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
 				this.queue.add(cTile);
 			}
 		}
-		
-		
+		int size1 = this.sizeBeingUsed();
 		//from the predictor
 		Iterator<Node> iter = list.iterator();
 		while(iter.hasNext()){
 			Node node = iter.next();
 			if (this.tiles.containsKey(node.point.hashCode())){
 				
-				CachedTile cTile = this.tiles.get(node.point.hashCode());
-				//IMPORTANT remove before the equality is busted because of change in probability
-				//this.queue.remove(cTile);
+				CachedTile cTile = queueFind(node.point.hashCode());//this.tiles.get(node.point.hashCode());
+				//IMPORTANT remove before the equality is busted because of change in probability;
 				queueRemove(cTile);
 				cTile.probability = node.probability;
-				//cTile.distance = Predictor.distance(cTile.point, currentPosition);
-				//cTile.data = new String[]{"da","dasd",null,null,null,null,null,null};	
 				if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode()) ){
 					this.queue.add(cTile);
 				}
 			}	
 		}
+		int size2 = this.sizeBeingUsed();
 		
-		
+		if (size0!=size1 || size0!=size2 || size1!=size2){
+			System.err.println("Memory size altered from Prediction");
+		}
 
-		System.out.println("Updated Memory because of Prediction"+this.queue);
+		System.out.println("Updated Memory because of Prediction "+this.queue);
+		System.out.println("Memory Size because of Prediction "+this.sizeBeingUsed());
 	}
 }

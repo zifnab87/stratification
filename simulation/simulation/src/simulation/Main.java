@@ -42,7 +42,7 @@ public class Main {
 		db.init(DATABASE_TILES_NUM);
 		db.clearCache();
 		System.out.println("Starting Experiment");
-		cache.warmUp();
+		//cache.warmUp();
 		
 	
 		
@@ -110,7 +110,7 @@ public class Main {
 			count++;
 			userMove.viewportFetch();
 			System.out.println("Memory after Fetch:"+Main.cache.queue);
-			
+			System.out.println("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 			
 			double start = System.currentTimeMillis();
 			
@@ -163,7 +163,7 @@ public class Main {
 			
 			//System.out.println("Memory "+Main.cache.SpaceBeingUsed);
 			
-			System.out.println("Memory Space Used after Prefetch "+Main.cache.sizeBeingUsed());
+			System.out.println("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
 			if (Main.cache.tiles.size()!=Main.cache.queue.size() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
 				System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
 				System.err.println("Memory Inconsistency Error");

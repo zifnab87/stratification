@@ -179,6 +179,7 @@ public class UserMove {
 						
 					}
 					else {// cachedLOD > LOD
+						System.err.println("hhhmmm");
 						//that many were needed and we had even more in the cache
 						/*for (int i=1; i<LOD; i++){
 							Main.cache.fetchFragmentOfTile(i,  new Point(key.y,key.x), this);

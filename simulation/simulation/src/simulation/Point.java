@@ -2,7 +2,6 @@ package simulation;
 
 import java.util.Vector;
 
-import simulation.events.UserMove;
 import simulation.predictor.Node;
 
 import static simulation.Config.DATABASE_WIDTH;

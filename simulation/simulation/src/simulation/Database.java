@@ -127,9 +127,9 @@ public class Database {
 		}
 	}
 	
-	public Tile fetchTile(Point index,UserMove caller){
+	public Tile fetchTile(Point index,UserMove userMove){
 		
-		caller.cacheMisses+=FRAGMENTS_PER_TILE;
+		userMove.cacheMisses+=FRAGMENTS_PER_TILE;
 		UserMove.totalCacheMisses+=FRAGMENTS_PER_TILE;
 		return getTile(index);
 	}
@@ -188,11 +188,11 @@ public class Database {
 		return tile;
 	}
 	
-	public Tile fetchTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove caller){
+	public Tile fetchTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
 		//fragments fetched
 		int num = lastFragment-firstFragment+1;
 		for (int i=0; i<num; i++){
-			caller.cacheMisses+=1;
+			userMove.cacheMisses+=1;
 			UserMove.totalCacheMisses+=1;
 		}
 		return getTileWithFragmentRange(index, firstFragment, lastFragment);

@@ -234,7 +234,7 @@ public class UserMoveOld {
 					tile.carryingProbability = 1.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
-					UserMoveOld.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
+					UserMove.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
 				}
 				//if tile partially exists request missing fragments
 				
@@ -249,7 +249,7 @@ public class UserMoveOld {
 					int misses = (FRAGMENTS_PER_TILE-cachedPartialTile.getCachedFragmentsNum());
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch += misses;
-					UserMoveOld.totalCacheMissesDuringFetch += misses;
+					UserMove.totalCacheMissesDuringFetch += misses;
 				}
 				else { // tileExistsAndFull == true
 					Main.cache.fetchTile(index, this);
@@ -265,7 +265,7 @@ public class UserMoveOld {
 	}
 	
 	
-	public UserMoveOld nextMove(String move){
+	public UserMove nextMove(String move){
 		if (move.equals("up")){
 			return this.goUp();
 		}
@@ -285,29 +285,29 @@ public class UserMoveOld {
 	}
 	
 	
-	public UserMoveOld goLeft(){
+	public UserMove goLeft(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
 		//System.out.println("left");
-		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"));
 	}
 	
-	public UserMoveOld goRight(){
+	public UserMove goRight(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
 		//System.out.println("right");
-		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"));
 	}
 	
-	public UserMoveOld goDown(){
+	public UserMove goDown(){
 		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
 		//System.out.println("down");
-		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"));
 	}
 
-	public UserMoveOld goUp(){
+	public UserMove goUp(){
 		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
 		//System.out.println("try" + newUpperLeft);
 		//System.out.println("up");
-		return new UserMoveOld(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"));
 	}
 	
 	

@@ -8,9 +8,9 @@ public class Config {
 	public static boolean PREFETCH = true;
 	
 	//USER
-	public static int THINK_TIME = 1;
+	public static int THINK_TIME = 15;
 
-	public static boolean FRAGMENT = true; 
+	public static boolean FRAGMENT = false; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
 	public static final int CACHE_SIZE = 64;
