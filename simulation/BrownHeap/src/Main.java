@@ -5,6 +5,9 @@ import java.util.Random;
 import java.util.Vector;
 
 
+//http://oeis.org/A145787
+//http://oeis.org/A019567
+
 public class Main {
 	public static HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
 	
@@ -31,6 +34,25 @@ public class Main {
 	
 	
 	
+	public static int probPappouv2(int n){
+		int mmax=100000;
+		int m;
+		for (m=1; m<mmax;m++){
+	        if (((Math.pow(2,m)-1)%(4*n+1)==0 || (Math.pow(2,m)+1)%(4*n+1)==0)){
+	            System.out.println("TELIKO~~"+(Math.pow(2, m)-1)+"/"+(4*n+1));
+	            System.out.println("TELIKO~~"+(Math.pow(2, m)+1)+"/"+(4*n+1));
+	            System.out.println("TELIKO~~"+m);
+	        	return m ;
+	        }
+	        System.out.println((Math.pow(2, m)-1)+"/"+(4*n+1));
+            System.out.println((Math.pow(2, m)+1)+"/"+(4*n+1));
+	        System.out.println("~~"+m);
+		}
+		return m;
+	}
+	
+	
+	
 	
 	public static void main(String args[]){
 		//Node root = BrownHeap.constructHeap();
@@ -38,8 +60,8 @@ public class Main {
 	
 		
 		
-		for (int i=1; i<200; i++){
-			probPappou(i);
+		for (int i=1; i<500; i++){
+			probPappouv2(i);
 		}
 		
 //		for (int heapSize=0; heapSize<=10000; heapSize++){
@@ -135,36 +157,54 @@ public class Main {
 			
 			
 		}
+		
+		
 		while(!isSorted(newIteration,cardArray));
 		
 		//System.out.println(numOfCards+","+(numOfCards+1)+":"+count);
 			boolean printed=false;
-			boolean output=true;
-			if (output){
-				if (numOfCards==count){
-					System.out.println("sameNumOf Cards with iterations:"+numOfCards+":("+count+")");
-					printed = true;
+			boolean output=false;
+			//if (numOfCards%2==0){
+			
+			/*int n = numOfCards/2;
+			if (isPrime(4*n+1)){
+				//also archimedes spiral
+				System.out.println(2*n+"AAA");
+			}*/
+			
+				if (output){
+					
+					if (numOfCards==count){
+						//http://oeis.org/A163777 Archimedes Spiral
+						//System.out.println("sameNumOf Cards with iterations:"+numOfCards+":("+count+")");
+						printed = true;
+					}
+					if (isTriangularNum(numOfCards)){
+						//System.out.println("Triangular Number:"+numOfCards+":("+count+")");
+						printed = true;
+					}
+					if (isPowerOfTwo(numOfCards)){
+						//System.out.println("Power of two Number:"+numOfCards+":("+count+")");
+						printed = true;
+					}
+					if (isPrime(numOfCards)){
+						//System.out.println("Prime Number:"+numOfCards+":("+count+")");
+						printed = true;
+					}
+					if (isPerfectSquare(numOfCards)){
+						//System.out.println("Is Perfect Square:"+numOfCards+":("+count+")");
+						printed = true;
+					}
+					if (!printed){
+						//System.out.println("Regular Number:"+numOfCards+":("+count+")");
+					}
+					
+					
 				}
-				if (isTriangularNum(numOfCards)){
-					System.out.println("Triangular Number:"+numOfCards+":("+count+")");
-					printed = true;
-				}
-				if (isPowerOfTwo(numOfCards)){
-					System.out.println("Power of two Number:"+numOfCards+":("+count+")");
-					printed = true;
-				}
-				if (isPrime(numOfCards)){
-					System.out.println("Prime Number:"+numOfCards+":("+count+")");
-					printed = true;
-				}
-				if (isPerfectSquare(numOfCards)){
-					System.out.println("Is Perfect Square:"+numOfCards+":("+count+")");
-					printed = true;
-				}
-				if (!printed){
-					System.out.println("Regular Number:"+numOfCards+":("+count+")");
-				}
-			}
+				//if (!printed){
+					System.out.println(numOfCards+":("+count+")");
+				//}
+			//}
 			if(!map.containsKey(count)){
 				map.put(count, 1);
 			}

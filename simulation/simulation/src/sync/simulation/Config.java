@@ -1,26 +1,31 @@
-package depr.simulation;
+package sync.simulation;
+
+import sync.simulation.Point;
 
 public class Config {
 	
 	public static boolean debug = false;
+	public static boolean PREFETCH = true;
 	
-	//public static boolean PREFETCH = false;
-	public static boolean FRAGMENT = false; 
+	//USER
+	public static int THINK_TIME = 15;
+
+	public static boolean FRAGMENT = true; 
 	public final static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static final int CACHE_SIZE = 128;
+	public static final int CACHE_SIZE = 64;
 	
 	//DATABASE 
 	public static final int DATABASE_TILES_NUM = 625;//625;
 	public static final int DATABASE_WIDTH = 25;//25;
 	//VIEWPORT
 	public static final Point UPPER_LEFT_STARTING_POINT = new Point(2,2);
-	public static final int VIEWPORT_HEIGHT = 3;
-	public static final int VIEWPORT_WIDTH = 3;
+	public static final int VIEWPORT_HEIGHT = 1;
+	public static final int VIEWPORT_WIDTH = 1;
 
 	//TILE
-	public final static int TILE_WIDTH = 8; //256
-	public final static int TILE_HEIGHT = 8; //256
+	public final static int TILE_WIDTH = 32; //256
+	public final static int TILE_HEIGHT = 32; //256
 	public final static int FRAGMENTS_PER_TILE = 8;
 	public final static int COLORS = 3;
 	
@@ -28,8 +33,11 @@ public class Config {
 	public final static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
 	
 	//PREDICTOR
-	public static int PREFETCH_DISTANCE = 4;  
-	public static int PROBABILITY_CUTOFF = 8;
+	public static boolean SKIP_PREDICTIONS = false;
+	public static double CUTOFF = 4; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
+	public static int WAVES = 1;
+	// small numbers -> aggressive
+	
 	
 	
 	public final static double SIMULATION_FACTOR = 100d; // unsafe for values >400

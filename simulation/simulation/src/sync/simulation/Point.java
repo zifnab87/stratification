@@ -1,27 +1,30 @@
-package depr.simulation;
+package sync.simulation;
 
 import java.util.Vector;
 
-import static depr.simulation.Config.DATABASE_WIDTH;
+import sync.simulation.predictor.Node;
+
+import static sync.simulation.Config.DATABASE_WIDTH;
 
 public class Point {
 	public int x;
 	public int y;
-	public Vector<Integer> fragmentNums;
-	public double carriedLikeliood = 0.0d;
+	
 	//public int LOD = 0;
 	public Point(int y, int x){
 		this.y = y;
 		this.x = x;
 		this.validate();
 	}
+	
+	public Point(int y, int x,boolean dummy){
+		this.y = y;
+		this.x = x;
+	}
 	public int hashCode(){
 		return ((this.y+"-"+this.x).hashCode());
 	}
 	
-	public void setFragmentNums(Vector<Integer> fragmentNums){
-		this.fragmentNums = fragmentNums;
-	}
 	
 	public String toString(){
 		return "("+y+","+x+")";
@@ -51,4 +54,29 @@ public class Point {
 		}
 	}
 	
+	public Object clone(){
+		return new Point(this.y,this.x);
+		
+	}
+	
+	public Point goLeft(){
+		return new Point(this.y,this.x-1);
+	}
+	
+	public Point goRight(){
+		return new Point(this.y,this.x+1);
+	}
+	
+	public Point goDown(){
+		return new Point(this.y+1,this.x);
+	}
+
+	public Point goUp(){
+		return new Point(this.y-1,this.x);
+	}
+	
+	
+	public Node createNode(){
+		return new Node(this.y,this.x);
+	}
 }
