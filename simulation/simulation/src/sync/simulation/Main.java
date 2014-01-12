@@ -4,6 +4,8 @@ import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.DATABASE_TILES_NUM;
 import static sync.simulation.Config.WORKLOAD_FILE;
 import static sync.simulation.Config.UPPER_LEFT_STARTING_POINT;
+import static sync.simulation.Config.VIEWPORT_HEIGHT;
+import static sync.simulation.Config.VIEWPORT_WIDTH;
 import static sync.simulation.Config.WAVES;
 import static sync.simulation.Config.CACHE_SIZE;
 import static sync.simulation.Config.THINK_TIME;
@@ -20,7 +22,6 @@ import sync.simulation.Cache;
 import sync.simulation.Database;
 import sync.simulation.Viewport;
 import sync.simulation.events.UserMove;
-import sync.simulation.monitor.Workload;
 import sync.simulation.predictor.Node;
 import sync.simulation.predictor.Predictor;
 import sync.simulation.predictor.PredictorOld;
@@ -31,7 +32,8 @@ public class Main {
 	//public static Viewport previousViewport=null;
 	public static Database db = new Database();
 	public static Cache cache = new Cache();
-	public static Vector<String> moves = Workload.readMoves();
+	//public static Vector<String> moves = Workload.readMoves();
+	
 	
 	public static void main(String args[]){
 
@@ -47,33 +49,34 @@ public class Main {
 	
 		
 		//UserMove userMove;
-		Viewport viewport = null;
+		Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  UPPER_LEFT_STARTING_POINT,null);
 		//Workload.init();
 		double startTime = System.nanoTime();
-		if (moves!=null && moves.size()>0){
+		/*if (moves!=null && moves.size()>0){
 			System.out.println("Starting Workload Execution "+WORKLOAD_FILE);
 		}
 		else {
 			System.out.println("Making a new Workload "+WORKLOAD_FILE);
-		}
+		}*/
 		int count=0;
-		UserMove userMove = null;
+		UserMove userMove = new UserMove(viewport);
+		System.out.println("Position: "+userMove);
 		while (true){
-		//for (int i=0; i<4; i++){	
+		
+		
+		//for (int i=0; i<10; i++){	
 			
-			
-			/*if (Main.previousViewport!=null){
-				Main.cache.updateAllTileLikelihoods(Main.previousViewport);
-			}*/
-			if (moves!=null && moves.size()>0){
+			userMove = Predictor.nextMove(userMove.viewport);
+			System.out.println("Position: "+userMove);
+			/*if (moves!=null && moves.size()>0){
 				userMove = Predictor.nextMoveFromWorkload(userMove,moves);
 			}
 			else {
 				userMove = Predictor.nextMove(viewport);
 				
-			}
+			}*/
 			
-			System.out.println("Test the other tree");
+			//System.out.println("Test the other tree");
 			
 			
 			
@@ -172,7 +175,7 @@ public class Main {
 			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			
 			boolean isTerminal = userMove.viewport.upperLeft.x == DATABASE_WIDTH-1 && userMove.viewport.upperLeft.y == DATABASE_WIDTH-1;
-			if (isTerminal || moves.size()==0){
+			if (isTerminal){
 				System.out.println("TELOS");
 				break;
 			}
@@ -187,6 +190,7 @@ public class Main {
 		System.out.println("All Misses Variance: "+ Util.variance(UserMove.misses));
 		System.out.println("#Total Moves: "+UserMove.totoalMoves);
 		System.out.println("#Total Cache Misses during Fetches: "+UserMove.totalCacheMissesDuringFetch);
+		System.out.println("#Total Cache Latency during Fetches: "+UserMove.totalLatencyDuringFetch+" msec");
 		System.out.println("#Total Disk Fetched Fragments: "+UserMove.totalCacheMisses);
 		System.out.println("#Total Cache Fetched Fragments: "+UserMove.totalCacheHits);
 	}

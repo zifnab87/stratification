@@ -19,7 +19,6 @@ import sync.simulation.Main;
 import sync.simulation.Point;
 import sync.simulation.Tile;
 import sync.simulation.Viewport;
-import sync.simulation.monitor.Workload;
 import sync.simulation.predictor.Node;
 //import static sync.simulation.Config.PREFETCH;
 import sync.simulation.predictor.Predictor;
@@ -33,10 +32,13 @@ public class UserMove {
 	
 	public int cacheHits = 0;
 	public int cacheMisses = 0;
+	
 	public static int totalCacheMisses = 0;
 	public static int totalCacheHits = 0;
 	public int cacheMissesDuringFetch = 0;
+	public double latencyDuringFetch = 0;
 	public static int totalCacheMissesDuringFetch = 0;
+	public static double totalLatencyDuringFetch = 0;
 	
 	public static int totoalMoves = 0;
 	public int thinkTime = THINK_TIME;
@@ -50,14 +52,14 @@ public class UserMove {
 		this.movementType = viewport.resultOfMovement;
 	}
 	
-	public void write(){
+	/*public void write(){
 		try {
 			Workload.writeMove(this);
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public void prefetch(Vector<Node> toPrefetch){
 		if (toPrefetch.size()==0){

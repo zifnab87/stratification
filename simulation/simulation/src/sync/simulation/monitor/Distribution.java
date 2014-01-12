@@ -16,10 +16,25 @@ import sync.simulation.events.UserMove;
 import static sync.simulation.Config.WORKLOAD_FILE;
 
 
-public class Workload {
+public class Distribution {
+	
+	public double up;
+	public double down;
+	public double left;
+	public double right; 
+	
+	public Distribution(double up,double down, double left, double right){
+		this.up = up;
+		this.down = down;
+		this.left = left;
+		this.right = right;
+	}
+	
+
 	
 	
-	public static void writeMove(UserMove userMove) throws FileNotFoundException, UnsupportedEncodingException{
+	
+	/*public static void writeMove(UserMove userMove) throws FileNotFoundException, UnsupportedEncodingException{
 		String movementType = userMove.movementType;
 		DataOutputStream writer = null;
 		try {
@@ -62,5 +77,5 @@ public class Workload {
 		
 		
 
-	}
+	}*/
 }

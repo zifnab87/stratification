@@ -1,6 +1,7 @@
 package sync.simulation;
 
 import sync.simulation.Point;
+import sync.simulation.monitor.Distribution;
 
 public class Config {
 	
@@ -8,7 +9,8 @@ public class Config {
 	public static boolean PREFETCH = true;
 	
 	//USER
-	public static int THINK_TIME = 15;
+	public static int THINK_TIME = 6;
+	public static Distribution DISTRIBUTION = new Distribution(0.1,0.5,0.1,0.3);
 
 	public static boolean FRAGMENT = true; 
 	public final static String WORKLOAD_FILE = "workload_4";

@@ -126,14 +126,15 @@ public class Database {
 		
 		userMove.cacheMisses+=FRAGMENTS_PER_TILE;
 		UserMove.totalCacheMisses+=FRAGMENTS_PER_TILE;
-		return getTile(index);
+		
+		return getTile(index,userMove);
 	}
 	
-	private Tile getTile(Point index){
+	private Tile getTile(Point index,UserMove userMove){
 		boolean first = true;
 		Tile firstTile = null;
 		for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
-			Tile partialTile = getTileWithFragmentRange(index, i, i);
+			Tile partialTile = getTileWithFragmentRange(index, i, i, userMove);
 			if (first){
 				firstTile = partialTile;
 			}
@@ -141,26 +142,26 @@ public class Database {
 				firstTile.data[i-1]= partialTile.data[i-1];
 			}
 			first = false;
-			System.out.println("$$$"+firstTile.printData());
+			//System.out.println("$$$"+firstTile.dataToString());
 		}
 		return firstTile;
 	}
 	
-	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove caller){
-		caller.cacheMisses+=1;
+	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
+		userMove.cacheMisses+=1;
 		UserMove.totalCacheMisses+=1;
-		return getFragmentOfTile(index, fragmentNumber);
+		return getFragmentOfTile(index, fragmentNumber,userMove);
 	}
 
 	
 	
-	private Tile getFragmentOfTile(Point index,int fragmentNumber){
+	private Tile getFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
 		
-		return getTileWithFragmentRange(index, fragmentNumber, fragmentNumber);
+		return getTileWithFragmentRange(index, fragmentNumber, fragmentNumber,userMove);
 	}
 	
 	
-	private Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment){
+	private Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
 		double start = System.currentTimeMillis();
 		Connection conn = null;
 		ResultSet results = null;
@@ -173,7 +174,7 @@ public class Database {
 		    // handle the error
 		}
 		 try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
+			conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1/stratification?" +
                      "user=root");
 			
 			Statement stmt = conn.createStatement();
@@ -186,8 +187,10 @@ public class Database {
 				totalData[fragment_num-1]=results.getString("data");
 			}
 			tile = new Tile(index,totalData);
-			double end = System.currentTimeMillis() - start;
-			System.out.println(end+" msecs");
+			double latency = System.currentTimeMillis() - start;
+			//System.out.println(end+" msecs");
+			userMove.latencyDuringFetch+=latency;
+			UserMove.totalLatencyDuringFetch+=latency;
 			conn.close();
 	 
 		} catch (SQLException e) {
@@ -203,7 +206,7 @@ public class Database {
 			userMove.cacheMisses+=1;
 			UserMove.totalCacheMisses+=1;
 		}
-		return getTileWithFragmentRange(index, firstFragment, lastFragment);
+		return getTileWithFragmentRange(index, firstFragment, lastFragment,userMove);
 	}
 	
 	

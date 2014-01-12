@@ -1,12 +1,9 @@
 package sync.simulation.predictor;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.Vector;
 
 import sync.simulation.Point;
@@ -18,9 +15,9 @@ import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static sync.simulation.Config.VIEWPORT_HEIGHT;
 import static sync.simulation.Config.VIEWPORT_WIDTH;
-import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.CUTOFF;
 import static sync.simulation.Config.FRAGMENT;
+import static sync.simulation.Config.DISTRIBUTION;
 
 public class Predictor {
 	
@@ -200,14 +197,19 @@ public class Predictor {
 		if (viewport == null){
 			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null));
 		}
+		
+		double up = DISTRIBUTION.up;
+		double down = DISTRIBUTION.down;
+		double left = DISTRIBUTION.left;
+		double right = DISTRIBUTION.right;
 		double random = Math.random();
-		if (random<=0.1d){
+		if (random<=up){
 			return new UserMove(viewport).goUp();
 		}
-		else if (random>0.1d && random<=0.4d){
+		else if (random>up && random<=up+right){
 			return new UserMove(viewport).goRight();
 		}
-		else if (random>0.40d && random<=0.9d){
+		else if (random>up+right && random<=up+right+down){
 			return new UserMove(viewport).goDown();
 		}
 		else {
@@ -220,16 +222,11 @@ public class Predictor {
 	
 	
 	public static LinkedList<Node> createPredictorTreeHelper(LinkedList<Node> listNodes,int wave){
-//		PERFECT
-		double upLikelihood = 0.1;
-		double downLikelihood = 0.5;
-		double leftLikelihood = 0.1;
-		double rightLikelihood = 0.3;
-		//HORRIBLE
-//		double upLikelihood = 0.25;
-//		double downLikelihood = 0.25;
-//		double leftLikelihood = 0.25;
-//		double rightLikelihood = 0.25;
+		double upLikelihood = DISTRIBUTION.up;
+		double downLikelihood = DISTRIBUTION.down;
+		double leftLikelihood = DISTRIBUTION.left;
+		double rightLikelihood = DISTRIBUTION.right;
+
 		
 		LinkedList<Node> toReturn = new LinkedList<Node>();
 		for(Node node : listNodes){
