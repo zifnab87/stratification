@@ -22,6 +22,7 @@ import sync.simulation.predictor.Node;
 import sync.simulation.predictor.Predictor;
 
 import sync.simulation.predictor.Tuple;
+import util.Util;
 
 public class Cache {
 	//public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
@@ -90,7 +91,7 @@ public class Cache {
 	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
 		while(!this.hasAvailableSpace(spaceNeeded)){
-			System.out.println("space still Needed "+spaceNeeded);
+			Util.debug("space still Needed "+spaceNeeded);
 			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
 			spaceNeeded -= diff;
 			
@@ -125,21 +126,21 @@ public class Cache {
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
 		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			//System.out.println(toBeCached.fragmentsToString());
+			//Util.debug(toBeCached.fragmentsToString());
 			toBeCached.probability = tile.carryingProbability;
 			this.queue.add(toBeCached);
 		}
 		else {
-			//System.out.println("bika");
+		
 			CachedTile cTile = queueFind(index);
-			//System.out.println(cTile);
-			//System.out.println(this.queue.size());
+			//Util.debug(cTile);
+			//Util.debug(this.queue.size());
 			queueRemove(cTile);
-			//System.out.println(this.queue.size());
-			System.out.println(cTile.fragmentsToString());
+			//Util.debug(this.queue.size());
+			Util.debug(cTile.fragmentsToString());
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			toBeCached.probability = tile.carryingProbability;
-			System.out.println(toBeCached.fragmentsToString());
+			Util.debug(toBeCached.fragmentsToString());
 			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 				this.queue.add(toBeCached);
 			}
@@ -280,7 +281,7 @@ public class Cache {
 		double start = System.currentTimeMillis();
 		CachedTile cTile = this.getTile(point.hashCode());
 		double total = System.currentTimeMillis() - start;
-		System.out.println("Cache: "+total+" msecs");
+		Util.debug("Cache: "+total+" msecs");
 		return cTile;
 	}
 	
@@ -288,7 +289,7 @@ public class Cache {
 		CachedTile cachedTile = queueFind(hash);
 		if (cachedTile!=null){
 			caller.cacheHits += cachedTile.getCachedFragmentsNum();
-			UserMove.totalCacheHits+=cachedTile.getCachedFragmentsNum();
+			caller.run.totalCacheHits+=cachedTile.getCachedFragmentsNum();
 		}
 		return getTile(hash);
 	}
@@ -332,7 +333,7 @@ public class Cache {
 	}
 	
 	public int makeSpaceAvailable(int fragmentsNeeded,Point currentPoint){
-		//System.out.println("I need"+fragmentsNeeded);
+		//Util.debug("I need"+fragmentsNeeded);
 		Iterator<CachedTile> iter = this.queue.iterator();
 		int evictedFragments = 0;
 		while(iter.hasNext() && evictedFragments<fragmentsNeeded){
@@ -353,7 +354,7 @@ public class Cache {
 			
 			
 		}
-		//System.out.println(queue);
+		//Util.debug(queue);
 		return evictedFragments;
 	}
 	
@@ -365,7 +366,7 @@ public class Cache {
 		this.tiles.remove(cTile.point.hashCode());
 		iter.remove();
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
-		System.out.println("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
+		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
 		decreaseSpaceUsed(numFragmentsCached);
 		return numFragmentsCached;
 	}
@@ -463,7 +464,7 @@ public class Cache {
 			System.err.println("Memory size altered from Prediction");
 		}
 
-		System.out.println("Updated Memory because of Prediction "+this.queue);
-		System.out.println("Memory Size because of Prediction "+this.sizeBeingUsed());
+		Util.debug("Updated Memory because of Prediction "+this.queue);
+		Util.debug("Memory Size because of Prediction "+this.sizeBeingUsed());
 	}
 }

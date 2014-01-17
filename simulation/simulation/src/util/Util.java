@@ -2,6 +2,8 @@ package util;
 
 import java.util.Vector;
 
+import static sync.simulation.Config.DEBUG;
+
 public class Util {
 	public static double average(Vector<Integer> vec){
 		double sum=0;
@@ -18,5 +20,15 @@ public class Util {
 			sum += Math.pow(vec.get(i)-avg,2);
 		}
 		return sum/((1.0*vec.size())+1);
+	}
+	
+	public static void debug(String text,boolean force){
+		if (DEBUG || force){
+			System.out.println(text);
+		}
+	}
+	
+	public static void debug(String text){
+		debug(text,false);
 	}
 }

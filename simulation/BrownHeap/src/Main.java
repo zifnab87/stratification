@@ -61,7 +61,7 @@ public class Main {
 		
 		
 		for (int i=1; i<500; i++){
-			probPappouv2(i);
+			probPappou(i);
 		}
 		
 //		for (int heapSize=0; heapSize<=10000; heapSize++){
@@ -172,11 +172,11 @@ public class Main {
 				System.out.println(2*n+"AAA");
 			}*/
 			
-				if (output){
+				//if (output){
 					
 					if (numOfCards==count){
 						//http://oeis.org/A163777 Archimedes Spiral
-						//System.out.println("sameNumOf Cards with iterations:"+numOfCards+":("+count+")");
+						System.out.println("sameNumOf Cards with iterations:"+numOfCards+":("+count+")");
 						printed = true;
 					}
 					if (isTriangularNum(numOfCards)){
@@ -200,9 +200,9 @@ public class Main {
 					}
 					
 					
-				}
+				//}
 				//if (!printed){
-					System.out.println(numOfCards+":("+count+")");
+					//System.out.println(numOfCards+":("+count+")");
 				//}
 			//}
 			if(!map.containsKey(count)){

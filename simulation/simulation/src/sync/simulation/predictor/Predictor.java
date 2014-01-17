@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import sync.simulation.Point;
+import sync.simulation.Run;
 import sync.simulation.Tile;
 import sync.simulation.Viewport;
 import sync.simulation.events.UserMove;
@@ -21,11 +22,17 @@ import static sync.simulation.Config.DISTRIBUTION;
 
 public class Predictor {
 	
+	public Run run;
+	
+	public Predictor(Run run){
+		this.run = run;
+	}
+	
 	//public final static float[] LOD_INTERVALS = lodIntervals(FRAGMENTS_PER_TILE);
-	public static Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
+	public  Map<Integer,Double> likelihoods = new HashMap<Integer, Double>();
 	
 	
-	private static HashMap<Integer,Node> createPredictorTree(Node node,int totalWaves){
+	private  HashMap<Integer,Node> createPredictorTree(Node node,int totalWaves){
 		node.probability = 1d;
 		LinkedList<Node> listNodes = createPredictorTreeHelper(node,1);
 		HashMap<Integer,Node> toReturn = new HashMap<Integer,Node>();
@@ -68,7 +75,7 @@ public class Predictor {
 	}
 	
 	
-	private static LinkedList<Node> createPredictorTreeHelper(Node node,int wave){
+	private  LinkedList<Node> createPredictorTreeHelper(Node node,int wave){
 		LinkedList<Node> input = new LinkedList<Node>();
 		input.add(node);
 		return createPredictorTreeHelper(input,wave);
@@ -76,7 +83,7 @@ public class Predictor {
 	
 	
 	
-	private static LinkedList<Node> deriveOrder(HashMap<Integer,Node> map ,int wave){
+	private  LinkedList<Node> deriveOrder(HashMap<Integer,Node> map ,int wave){
 		//filter all the other waves
 		Iterator<Integer> iter = map.keySet().iterator();
 		LinkedList<Node> list = new LinkedList<Node>();
@@ -94,7 +101,7 @@ public class Predictor {
 		return  list;
 	}
 	
-	private static Object[] deriveFragmentNumbers(LinkedList<Node> list,Integer previousFrames,Double previousProb){
+	private  Object[] deriveFragmentNumbers(LinkedList<Node> list,Integer previousFrames,Double previousProb){
 		if (previousFrames==null){
 			previousFrames = 8;
 		}
@@ -110,6 +117,7 @@ public class Predictor {
 			else {
 				previousFrames = Math.min((int) Math.ceil((node.probability/previousProb)*previousFrames),FRAGMENTS_PER_TILE);
 			}
+			previousFrames = 8;
 			//System.out.println(previousFrames);
 			if (previousFrames>0){
 				previousProb = node.probability;
@@ -130,13 +138,13 @@ public class Predictor {
 	}
 
 	
-	public static Object[] preparePrefetching(Node node,int waveNeeded,int maxWaveNum,Integer previousFrames,Double previousProb){
+	public Object[] preparePrefetching(Node node,int waveNeeded,int maxWaveNum,Integer previousFrames,Double previousProb){
 		
 		assert(waveNeeded<=maxWaveNum);
 		node.probability = 1.0; //root
-		HashMap<Integer,Node> list = Predictor.createPredictorTree(node,maxWaveNum); 
-		LinkedList<Node> orderedWave = Predictor.deriveOrder(list,waveNeeded);
-		return Predictor.deriveFragmentNumbers(orderedWave, previousFrames, previousProb);
+		HashMap<Integer,Node> list = createPredictorTree(node,maxWaveNum); 
+		LinkedList<Node> orderedWave = deriveOrder(list,waveNeeded);
+		return deriveFragmentNumbers(orderedWave, previousFrames, previousProb);
 		//Vector<Node> fragmNums = ((Vector<Node>)Predictor.deriveFragmentNumbers(orderedWave, previousFrames, previousProb)[0]);
 		
 	}
@@ -182,9 +190,9 @@ public class Predictor {
 	
 	
 	
-	public static UserMove nextMoveFromWorkload(UserMove previousMove,Vector<String> moves){
+	public UserMove nextMoveFromWorkload(UserMove previousMove,Vector<String> moves){
 		if (previousMove == null){
-			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null));
+			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null),previousMove.run);
 		}
 		String move = moves.remove(0);
 		return  previousMove.nextMove(move);			
@@ -193,9 +201,9 @@ public class Predictor {
 
 	
 	
-	public static UserMove nextMove(Viewport viewport){
+	public UserMove nextMove(Viewport viewport){
 		if (viewport == null){
-			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null));
+			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null),this.run);
 		}
 		
 		double up = DISTRIBUTION.up;
@@ -204,16 +212,16 @@ public class Predictor {
 		double right = DISTRIBUTION.right;
 		double random = Math.random();
 		if (random<=up){
-			return new UserMove(viewport).goUp();
+			return new UserMove(viewport,this.run).goUp();
 		}
 		else if (random>up && random<=up+right){
-			return new UserMove(viewport).goRight();
+			return new UserMove(viewport,this.run).goRight();
 		}
 		else if (random>up+right && random<=up+right+down){
-			return new UserMove(viewport).goDown();
+			return new UserMove(viewport,this.run).goDown();
 		}
 		else {
-			return new UserMove(viewport).goLeft();
+			return new UserMove(viewport,this.run).goLeft();
 		}
 	}
 	

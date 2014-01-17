@@ -39,7 +39,7 @@ public class Viewport {
 		this.lowerLeft = new Point(upperLeft.y + height-1, upperLeft.x);
 		//previousCenter = this.center;
 		this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
-		
+		 
 		this.resultOfMovement = resultOfMovement;
 		//System.out.println("upperLeft:"+upperLeft);
 		//System.out.println(center.y+"!!!"+center.x);

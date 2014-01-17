@@ -4,7 +4,7 @@ import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.SKIP_PREDICTIONS;
-import static sync.simulation.Config.debug;
+import static sync.simulation.Config.DEBUG;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -17,12 +17,14 @@ import sync.simulation.CachedTile;
 import sync.simulation.Database;
 import sync.simulation.Main;
 import sync.simulation.Point;
+import sync.simulation.Run;
 import sync.simulation.Tile;
 import sync.simulation.Viewport;
 import sync.simulation.predictor.Node;
 //import static sync.simulation.Config.PREFETCH;
 import sync.simulation.predictor.Predictor;
 import sync.simulation.predictor.Tuple;
+import util.Util;
 import static sync.simulation.Config.THINK_TIME;
 
 public class UserMove {
@@ -33,20 +35,19 @@ public class UserMove {
 	public int cacheHits = 0;
 	public int cacheMisses = 0;
 	
-	public static int totalCacheMisses = 0;
-	public static int totalCacheHits = 0;
+
 	public int cacheMissesDuringFetch = 0;
 	public double latencyDuringFetch = 0;
-	public static int totalCacheMissesDuringFetch = 0;
-	public static double totalLatencyDuringFetch = 0;
 	
-	public static int totoalMoves = 0;
 	public int thinkTime = THINK_TIME;
 	
+	public Run run;
 	
-	public static Vector<Integer> misses = new Vector<Integer>();
 	
-	public UserMove(Viewport viewport){
+	
+	
+	public UserMove(Viewport viewport,Run run){
+		this.run = run;
 		this.upperLeft = viewport.upperLeft;
 		this.viewport = viewport;
 		this.movementType = viewport.resultOfMovement;
@@ -103,7 +104,7 @@ public class UserMove {
 						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
 					}
 					
-					//System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
+					//Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
 						return ;
 					}
@@ -164,7 +165,7 @@ public class UserMove {
 						int fragmCount = fragmentsToBePrefetched.size();
 						int firstFragment = fragmentsToBePrefetched.get(0);
 						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-						System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
+						Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
 						if (availThinkTime-fragmentsToBePrefetched.size()<0){
 							this.thinkTime = availThinkTime;
 							return ;
@@ -181,7 +182,7 @@ public class UserMove {
 						
 					}
 					else {// cachedLOD > LOD
-						System.err.println("hhhmmm");
+						//System.err.println("hhhmmm");
 						//that many were needed and we had even more in the cache
 						/*for (int i=1; i<LOD; i++){
 							Main.cache.fetchFragmentOfTile(i,  new Point(key.y,key.x), this);
@@ -200,7 +201,7 @@ public class UserMove {
 					int fragmCount = fragmentsToBePrefetched.size();
 					int firstFragment = fragmentsToBePrefetched.get(0);
 					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-					System.out.println(availThinkTime+"-"+fragmentsToBePrefetched.size());
+					Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
 					if (availThinkTime-fragmentsToBePrefetched.size()<0){
 						this.thinkTime = availThinkTime;
 						return ;
@@ -225,7 +226,7 @@ public class UserMove {
 			
 			if (prefetched){
 			
-				System.out.println("prefetched!"+point);	
+				Util.debug("prefetched!"+point);	
 			}
 			
 			
@@ -252,7 +253,7 @@ public class UserMove {
 					tile.carryingProbability = 1.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
-					UserMove.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
+					this.run.totalCacheMissesDuringFetch+=FRAGMENTS_PER_TILE;
 				}
 				//if tile partially exists request missing fragments
 				
@@ -267,7 +268,7 @@ public class UserMove {
 					int misses = (FRAGMENTS_PER_TILE-cachedPartialTile.getCachedFragmentsNum());
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch += misses;
-					UserMove.totalCacheMissesDuringFetch += misses;
+					this.run.totalCacheMissesDuringFetch += misses;
 				}
 				else { // tileExistsAndFull == true
 					Main.cache.fetchTile(index, this);
@@ -306,26 +307,26 @@ public class UserMove {
 	public UserMove goLeft(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
 		//System.out.println("left");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"),this.run);
 	}
 	
 	public UserMove goRight(){
 		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
 		//System.out.println("right");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"),this.run);
 	}
 	
 	public UserMove goDown(){
 		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
 		//System.out.println("down");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"),this.run);
 	}
 
 	public UserMove goUp(){
 		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
 		//System.out.println("try" + newUpperLeft);
 		//System.out.println("up");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"));
+		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"),this.run);
 	}
 	
 	
