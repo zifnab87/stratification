@@ -4,6 +4,7 @@ import java.util.Vector;
 
 public class AverageRun {
 	public double totalCacheMissesDuringFetch = 0;
+	public double totalCacheHitsDuringFetch = 0;
 	public double totalLatencyDuringFetch = 0;
 	public double totalCacheMisses = 0;
 	public double totalCacheHits = 0;
@@ -23,7 +24,7 @@ public class AverageRun {
 			if (runs.get(i).totalLatencyDuringFetch > maxLatency){
 				maxLatency = runs.get(i).totalLatencyDuringFetch;
 			}
-			
+			totalCacheHitsDuringFetch+=runs.get(i).totalCacheHitsDuringFetch;
 			totalCacheMissesDuringFetch+=runs.get(i).totalCacheMissesDuringFetch;
 			totalLatencyDuringFetch+=runs.get(i).totalLatencyDuringFetch;
 			totalCacheMisses+=runs.get(i).totalCacheMisses;
@@ -32,7 +33,7 @@ public class AverageRun {
 			
 			
 		}
-		
+		totalCacheHitsDuringFetch = totalCacheHitsDuringFetch/size*1.0d;
 		totalCacheMissesDuringFetch = totalCacheMissesDuringFetch/size*1.0d;
 		totalLatencyDuringFetch = totalLatencyDuringFetch/size*1.0d;
 		totalCacheMisses = totalCacheMisses/size*1.0d;

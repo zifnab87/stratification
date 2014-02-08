@@ -110,6 +110,26 @@ public class CachedTile extends Tile {
 	public static Comparator<CachedTile> probabilityComparator = new Comparator<CachedTile>(){
 		@Override
 		public int compare(CachedTile t1, CachedTile t2) {
+			//only distance
+//			if (t1.distance < t2.distance ) {
+//		    	return 1;
+//		    }
+//		    else if (t1.distance > t2.distance) {
+//		    	return -1;
+//		    }
+//		    else if (t1.distance == t2.distance && t1.id < t2.id)
+//		    {
+//		    	return -1;
+//		    }
+//		    else if (t1.distance == t2.distance && t1.id > t2.id)
+//		    {
+//		    	return 1;
+//		    }
+//		    else {
+//		    	return 0;
+//		    }
+//			
+			//probability and distance
 		    if (t1.probability < t2.probability ){
 		    	return -1;
 		    }

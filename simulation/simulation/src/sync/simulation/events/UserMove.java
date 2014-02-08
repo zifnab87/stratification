@@ -5,11 +5,13 @@ import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.SKIP_PREDICTIONS;
 import static sync.simulation.Config.DEBUG;
+import static sync.simulation.Config.USER_THINK_DISTR;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
 
 import sync.simulation.Cache;
@@ -36,7 +38,8 @@ public class UserMove {
 	public int cacheMisses = 0;
 	
 
-	public int cacheMissesDuringFetch = 0;
+	public double cacheMissesDuringFetch = 0;
+	public int cacheHitsDuringFetch = 0;
 	public double latencyDuringFetch = 0;
 	
 	public int thinkTime = THINK_TIME;
@@ -44,6 +47,23 @@ public class UserMove {
 	public Run run;
 	
 	
+	
+	
+	public static int nextFromDistribution(Random rand){
+		if (USER_THINK_DISTR.equalsIgnoreCase("Gaussian")){
+			double think = rand.nextGaussian()*5.33d + 16;
+			return (int)Math.floor(think);
+		}
+		else if(USER_THINK_DISTR.equalsIgnoreCase("NegativeExponential")){
+			double lambda = 0.2;
+			double low = 1;
+			double high = 32;
+			double U = Math.random();
+			double think = -Math.log(Math.exp(-lambda*low) - (Math.exp(-lambda*low) - Math.exp(-lambda*high)) * U) / lambda;
+			return (int)think;
+		}
+		return 1;
+	}
 	
 	
 	public UserMove(Viewport viewport,Run run){
@@ -264,14 +284,18 @@ public class UserMove {
 					Main.cache.fetchTile(index, this);
 					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,FRAGMENTS_PER_TILE,this);
 					tile.carryingProbability = 1.0d; // carry it to the cache
-					
-					int misses = (FRAGMENTS_PER_TILE-cachedPartialTile.getCachedFragmentsNum());
+					int cached = cachedPartialTile.getCachedFragmentsNum();
+					int misses = (FRAGMENTS_PER_TILE-cached);
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,FRAGMENTS_PER_TILE);
 					this.cacheMissesDuringFetch += misses;
 					this.run.totalCacheMissesDuringFetch += misses;
+					this.cacheHitsDuringFetch += cached;
+					this.run.totalCacheHitsDuringFetch += cached;
 				}
 				else { // tileExistsAndFull == true
 					Main.cache.fetchTile(index, this);
+					this.cacheHitsDuringFetch+=FRAGMENTS_PER_TILE;
+					this.run.totalCacheHitsDuringFetch+=FRAGMENTS_PER_TILE;
 				}
 				
 			}

@@ -5,7 +5,7 @@ import java.util.Vector;
 import static sync.simulation.Config.DEBUG;
 
 public class Util {
-	public static double average(Vector<Integer> vec){
+	public static double average(Vector<Double> vec){
 		double sum=0;
 		for (int i=0; i<vec.size(); i++){
 			sum += vec.get(i);
@@ -13,7 +13,7 @@ public class Util {
 		return sum/(1.0*vec.size());
 	}
 	
-	public static double variance(Vector<Integer> vec){
+	public static double variance(Vector<Double> vec){
 		double avg = average(vec);
 		double sum=0;
 		for (int i=0; i<vec.size(); i++){

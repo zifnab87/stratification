@@ -1,7 +1,7 @@
 package sync.simulation;
 
-import static simulation.Config.CACHE_SIZE;
-import static simulation.Config.FRAGMENTS_PER_TILE;
+import static sync.simulation.Config.CACHE_SIZE;
+import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.FRAGMENT_SIZE;
 
 import java.util.Collections;
