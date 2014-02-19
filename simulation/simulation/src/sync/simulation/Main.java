@@ -10,6 +10,7 @@ import static sync.simulation.Config.CACHE_SIZE;
 import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.RUNS;
+import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
 
 import java.sql.SQLException;
 import java.util.Random;
@@ -65,12 +66,14 @@ public class Main {
 		Random rand = new Random();
 			
 			//THINK_TIME = j;	
-		for (int k=0; k<=1; k++){
+		for (int k=1; k<=1; k++){
 			if (k==0){
 				FRAGMENT = true;
+				CONTIG_FRAGM_IN_SINGLE_QUERY = false;
 			}
 			else {
 				FRAGMENT = false;
+				CONTIG_FRAGM_IN_SINGLE_QUERY = true;
 			}
 			Vector<Run> runs = new Vector<Run>();
 			for (int i=0; i<=RUNS+5; i++){

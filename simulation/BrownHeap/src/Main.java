@@ -59,10 +59,16 @@ public class Main {
 		//BrownHeap.print(root);
 	
 		
+		for (int i=1; i<1000; i++){
+			if (Math.pow(i,4) % 30 == 1 && !isPrime(i)){
+				System.out.println(i);
+			}
+		}
 		
+		/*
 		for (int i=1; i<500; i++){
 			probPappou(i);
-		}
+		}*/
 		
 //		for (int heapSize=0; heapSize<=10000; heapSize++){
 //			for (int i=0; i<heapSize; i++){
