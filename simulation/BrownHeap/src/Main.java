@@ -59,16 +59,16 @@ public class Main {
 		//BrownHeap.print(root);
 	
 		
-		for (int i=1; i<1000; i++){
-			if (Math.pow(i,4) % 30 == 1 && !isPrime(i)){
-				System.out.println(i);
-			}
-		}
+//		for (int i=1; i<1000; i++){
+//			if (Math.pow(i,4) % 30 == 1 && !isPrime(i)){
+//				System.out.println(i);
+//			}
+//		}
 		
-		/*
+		
 		for (int i=1; i<500; i++){
 			probPappou(i);
-		}*/
+		}
 		
 //		for (int heapSize=0; heapSize<=10000; heapSize++){
 //			for (int i=0; i<heapSize; i++){
@@ -186,30 +186,30 @@ public class Main {
 						printed = true;
 					}
 					if (isTriangularNum(numOfCards)){
-						//System.out.println("Triangular Number:"+numOfCards+":("+count+")");
+						System.out.println("Triangular Number:"+numOfCards+":("+count+")");
 						printed = true;
 					}
 					if (isPowerOfTwo(numOfCards)){
-						//System.out.println("Power of two Number:"+numOfCards+":("+count+")");
+						System.out.println("Power of two Number:"+numOfCards+":("+count+")");
 						printed = true;
 					}
 					if (isPrime(numOfCards)){
-						//System.out.println("Prime Number:"+numOfCards+":("+count+")");
+						System.out.println("Prime Number:"+numOfCards+":("+count+")");
 						printed = true;
 					}
 					if (isPerfectSquare(numOfCards)){
-						//System.out.println("Is Perfect Square:"+numOfCards+":("+count+")");
+						System.out.println("Is Perfect Square:"+numOfCards+":("+count+")");
 						printed = true;
 					}
 					if (!printed){
-						//System.out.println("Regular Number:"+numOfCards+":("+count+")");
+						System.out.println("Regular Number:"+numOfCards+":("+count+")");
 					}
 					
 					
 				//}
-				//if (!printed){
-					//System.out.println(numOfCards+":("+count+")");
-				//}
+				if (!printed){
+					System.out.println(numOfCards+":("+count+")");
+				}
 			//}
 			if(!map.containsKey(count)){
 				map.put(count, 1);

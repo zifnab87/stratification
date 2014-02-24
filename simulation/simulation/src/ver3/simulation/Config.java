@@ -54,7 +54,7 @@ public class Config {
 	//========== TILE ======================================================
 	public  static int TILE_WIDTH = 32; //256
 	public  static int TILE_HEIGHT = 32; //256
-	public  static int FRAGMENTS_PER_TILE = 16;
+	public  static int FRAGMENTS_PER_TILE = 8;
 	public  static int COLORS = 3;
 	
 	//========== FRAGMENT ===================================================
@@ -88,7 +88,6 @@ public class Config {
 	
 	public  static int EXPERIMENT_TIME = 60; //seconds*/
 	
-
 	
 	
 	

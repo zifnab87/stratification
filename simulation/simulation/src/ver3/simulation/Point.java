@@ -20,7 +20,7 @@ public class Point {
 			this.x = DATABASE_WIDTH-1;
 		}
 		else {
-			this.x = 0;
+			this.x = x;
 		}
 		if (y < 0) {
 			this.y = 0;
@@ -29,7 +29,7 @@ public class Point {
 			this.y = DATABASE_WIDTH-1;
 		}
 		else {
-			this.y =0;
+			this.y = y;
 		}
 		this.id = (this.y+"-"+this.x).hashCode();
 		
@@ -66,19 +66,19 @@ public class Point {
 	}
 	
 	public Point goLeft(){
-		return new Point(this.y,this.x-1);
+		return Database.points(this.y,this.x-1);
 	}
 	
 	public Point goRight(){
-		return new Point(this.y,this.x+1);
+		return Database.points(this.y,this.x+1);
 	}
 	
 	public Point goDown(){
-		return new Point(this.y+1,this.x);
+		return Database.points(this.y+1,this.x);
 	}
 
 	public Point goUp(){
-		return new Point(this.y-1,this.x);
+		return Database.points(this.y-1,this.x);
 	}
 	
 	
@@ -86,6 +86,8 @@ public class Point {
 		double dist = Math.sqrt(Math.pow(a.y-b.y,2)+Math.pow(a.x-b.x,2));
 		return dist;
 	}
+	
+	
 	
 	/*public Node createNode(){
 		return new Node(this.y,this.x);

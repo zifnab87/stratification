@@ -7,7 +7,22 @@ import ver3.simulation.events.UserMove;
 import static ver3.simulation.Config.DISTANCE_WEIGHT_FACTOR;
 import static ver3.simulation.Config.IMPORTANCE_WEIGHT_FACTOR;
 import static ver3.simulation.Config.JUMP_WEIGHT_FACTOR;
+import static ver3.simulation.Config.FRAGMENTS_PER_TILE;
 public class TileOverall {
+	
+	
+	public int jumpToCounts;
+	public int[] visitResolutons = new int[FRAGMENTS_PER_TILE+1];
+	public int visitsCounts;
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public double jumpImportance;
 	public double zoomImportance;
 	public double totalImportance;
@@ -20,7 +35,7 @@ public class TileOverall {
 	public void updateImportance(UserMove currentPosition){
 		
 		double sum = DISTANCE_WEIGHT_FACTOR + IMPORTANCE_WEIGHT_FACTOR + JUMP_WEIGHT_FACTOR;
-		double distance = Point.distance(this.point, currentPosition.upperLeft);
+		double distance = Point.distance(this.point, currentPosition.point);
 		
 		this.totalImportance = (DISTANCE_WEIGHT_FACTOR*distance + 
 			   IMPORTANCE_WEIGHT_FACTOR*this.zoomImportance +

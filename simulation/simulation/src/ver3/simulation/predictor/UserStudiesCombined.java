@@ -14,7 +14,7 @@ public class UserStudiesCombined {
 	public UserStudiesCombined(){
 		for (int y=0; y<tiles.length; y++){
 			for (int x=0; x<tiles[0].length; x++){
-				Point point = Database.points[y][x];
+				Point point = Database.points(y,x);
 				tiles[y][x] = new TileOverall(point);
 				//extra information in that TileOverall
 			}
