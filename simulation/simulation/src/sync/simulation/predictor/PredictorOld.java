@@ -153,7 +153,7 @@ public class PredictorOld {
 //		double rightLikelihood = 0.25;
 		
 		//int maxDistance = 1;
-		Node root = new Node(null,move.upperLeft.y,move.upperLeft.x,1.0d);
+		Node root = new Node(null,move.point.y,move.point.x,1.0d);
 		LinkedList<Node> list = new LinkedList<Node>();
 		LinkedList<Node> toReturn = new LinkedList<Node>();
 		list.addLast(root);

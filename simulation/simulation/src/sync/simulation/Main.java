@@ -136,7 +136,7 @@ public class Main {
 					userMove.run.totalMoves+=1;
 					
 					Util.debug("Memory before Move:"+Main.cache.getQueue());
-					Node currentNode = userMove.viewport.upperLeft.createNode();
+					Node currentNode = null;//userMove.viewport.upperLeft.createNode();
 					Util.debug("Current Position we just moved: "+currentNode.point);
 					
 					

@@ -7,23 +7,50 @@ import java.sql.Statement;
 import java.sql.Connection;
 
 import sync.simulation.events.UserMove;
+import sync.simulation.regions.Region;
 
 import sync.simulation.Point;
 import sync.simulation.Tile;
 import sync.simulation.Viewport;
+import util.Util;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.FRAGMENT_SIZE;
 import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
-public class Database {
+import static sync.simulation.Config.DATABASE_WIDTH;
+public class Database extends Region {
 	//public Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	public static Connection conn;
 	public Viewport viewport;
+	public static Point[][] points = new Point[DATABASE_WIDTH][DATABASE_WIDTH];
 	
+	public int width = DATABASE_WIDTH;
+	public int height = DATABASE_WIDTH;
 	
 	
 	
 	public Database(){
+		
+		for (int y=0; y<points.length; y++){
+			for (int x=0; x<points[0].length; x++){
+				points[y][x] = new Point(y,x);
+			}
+		}
+
+		this.upperLeft = points(0,0);
+
+	}
+	
+	public Point randomPoint(){
+		int ymin = upperLeft.y;
+		int xmin = upperLeft.x;
+		int ymax = ymin + (height - 1);
+		int xmax = xmin + (width - 1);
+		
+		int yrand = Util.randInt(ymin,ymax);
+		int xrand = Util.randInt(xmin,xmax);
+		Point point = Database.points(yrand,xrand);
+		return point;
 		
 	}
 	
@@ -274,6 +301,24 @@ public class Database {
 		else {
 			return getTileWithFragmentRange(index, firstFragment, lastFragment,userMove);
 		}
+	}
+	
+	
+	public static Point points(int y,int x){
+		if (x < 0) {
+			x = 0;
+		}
+		else if(x > DATABASE_WIDTH-1){
+			x = DATABASE_WIDTH-1;
+		}
+		if (y < 0) {
+			y = 0;
+		}
+		else if(y > DATABASE_WIDTH-1){
+			y = DATABASE_WIDTH-1;
+		}
+
+		return points[y][x];
 	}
 	
 	

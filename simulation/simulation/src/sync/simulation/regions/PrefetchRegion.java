@@ -1,14 +1,12 @@
-package ver3.simulation.regions;
+package sync.simulation.regions;
 
 import java.util.TreeSet;
 
 import util.Util;
-import ver3.simulation.CachedTile;
-import ver3.simulation.Database;
-import ver3.simulation.Point;
-import ver3.simulation.predictor.TileOverall;
-import ver3.simulation.predictor.UserStudiesCombined;
-import static ver3.simulation.Config.PREFETCH_REGION_WIDTH;
+import sync.simulation.CachedTile;
+import sync.simulation.Database;
+import sync.simulation.Point;
+import static sync.simulation.Config.PREFETCH_REGION_WIDTH;
 
 public class PrefetchRegion extends Region{
 

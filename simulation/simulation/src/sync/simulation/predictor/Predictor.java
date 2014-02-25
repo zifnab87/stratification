@@ -195,7 +195,7 @@ public class Predictor {
 			return new UserMove(new Viewport(VIEWPORT_HEIGHT,VIEWPORT_WIDTH,UPPER_LEFT_STARTING_POINT,null),previousMove.run);
 		}
 		String move = moves.remove(0);
-		return  previousMove.nextMove(move);			
+		return  previousMove.go(move);			
 	}
 	
 
@@ -212,16 +212,16 @@ public class Predictor {
 		double right = DISTRIBUTION.right;
 		double random = Math.random();
 		if (random<=up){
-			return new UserMove(viewport,this.run).goUp();
+			return new UserMove(viewport,this.run).go("up");
 		}
 		else if (random>up && random<=up+right){
-			return new UserMove(viewport,this.run).goRight();
+			return new UserMove(viewport,this.run).go("right");
 		}
 		else if (random>up+right && random<=up+right+down){
-			return new UserMove(viewport,this.run).goDown();
+			return new UserMove(viewport,this.run).go("down");
 		}
 		else {
-			return new UserMove(viewport,this.run).goLeft();
+			return new UserMove(viewport,this.run).go("left");
 		}
 	}
 	

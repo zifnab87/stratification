@@ -1,18 +1,18 @@
-package ver3.simulation.predictor;
+package sync.simulation.regions;
 
 import java.util.Comparator;
 
-import ver3.simulation.Point;
-import ver3.simulation.events.UserMove;
-import static ver3.simulation.Config.DISTANCE_WEIGHT_FACTOR;
-import static ver3.simulation.Config.IMPORTANCE_WEIGHT_FACTOR;
-import static ver3.simulation.Config.JUMP_WEIGHT_FACTOR;
-import static ver3.simulation.Config.FRAGMENTS_PER_TILE;
+import sync.simulation.Point;
+import sync.simulation.events.UserMove;
+import static sync.simulation.Config.DISTANCE_WEIGHT_FACTOR;
+import static sync.simulation.Config.IMPORTANCE_WEIGHT_FACTOR;
+import static sync.simulation.Config.JUMP_WEIGHT_FACTOR;
+import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 public class TileOverall {
 	
-	
+	public final Point point;
 	public int jumpToCounts;
-	public int[] visitResolutons = new int[FRAGMENTS_PER_TILE+1];
+	public double[] visitResolutions = new double[FRAGMENTS_PER_TILE+1];
 	public int visitsCounts;
 	
 	
@@ -26,7 +26,16 @@ public class TileOverall {
 	public double jumpImportance;
 	public double zoomImportance;
 	public double totalImportance;
-	public final Point point;
+	
+	
+	public TileOverall(Point point,double[] visitResolutions, int jumpToCounts,int visitsCounts){
+		this.point = point;
+		for (int i=0; i<this.visitResolutions.length;i++){
+			this.visitResolutions[i] = visitResolutions[i];
+		}
+		this.jumpToCounts = jumpToCounts;
+		this.visitsCounts = visitsCounts;
+	}
 	
 	public TileOverall(Point point){
 		this.point = point;

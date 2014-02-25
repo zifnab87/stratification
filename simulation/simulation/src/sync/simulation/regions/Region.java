@@ -1,10 +1,9 @@
-package ver3.simulation.regions;
+package sync.simulation.regions;
 
 
 import util.Util;
-import ver3.simulation.Database;
-import ver3.simulation.Point;
-import ver3.simulation.predictor.UserStudiesCombined;
+import sync.simulation.Database;
+import sync.simulation.Point;
 
 public abstract class Region { // region of points
 	public int width;
@@ -17,7 +16,6 @@ public abstract class Region { // region of points
 	public Point center;*/
 	//public String resultOfMovement;
 	
-	abstract public Point randomPoint();
 	
 	public boolean contains(Point point){
 		return contains(point.y,point.x);

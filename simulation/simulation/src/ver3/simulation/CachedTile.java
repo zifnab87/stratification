@@ -2,10 +2,10 @@ package ver3.simulation;
 
 import java.util.Comparator;
 
+import sync.simulation.regions.TileOverall;
+import sync.simulation.regions.UserStudiesCombined;
 import ver3.simulation.CachedTile;
 import ver3.simulation.events.UserMove;
-import ver3.simulation.predictor.TileOverall;
-import ver3.simulation.predictor.UserStudiesCombined;
 
 public class CachedTile extends Tile {
 

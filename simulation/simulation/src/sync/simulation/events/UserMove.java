@@ -28,9 +28,25 @@ import sync.simulation.predictor.Predictor;
 import sync.simulation.predictor.Tuple;
 import util.Util;
 import static sync.simulation.Config.THINK_TIME;
+import static sync.simulation.Config.FRAGMENTS_PER_TILE;
+import static sync.simulation.Config.THINK_TIME;
 
 public class UserMove {
-	public Point  upperLeft;
+//	public Point  upperLeft;
+//	public Viewport viewport;
+//	public String movementType;
+//	
+//	public int cacheHits = 0;
+//	public int cacheMisses = 0;
+//	
+//
+//	public double cacheMissesDuringFetch = 0;
+//	public int cacheHitsDuringFetch = 0;
+//	public double latencyDuringFetch = 0;
+//	
+//	public int thinkTime = THINK_TIME;
+	
+	public Point  point;
 	public Viewport viewport;
 	public String movementType;
 	
@@ -43,6 +59,9 @@ public class UserMove {
 	public double latencyDuringFetch = 0;
 	
 	public int thinkTime = THINK_TIME;
+	
+	
+	public static int currentZoomLevel = 1;
 	
 	public Run run;
 	
@@ -68,7 +87,7 @@ public class UserMove {
 	
 	public UserMove(Viewport viewport,Run run){
 		this.run = run;
-		this.upperLeft = viewport.upperLeft;
+		this.point = viewport.upperLeft;
 		this.viewport = viewport;
 		this.movementType = viewport.resultOfMovement;
 	}
@@ -308,49 +327,64 @@ public class UserMove {
 	}
 	
 	
-	public UserMove nextMove(String move){
+	
+	
+	public UserMove(Point point){
+		this.point = point;
+	}
+	
+	
+	
+	public UserMove jumpTo(Point point){
+		return new UserMove(this.point);
+	}
+	
+	
+	public UserMove go(String move){
 		if (move.equals("up")){
-			return this.goUp();
+			System.out.println("up");
+			UserMove newU = new UserMove(this.point.goUp());
+			
+			return newU;
+			
 		}
 		else if (move.equals("right")){
-			return this.goRight();
+			return new UserMove(this.point.goRight());
 		}
 		else if (move.equals("down")){
-			return this.goDown();
+			return new UserMove(this.point.goDown());
 		}
 		else if (move.equals("left")){
-			return this.goLeft();
+			return new UserMove(this.point.goLeft());
+		}
+		else if (move.equals("zoomin")){
+			
+			currentZoomLevel+=1;
+			
+			if (currentZoomLevel>FRAGMENTS_PER_TILE){
+				currentZoomLevel = FRAGMENTS_PER_TILE;
+			}
+			return this;
+		}
+		else if (move.equals("zoomout")){
+			currentZoomLevel-=1;
+			
+			if (currentZoomLevel<1){
+				currentZoomLevel = 1;
+			}
+			return this;
+		}
+		else if(move.equals("zoommax")){
+			currentZoomLevel = FRAGMENTS_PER_TILE;
+			return this;
+		}
+		else if(move.equals("zoommin")){
+			currentZoomLevel = 1;
+			return this;
 		}
 		else {
-			
 			return null;
 		}
-	}
-	
-	
-	public UserMove goLeft(){
-		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x-1);
-		//System.out.println("left");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"left"),this.run);
-	}
-	
-	public UserMove goRight(){
-		Point newUpperLeft = new Point(this.upperLeft.y,this.upperLeft.x+1);
-		//System.out.println("right");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"right"),this.run);
-	}
-	
-	public UserMove goDown(){
-		Point newUpperLeft = new Point(this.upperLeft.y+1,this.upperLeft.x);
-		//System.out.println("down");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"down"),this.run);
-	}
-
-	public UserMove goUp(){
-		Point newUpperLeft = new Point(this.upperLeft.y-1,this.upperLeft.x);
-		//System.out.println("try" + newUpperLeft);
-		//System.out.println("up");
-		return new UserMove(new Viewport(this.viewport.height,this.viewport.width,newUpperLeft,"up"),this.run);
 	}
 	
 	

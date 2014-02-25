@@ -1,17 +1,17 @@
-package ver3.userstudysynthesizer;
+package sync.userstudysynthesizer;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
-import ver3.simulation.Database;
-import ver3.simulation.Point;
-import ver3.simulation.Viewport;
-import ver3.simulation.events.UserMove;
-import ver3.simulation.predictor.TileOverall;
-import ver3.simulation.predictor.UserStudiesCombined;
-import ver3.simulation.regions.JumpRegion;
-import static ver3.simulation.Config.DATABASE_WIDTH;
-import static ver3.simulation.Config.JUMP_REGION_WIDTH;
+import sync.simulation.regions.JumpRegion;
+import sync.simulation.regions.TileOverall;
+import sync.simulation.regions.UserStudiesCombined;
+import sync.simulation.Database;
+import sync.simulation.Point;
+import sync.simulation.Viewport;
+import sync.simulation.events.UserMove;
+import static sync.simulation.Config.DATABASE_WIDTH;
+import static sync.simulation.Config.JUMP_REGION_WIDTH;
 
 
 
@@ -41,8 +41,12 @@ public class UserStudySynthesizer {
 	
 	public static void updateCounts(UserMove current){
 		TileOverall currentTile = map.get(current.point.id);
-		currentTile.visitsCounts++;
-		currentTile.visitResolutons[UserMove.currentZoomLevel]++;
+		if (currentTile.visitsCounts<numOfUserStudies){
+			currentTile.visitsCounts++;
+		}
+		if (currentTile.visitResolutions[UserMove.currentZoomLevel]<numOfUserStudies){
+			currentTile.visitResolutions[UserMove.currentZoomLevel]++;
+		}
 		
 	}
 	
@@ -74,14 +78,14 @@ public class UserStudySynthesizer {
 		zoomMaxProbability =  zoomProbability * zoomMaxProbability;
 		zoomMinProbability =  zoomProbability * zoomMinProbability;
 		// Starting point
-		System.out.println(db.upperLeft);
+		//System.out.println(db.upperLeft);
 		//Viewport viewport = new Viewport(Database.points(0,0));
 		
 		
 		
 		for (int i=0; i<numOfUserStudies; i++){
 			UserMove current = new UserMove(db.randomPoint());
-			System.out.println(current.point+"");
+			//System.out.println(current.point+"");
 			for (int j=0; j<numOfMovesPerStudy; j++){
 				current = whatHappensNext(current);
 				//System.out.println(current.point);
@@ -104,14 +108,24 @@ public class UserStudySynthesizer {
 			//jump
 			JumpRegion jump = new JumpRegion(Database.points(current.point.y-JUMP_REGION_WIDTH/2,current.point.x-JUMP_REGION_WIDTH/2));
 			//System.out.println(Database.points(current.point.y-JUMP_REGION_WIDTH/2,current.point.x-JUMP_REGION_WIDTH/2)+"!!!");
-			Point jumpPoint = jump.randomPoint();
-			while (map.get(jumpPoint.id).jumpToCounts>100){
-				jumpPoint = jump.randomPoint(); // remove the jumps from the boundaries of db
-			}
+			Point jumpPoint = null;
+			TileOverall currentTile = null;
+			
+			jumpPoint = jump.randomPoint(); // remove the jumps from the boundaries of db
+			
 			current = current.jumpTo(jumpPoint);
+			currentTile = map.get(current.point.id);
+				
+			
+			
+			//current = current.jumpTo(jumpPoint);
 			updateCounts(current);
-			TileOverall currentTile = map.get(current.point.id);
-			currentTile.jumpToCounts++;
+			//TileOverall currentTile = map.get(current.point.id);
+			//System.out.println("bgika"+map.get(jumpPoint.id).jumpToCounts);
+			if (currentTile.jumpToCounts<60){
+				currentTile.jumpToCounts++;
+			}
+			
 		
 		}
 		if(rand>jumpProbability && rand<=jumpProbability+upProbability){
@@ -160,18 +174,46 @@ public class UserStudySynthesizer {
 		}
 		return current;
 	}
-	
-	
+	//process the resolutions to be cumulative percentiles
+	public static void process(){
+		Iterator<Integer> iter = map.keySet().iterator();
+		while (iter.hasNext()){
+			Integer key = iter.next();
+			TileOverall tile = map.get(key);
+			int sum=0;
+			for(int i=1; i<tile.visitResolutions.length; i++){
+				sum+=tile.visitResolutions[i];
+			}
+			if (sum!=0){
+				for(int i=1; i<tile.visitResolutions.length; i++){
+					tile.visitResolutions[i] = tile.visitResolutions[i]/(1.0*sum);
+				}
+				for(int i=2; i<tile.visitResolutions.length; i++){
+					tile.visitResolutions[i] = tile.visitResolutions[i-1]+tile.visitResolutions[i];
+				}
+			
+			}
+			
+		}
+	}
 	
 	public static void printUserStudies(){
+		process();
 		Iterator<Integer> iter = map.keySet().iterator();
 		while(iter.hasNext()){
 			Integer key = iter.next();
 			TileOverall tile = map.get(key);
-			for(int i=1; i<tile.visitResolutons.length; i++){
-				System.out.print("["+i+"]="+tile.visitResolutons[i]+",");
+			int y = tile.point.y;
+			int x = tile.point.x;
+			System.out.print("tiles["+y+"]["+x+"] = new TileOverall(Database.points("+y+","+x+"),new double[]{0,");
+			for(int i=1; i<tile.visitResolutions.length; i++){
+				System.out.print(tile.visitResolutions[i]);
+				if (i!=tile.visitResolutions.length-1){//not last
+					System.out.print(",");
+				}
+				
 			}
-			System.out.println(tile.jumpToCounts+","+tile.point);
+			System.out.println("},"+tile.jumpToCounts+","+tile.visitsCounts+");");
 		}
 		
 		
