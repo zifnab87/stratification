@@ -6,12 +6,12 @@ import sync.simulation.monitor.Distribution;
 public class Config {
 	
 	public static boolean DEBUG = false;
-	public  static int RUNS = 100;
+	public  static int RUNS = 50;
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================
 	public static int THINK_TIME = 32;
-	public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
+	//public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
 	//public static Distribution DISTRIBUTION = new Distribution(0.01,0.33,0.33,0.33);
 	//public static Distribution DISTRIBUTION = new Distribution(0.1,0.5,0.1,0.3);
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,0.5,0.25,0.25);
@@ -23,12 +23,12 @@ public class Config {
 	public static boolean FRAGMENT = true; 
 	public  static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static  int CACHE_SIZE = 128;
+	public static  int CACHE_SIZE = 5000;
 
 	//========== DATABASE =================================================
 	public static  int DATABASE_TILES_NUM = 625;//625;
 	public static  int DATABASE_WIDTH = 25;//25;
-	public static  boolean CONTIG_FRAGM_IN_SINGLE_QUERY = false;
+	public static  boolean CONTIG_FRAGM_IN_SINGLE_QUERY = true;
 	
 	//========== VIEWPORT ==================================================
 	

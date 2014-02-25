@@ -37,6 +37,24 @@ public class UserStudySynthesizer {
 	static double numOfMovesPerStudy = 1000;
 	
 	
+	public UserStudySynthesizer(){
+		for (int j=0; j<DATABASE_WIDTH; j++){
+			for (int i=0; i<DATABASE_WIDTH; i++){
+				Point point = Database.points(j,i);
+				map.put(point.id, new TileOverall(point));
+			}
+		}
+		// Prepare probabilities
+				upProbability = panProbability * upProbability;
+				downProbability = panProbability * downProbability;
+				leftProbability = panProbability * leftProbability;
+				rightProbability = panProbability * rightProbability;
+				
+				zoomInProbability = zoomProbability * zoomInProbability;
+				zoomOutProbability = zoomProbability * zoomOutProbability;
+				zoomMaxProbability =  zoomProbability * zoomMaxProbability;
+				zoomMinProbability =  zoomProbability * zoomMinProbability;
+	}
 	
 	
 	public static void updateCounts(UserMove current){
@@ -59,24 +77,10 @@ public class UserStudySynthesizer {
 		UserStudiesCombined usc = new UserStudiesCombined();
 		
 		
-		for (int j=0; j<DATABASE_WIDTH; j++){
-			for (int i=0; i<DATABASE_WIDTH; i++){
-				Point point = Database.points(j,i);
-				map.put(point.id, new TileOverall(point));
-			}
-		}
+		UserStudySynthesizer uss = new UserStudySynthesizer();
 		
 		
-		// Prepare probabilities
-		upProbability = panProbability * upProbability;
-		downProbability = panProbability * downProbability;
-		leftProbability = panProbability * leftProbability;
-		rightProbability = panProbability * rightProbability;
 		
-		zoomInProbability = zoomProbability * zoomInProbability;
-		zoomOutProbability = zoomProbability * zoomOutProbability;
-		zoomMaxProbability =  zoomProbability * zoomMaxProbability;
-		zoomMinProbability =  zoomProbability * zoomMinProbability;
 		// Starting point
 		//System.out.println(db.upperLeft);
 		//Viewport viewport = new Viewport(Database.points(0,0));
@@ -88,6 +92,7 @@ public class UserStudySynthesizer {
 			//System.out.println(current.point+"");
 			for (int j=0; j<numOfMovesPerStudy; j++){
 				current = whatHappensNext(current);
+				updateCounts(current);
 				//System.out.println(current.point);
 			}
 		}
@@ -112,65 +117,70 @@ public class UserStudySynthesizer {
 			TileOverall currentTile = null;
 			
 			jumpPoint = jump.randomPoint(); // remove the jumps from the boundaries of db
-			
+			UserMove previous = current;
 			current = current.jumpTo(jumpPoint);
 			currentTile = map.get(current.point.id);
 				
 			
 			
+			
 			//current = current.jumpTo(jumpPoint);
-			updateCounts(current);
+			
 			//TileOverall currentTile = map.get(current.point.id);
 			//System.out.println("bgika"+map.get(jumpPoint.id).jumpToCounts);
 			if (currentTile.jumpToCounts<60){
 				currentTile.jumpToCounts++;
 			}
+			else {
+				current = previous;
+			}
 			
 		
 		}
-		if(rand>jumpProbability && rand<=jumpProbability+upProbability){
+		else if(rand>jumpProbability && rand<=jumpProbability+upProbability){
 			//up
 			//System.out.println(current+"@@");
-			updateCounts(current);
+			current = current.go("up");
+			
 		}
 		else if(rand>jumpProbability+upProbability && rand<=jumpProbability+upProbability+downProbability){
 			//down
 			current = current.go("down");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability && rand<=jumpProbability+upProbability+downProbability+leftProbability){
 			//left
 			current = current.go("left");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability+leftProbability && rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability){
 			//right
 			current = current.go("right");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability 
 				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+zoomInProbability){
 			//zoom in 
 			current = current.go("zoomin");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability 
 				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+zoomInProbability+zoomOutProbability){
 			//zoom out; 
 			current = current.go("zoomout");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability
 				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability){
 			//zoom in max;
 			current = current.go("zoommax");
-			updateCounts(current);
+			
 		}
 		else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability
 				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability+zoomMinProbability){
 			//zoom out min;
 			current = current.go("zoommin");
-			updateCounts(current);
+			
 		}
 		return current;
 	}

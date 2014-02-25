@@ -282,8 +282,8 @@ public class UserMove {
 		Viewport viewport = this.viewport;
 		Point upperLeft = viewport.upperLeft;
 		Point lowerRight = viewport.lowerRight;
-		for (int y=upperLeft.y; y<=lowerRight.y; y++){
-			for (int x=upperLeft.x; x<=lowerRight.x; x++){
+		for (int y=upperLeft.y; y<=upperLeft.y+(viewport.height-1); y++){
+			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
 				Point index = new Point(y,x);
 				//if tile doesn't exist in cache
 				if (!Main.cache.tileExists(index)){
@@ -336,17 +336,13 @@ public class UserMove {
 	
 	
 	public UserMove jumpTo(Point point){
-		return new UserMove(this.point);
+		return new UserMove(point);
 	}
 	
 	
 	public UserMove go(String move){
 		if (move.equals("up")){
-			System.out.println("up");
-			UserMove newU = new UserMove(this.point.goUp());
-			
-			return newU;
-			
+			return new UserMove(this.point.goUp());
 		}
 		else if (move.equals("right")){
 			return new UserMove(this.point.goRight());
@@ -358,9 +354,7 @@ public class UserMove {
 			return new UserMove(this.point.goLeft());
 		}
 		else if (move.equals("zoomin")){
-			
 			currentZoomLevel+=1;
-			
 			if (currentZoomLevel>FRAGMENTS_PER_TILE){
 				currentZoomLevel = FRAGMENTS_PER_TILE;
 			}

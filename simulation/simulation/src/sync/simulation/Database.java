@@ -242,19 +242,19 @@ public class Database extends Region {
 			double latency = (System.nanoTime() - start)/1000000;
 			tile = new Tile(index,totalData);
 
-			if (latency>600d){
-				System.out.println("~~~~~~~~~~~~~~~~");
-				System.out.println(latency1+" msecs");
-				System.out.println(latency2+" msecs");
-				System.out.println(latency3+" msecs");
-				System.out.println(latency4+" msecs");
-				System.out.println("TRALALO "+latency+" msecs");
-				for (int i=0; i<totalData.length; i++){
-					System.out.println(totalData[i]);
-				}
-				System.out.println(query);
-				System.out.println("~~~~~~~~~~~~~~~~");
-			}
+//			if (latency>600d){
+//				System.out.println("~~~~~~~~~~~~~~~~");
+//				System.out.println(latency1+" msecs");
+//				System.out.println(latency2+" msecs");
+//				System.out.println(latency3+" msecs");
+//				System.out.println(latency4+" msecs");
+//				System.out.println("TRALALO "+latency+" msecs");
+//				for (int i=0; i<totalData.length; i++){
+//					System.out.println(totalData[i]);
+//				}
+//				System.out.println(query);
+//				System.out.println("~~~~~~~~~~~~~~~~");
+//			}
 			
 			/*else {
 				System.out.println(latency+" msecs");
