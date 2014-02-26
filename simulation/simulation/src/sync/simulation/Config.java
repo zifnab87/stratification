@@ -10,8 +10,8 @@ public class Config {
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================
-	public static int THINK_TIME = 32;
-	//public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
+	public static int THINK_TIME = 1024;
+	public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
 	//public static Distribution DISTRIBUTION = new Distribution(0.01,0.33,0.33,0.33);
 	//public static Distribution DISTRIBUTION = new Distribution(0.1,0.5,0.1,0.3);
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,0.5,0.25,0.25);
@@ -20,10 +20,10 @@ public class Config {
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,0.9,0.0,0.1);
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,1,0.0,0.0);
 	public static String USER_THINK_DISTR = "NegativeExponential";
-	public static boolean FRAGMENT = true; 
+	public static boolean FRAGMENT = false; 
 	public  static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static  int CACHE_SIZE = 5000;
+	public static  int CACHE_SIZE = 2048;
 
 	//========== DATABASE =================================================
 	public static  int DATABASE_TILES_NUM = 625;//625;
@@ -69,7 +69,7 @@ public class Config {
 	
 	public static boolean SKIP_PREDICTIONS = false;
 	public static double CUTOFF = 30; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 
-	public static int WAVES = 1;
+	public static int WAVES = 10;
 	// small numbers -> aggressive
 	
 	

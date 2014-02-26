@@ -3,6 +3,8 @@ package sync.simulation;
 
 import java.util.Vector;
 
+import sync.simulation.predictor.Node;
+
 import static sync.simulation.Config.DATABASE_WIDTH;
 
 public class Point {
@@ -84,9 +86,9 @@ public class Point {
 		return dist;
 	}
 	
-	/*public Node createNode(){
+	public Node createNode(){
 		return new Node(this.y,this.x);
-	}*/
+	}
 	
 	/*public Node createNode(){
 		return new Node(this.y,this.x);

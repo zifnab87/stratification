@@ -8,7 +8,7 @@ public class CachedTile extends Tile {
 
 	
 	public double probability;
-	public int distance;
+	public double distance;
 	
 	public int getCachedFragmentsNum(){
 		int count = 0;

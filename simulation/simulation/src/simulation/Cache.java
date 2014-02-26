@@ -326,19 +326,35 @@ public class Cache {
 		//System.out.println("I need"+fragmentsNeeded);
 		Iterator<CachedTile> iter = this.queue.iterator();
 		int evictedFragments = 0;
+		boolean prob1 = false;
+		boolean prob2 = false; 
 		while(iter.hasNext() && evictedFragments<fragmentsNeeded){
 			CachedTile lessLikelyTile = iter.next();
 			//if it is the same that we are currentlyPrefetching 
+			
 			if (lessLikelyTile.point.equals(currentPoint)){
-				System.err.println("ELEOS to idio");
+				
+				prob1 = true;
+				//continue;
 			}
 			CachedTile toBeCached = queueFind(currentPoint.hashCode());
 			if (toBeCached!=null){ //if already cached 
 				if (toBeCached.probability < lessLikelyTile.probability){  //and has less probability than the anything in the cache
-					System.err.println("ELEOS cache degradation");
-				
+					//System.err.println("ELEOS cache degradation");
+					prob2 = true;
+					//continue;
 				}
 			}
+			if (prob1){
+				System.err.println("ELEOS to idio");
+			}
+			if (prob2){
+				System.err.println("ELEOS cache degradation");
+			}
+			if (prob1 || prob2){
+				continue;
+			}
+			
 			int fragmentsEvicted = evictTile(lessLikelyTile,iter);
 			evictedFragments+=fragmentsEvicted;
 			

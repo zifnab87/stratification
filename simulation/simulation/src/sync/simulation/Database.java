@@ -200,7 +200,7 @@ public class Database extends Region {
 	}
 	
 	
-	private Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
+	public Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
 		
 		//Connection conn = null;
 		ResultSet results = null;
@@ -259,8 +259,10 @@ public class Database extends Region {
 			/*else {
 				System.out.println(latency+" msecs");
 			}*/
-			userMove.latencyDuringFetch+=latency;
-			userMove.run.totalLatencyDuringFetch+=latency;
+			if (userMove!=null){ //if null don't count latencies
+				userMove.latencyDuringFetch+=latency;
+				userMove.run.totalLatencyDuringFetch+=latency;
+			}
 	 
 		} catch (SQLException e) {
 			e.printStackTrace();

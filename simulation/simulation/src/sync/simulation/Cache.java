@@ -437,7 +437,7 @@ public class Cache {
 			else {
 				cTile.probability = 0.0d;
 			}
-			cTile.distance = Predictor.distance(cTile.point, currentPosition);
+			cTile.distance = Point.distance(cTile.point, currentPosition);
 			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
 				this.queue.add(cTile);
 			}

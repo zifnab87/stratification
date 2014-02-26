@@ -81,10 +81,11 @@ public class Main {
 				runs.add(run);
 			}
 			Random rand = new Random();
-			THINK_TIME = UserMove.nextFromDistribution(rand);
+			//THINK_TIME = UserMove.nextFromDistribution(rand);
 			UserMove current = new UserMove(db.randomPoint());
 			UserMove.currentZoomLevel = 1;
 			Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
+			Predictor predictor = new Predictor(run);
 		    for (int j=0; j<500; j++){ //moves per run	
 		    	current = UserStudySynthesizer.whatHappensNext(current);
 		    	current.run = run;
@@ -95,10 +96,13 @@ public class Main {
 				Util.debug("Memory before Move:"+Main.cache.getQueue());
 				Util.debug("Current Position we just moved: "+current.point);
 				current.viewportFetch();
+				//Main.cache.updateProbabilities(new Vector<Node>(),current.point);
+				//System.out.println(cache);
 				Util.debug("Memory after Fetch:"+Main.cache.getQueue());
 				Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 		    
 			   //PREDICTOR
+				
 				
 			
 				Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
@@ -107,13 +111,28 @@ public class Main {
 				
 				//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
 				
-				Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed(),true);
+				Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
 				if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
 					System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
 					System.err.println("Memory Inconsistency Error");
 					break;
 				}
 				Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+//					
+			
+				/*Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
+				current.run.misses.add(current.cacheMissesDuringFetch);
+				Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
+				
+				//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
+				
+				Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
+				if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
+					System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
+					System.err.println("Memory Inconsistency Error");
+					break;
+				}
+				Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");*/
 				
 				
 				
