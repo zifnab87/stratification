@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import sync.simulation.Cache;
@@ -26,6 +27,9 @@ import sync.simulation.predictor.Node;
 //import static sync.simulation.Config.PREFETCH;
 import sync.simulation.predictor.Predictor;
 import sync.simulation.predictor.Tuple;
+import sync.simulation.regions.JumpRegion;
+import sync.simulation.regions.Region;
+import sync.simulation.regions.TileOverall;
 import util.Util;
 import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
@@ -101,19 +105,27 @@ public class UserMove {
 		}
 	}*/
 	
-	public void prefetch(Vector<Node> toPrefetch){
-		if (toPrefetch.size()==0){
+	public void prefetch(JumpRegion region,Point current){
+		/*if (toPrefetch.size()==0){
 			return;
-		}
-		
-		Iterator<Node> iter = toPrefetch.iterator();
+		}*/
+		double start = System.currentTimeMillis();
+		TreeSet<TileOverall> toPrefetch = region.tree(current);
+		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
+		//System.out.println(availThinkTime);
 		while (iter.hasNext() && availThinkTime>0){
 			boolean prefetched  = false;
-			Node node = iter.next();
-			Point point = node.point;
+			TileOverall tileStatistic = iter.next();
+			Point point = tileStatistic.point;
 			int index = point.hashCode();
-			int fragmentsNeeded = node.fragmentsNeeded;
+			int fragmentsNeeded = 8;
+			if (FRAGMENT){
+				fragmentsNeeded = 6;
+			}
+			else {
+				fragmentsNeeded = 8;//tile.fragmentsNeeded;
+			}
 			//Vector<Integer> fragmentsToBePrefetched = null;
 			//index.LOD = LOD;
 			//System.out.println(LOD);
@@ -124,12 +136,12 @@ public class UserMove {
 				//System.out.println(Main.cache.tileExists(index));
 				//System.out.println(Main.cache.getTile(index).getFragmentNumber());
 			//}
-			
+			//System.out.println("bika"+point);
 			
 			
 			
 			//CHECK What is in the cache
-			double start = System.nanoTime();
+			
 			if (!Main.cache.tileExists(index)){
 				Tile tile = Main.db.getTileWithFragmentRange( point,1,fragmentsNeeded,null);
 				Main.cache.cacheTileWithFragmentRange(tile,1,fragmentsNeeded);
@@ -142,8 +154,9 @@ public class UserMove {
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
 				}
 			}
-			double end = System.nanoTime() - start;
-			availThinkTime -= 1000000*end; //msec
+			double end = (System.currentTimeMillis() - start);
+			//System.out.println(end);
+			availThinkTime -= end; //msec
 			
 			
 			
@@ -318,7 +331,7 @@ public class UserMove {
 				Point index = Database.points(y,x);
 				if (!Main.cache.tileExists(index)){
 					Tile tile = Main.db.fetchTile(index, this);
-					tile.carryingProbability = 1.0d; // carry it to the cache
+					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
 					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
@@ -329,7 +342,7 @@ public class UserMove {
 					//what was actually fetched to be viewed
 					Main.cache.fetchTile(index, this);
 					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
-					tile.carryingProbability = 1.0d; // carry it to the cache
+					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
@@ -423,8 +436,8 @@ public class UserMove {
 		}
 		else if (move.equals("zoomin")){
 			currentZoomLevel+=1;
-			if (currentZoomLevel>3){//FRAGMENTS_PER_TILE){
-				currentZoomLevel = 3;//FRAGMENTS_PER_TILE;
+			if (currentZoomLevel>FRAGMENTS_PER_TILE){
+				currentZoomLevel = FRAGMENTS_PER_TILE;
 			}
 			return this;
 		}
@@ -437,7 +450,7 @@ public class UserMove {
 			return this;
 		}
 		else if(move.equals("zoommax")){
-			currentZoomLevel = 3;//FRAGMENTS_PER_TILE;
+			currentZoomLevel = FRAGMENTS_PER_TILE;
 			return this;
 		}
 		else if(move.equals("zoommin")){

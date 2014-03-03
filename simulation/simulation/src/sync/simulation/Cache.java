@@ -22,6 +22,7 @@ import sync.simulation.predictor.Node;
 import sync.simulation.predictor.Predictor;
 
 import sync.simulation.predictor.Tuple;
+import sync.simulation.regions.UserStudiesCombined;
 import util.Util;
 
 public class Cache {
@@ -49,34 +50,34 @@ public class Cache {
 	
 	public int SpaceBeingUsed = 0;
 	
-	public void warmUp(){
-		
-		int start = 10000;
-		int count = 0;
-		while(CACHE_SIZE!=this.sizeBeingUsed()){
-			String data[] = new String[FRAGMENTS_PER_TILE];
-			
-			for(int j=0; j<Math.min(FRAGMENTS_PER_TILE,(CACHE_SIZE-this.sizeBeingUsed())); j++){
-				String datum = "[";
-				for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
-					int red = new Random().nextInt(255);
-					int green = new Random().nextInt(255);
-					int blue = new Random().nextInt(255);
-					datum += "["+red+","+green+","+blue+"],";
-				}
-				datum +="]";
-				data[j]=datum;
-			}
-			Point point  = new Point((start+count),(start+count),true);
-			CachedTile cTile = new CachedTile(point, data);
-			cTile.distance =  10000;
-			tiles.put(point.hashCode(), cTile);
-			queue.add(cTile);
-			//increaseSpaceUsed(FRAGMENTS_PER_TILE);
-			count++;
-		}
-		
-	}
+//	public void warmUp(){
+//		
+//		int start = 10000;
+//		int count = 0;
+//		while(CACHE_SIZE!=this.sizeBeingUsed()){
+//			String data[] = new String[FRAGMENTS_PER_TILE];
+//			
+//			for(int j=0; j<Math.min(FRAGMENTS_PER_TILE,(CACHE_SIZE-this.sizeBeingUsed())); j++){
+//				String datum = "[";
+//				for (int pixel=0; pixel<FRAGMENT_SIZE; pixel++){
+//					int red = new Random().nextInt(255);
+//					int green = new Random().nextInt(255);
+//					int blue = new Random().nextInt(255);
+//					datum += "["+red+","+green+","+blue+"],";
+//				}
+//				datum +="]";
+//				data[j]=datum;
+//			}
+//			Point point  = new Point((start+count),(start+count),true);
+//			CachedTile cTile = new CachedTile(point, data);
+//			cTile.distance =  10000;
+//			tiles.put(point.hashCode(), cTile);
+//			queue.add(cTile);
+//			//increaseSpaceUsed(FRAGMENTS_PER_TILE);
+//			count++;
+//		}
+//		
+//	}
 	
 //	public CachedTile cacheFullTile(Tile tile){
 //		return cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
@@ -121,14 +122,15 @@ public class Cache {
 		if (toBeCached==null){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			this.tiles.put(index,toBeCached);
-			increaseSpaceUsed(spaceNeeded);
+			//increaseSpaceUsed(spaceNeeded);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
 		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//Util.debug(toBeCached.fragmentsToString());
-			toBeCached.probability = tile.carryingProbability;
-			this.queue.add(toBeCached);
+			toBeCached.totalImportance = tile.carryingProbability;
+			//this.queue.add(toBeCached);
+			queueAdd(toBeCached);
 		}
 		else {
 		
@@ -139,11 +141,12 @@ public class Cache {
 			//Util.debug(this.queue.size());
 			Util.debug(cTile.fragmentsToString());
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			toBeCached.probability = tile.carryingProbability;
+			toBeCached.totalImportance = tile.carryingProbability;
 			Util.debug(toBeCached.fragmentsToString());
-			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
-				this.queue.add(toBeCached);
-			}
+//			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
+//				this.queue.add(toBeCached);
+//			}
+			queueAdd(toBeCached);
 		}
 		
 	
@@ -152,6 +155,13 @@ public class Cache {
 		return toBeCached;
 		
 	}
+	private void queueAdd(CachedTile tobeAdded){
+		if (!queueContains(tobeAdded) && tiles.containsKey(tobeAdded.point.hashCode())){
+			this.queue.add(tobeAdded);
+		}
+	}
+	
+	
 	private CachedTile queueFind(int hashCode) {
 		boolean found = false;
 		Iterator<CachedTile> iter = this.queue.iterator();
@@ -229,13 +239,13 @@ public class Cache {
 		return total;
 	}
 	
-	public synchronized void increaseSpaceUsed(int numOfFragments){
+	/*public synchronized void increaseSpaceUsed(int numOfFragments){
 		this.SpaceBeingUsed = this.SpaceBeingUsed + numOfFragments;
 	}
 	
 	public synchronized void decreaseSpaceUsed(int numOfFragments){
 		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
-	}
+	}*/
 	
 	/*public void declareOccupied(Point point){
 		if (tileExists(point)){
@@ -344,7 +354,7 @@ public class Cache {
 			}
 			CachedTile toBeCached = queueFind(currentPoint.hashCode());
 			if (toBeCached!=null){ //if already cached 
-				if (toBeCached.probability < lessLikelyTile.probability){  //and has less probability than the anything in the cache
+				if (toBeCached.totalImportance < lessLikelyTile.totalImportance){  //and has less probability than the anything in the cache
 					System.err.println("ELEOS cache degradation");
 				
 				}
@@ -367,7 +377,7 @@ public class Cache {
 		iter.remove();
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
 		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
-		decreaseSpaceUsed(numFragmentsCached);
+		//decreaseSpaceUsed(numFragmentsCached);
 		return numFragmentsCached;
 	}
 	
@@ -379,7 +389,7 @@ public class Cache {
 	
 	
 	public String toString(){
-		String result="";
+		String result="[";
 		/*for(Tile tile : queue){
 			result+=tile.toString()+": ("+tile.getFragmentNumber()+"): fragments[";
 		    for(int index : tile.fragments.keySet()){
@@ -397,8 +407,9 @@ public class Cache {
 				//return result;
 			}*/
 			result+=tile.toString()+": ("+tile.getCachedFragmentsNum()+"): fragments";
-			result+=tile.fragmentsToString();
+			result+=tile.fragmentsToString()+",\n";
 		}
+		result+="]\n";
 		return result;
 	}
 	
@@ -412,17 +423,20 @@ public class Cache {
 		}
 	}
 	
-	//update cache probability based on the prediction tree
-	public void updateProbabilities(Vector<Node> list,Point currentPosition){
+	
+	
+	
+	
+	public void updateImportances(Point currentPosition){
 		int size0 = this.sizeBeingUsed();
 		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
 		while (mapIter.hasNext()){
 			CachedTile cTile = queueFind(mapIter.next());
 			String[] data = cTile.data;
-			/*if (currentPosition.equals(cTile.point)){
-				
-				continue;
-			}*/
+			//if (currentPosition.equals(cTile.point)){
+			//	
+			//	continue;
+			//}
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
 			
@@ -431,11 +445,56 @@ public class Cache {
 			//prediction tree will have probability less than zero
 			//if it is current we give it a probability of 1.0d
 			if (currentPosition.equals(cTile.point)){
-				cTile.probability = 1.0d;
+				cTile.totalImportance = 1000000.0d;
 				
 			}
 			else {
-				cTile.probability = 0.0d;
+				cTile.totalImportance = UserStudiesCombined.tiles[currentPosition.y][currentPosition.x].visitsCounts;
+			}
+			cTile.distance = Point.distance(cTile.point, currentPosition);
+			queueAdd(cTile);
+//			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
+//				this.queue.add(cTile);
+//			}
+		}
+		int size1 = this.sizeBeingUsed();
+		
+		if (size0!=size1){
+			System.err.println("Memory size altered from Prediction");
+		}
+
+		Util.debug("Updated Memory because of Prediction "+this.queue);
+		Util.debug("Memory Size because of Prediction "+this.sizeBeingUsed());
+	}
+	
+	
+	/*
+	
+	
+	//update cache probability based on the prediction tree
+	public void updateProbabilities(Vector<Node> list,Point currentPosition){
+		int size0 = this.sizeBeingUsed();
+		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
+		while (mapIter.hasNext()){
+			CachedTile cTile = queueFind(mapIter.next());
+			String[] data = cTile.data;
+//			if (currentPosition.equals(cTile.point)){
+//				
+//				continue;
+//			}
+			
+			//IMPORTANT remove before the equality is busted because of change in probability
+			
+			queueRemove(cTile);
+			//we make probabilities zero so only the ones that will be updated by the 
+			//prediction tree will have probability less than zero
+			//if it is current we give it a probability of 1.0d
+			if (currentPosition.equals(cTile.point)){
+				cTile.totalImportance = 1.0d;
+				
+			}
+			else {
+				cTile.totalImportance = 0.0d;
 			}
 			cTile.distance = Point.distance(cTile.point, currentPosition);
 			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
@@ -452,7 +511,7 @@ public class Cache {
 				CachedTile cTile = queueFind(node.point.hashCode());//this.tiles.get(node.point.hashCode());
 				//IMPORTANT remove before the equality is busted because of change in probability;
 				queueRemove(cTile);
-				cTile.probability = node.probability;
+				cTile.totalImportance = node.probability;
 				if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode()) ){
 					this.queue.add(cTile);
 				}
@@ -467,4 +526,6 @@ public class Cache {
 		Util.debug("Updated Memory because of Prediction "+this.queue);
 		Util.debug("Memory Size because of Prediction "+this.sizeBeingUsed());
 	}
+	
+	*/
 }

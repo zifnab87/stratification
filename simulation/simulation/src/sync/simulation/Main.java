@@ -11,7 +11,7 @@ import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.RUNS;
 import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
-
+import static sync.simulation.Config.JUMP_REGION_WIDTH;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.Vector;
@@ -53,7 +53,8 @@ public class Main {
 //		System.out.println(Util.variance(vec));
 		
 		
-		
+		//db.init();
+		//System.exit(9);
 		Util.debug("Initializing  Sync Database");
 		//db.init(DATABASE_TILES_NUM);
 		db.clearCache();
@@ -85,25 +86,28 @@ public class Main {
 			UserMove current = new UserMove(db.randomPoint());
 			UserMove.currentZoomLevel = 1;
 			Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-			Predictor predictor = new Predictor(run);
-		    for (int j=0; j<500; j++){ //moves per run	
+			//Predictor predictor = new Predictor(run);
+			for (int j=0; j<500; j++){ //moves per run	
+		    	System.gc();
 		    	current = UserStudySynthesizer.whatHappensNext(current);
 		    	current.run = run;
 		    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 		    	current.viewport = viewport;
-		    	jump = new JumpRegion(current.point);
+		    	jump = new JumpRegion(Database.points(current.point.y - JUMP_REGION_WIDTH/2, current.point.x - JUMP_REGION_WIDTH/2));
 		    	current.run.totalMoves+=1;			
 				Util.debug("Memory before Move:"+Main.cache.getQueue());
 				Util.debug("Current Position we just moved: "+current.point);
 				current.viewportFetch();
-				//Main.cache.updateProbabilities(new Vector<Node>(),current.point);
+				Main.cache.updateImportances(current.point);
 				//System.out.println(cache);
 				Util.debug("Memory after Fetch:"+Main.cache.getQueue());
 				Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 		    
 			   //PREDICTOR
 				
-				
+				System.out.println("Before:"+cache);
+				current.prefetch(jump, current.point);
+				//System.out.println("After:"+cache);
 			
 				Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
 				current.run.misses.add(current.cacheMissesDuringFetch);
@@ -111,12 +115,12 @@ public class Main {
 				
 				//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
 				
-				Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
-				if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
-					System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
+				//Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
+				/*if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
+					System.err.println(Main.cache.sizeBeingUsed()+" "+Main.cache.getTilesOccupied()+" "+Main.cache.getQueueSize()+" "+CACHE_SIZE);
 					System.err.println("Memory Inconsistency Error");
 					break;
-				}
+				}*/
 				Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 //					
 			

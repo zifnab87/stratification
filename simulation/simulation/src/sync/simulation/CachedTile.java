@@ -7,7 +7,7 @@ import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 public class CachedTile extends Tile {
 
 	
-	public double probability;
+	public double totalImportance;
 	public double distance;
 	
 	public int getCachedFragmentsNum(){
@@ -101,7 +101,7 @@ public class CachedTile extends Tile {
 	
 	public String toString(){
 		String str;
-		str = "CachedTile("+this.point.y+","+this.point.x+",lod="+this.getCachedFragmentsNum()+",Probability="+this.probability+",Distance="+this.distance+")";
+		str = "CachedTile("+this.point.y+","+this.point.x+",lod="+this.getCachedFragmentsNum()+",Total Importance="+this.totalImportance+",Distance="+this.distance+")";
 		return str;
 	}
 	
@@ -130,26 +130,26 @@ public class CachedTile extends Tile {
 //		    }
 //			
 			//probability and distance
-		    if (t1.probability < t2.probability ){
+		    if (t1.totalImportance < t2.totalImportance ){
 		    	return -1;
 		    }
-		    else if (t1.probability > t2.probability  ){
+		    else if (t1.totalImportance > t2.totalImportance  ){
 		    	return 1;
 		    }
-		    else if (t1.probability == t2.probability &&
+		    else if (t1.totalImportance == t2.totalImportance &&
 		    		 t1.distance < t2.distance ) {
 		    	return 1;
 		    }
-		    else if (t1.probability == t2.probability &&
+		    else if (t1.totalImportance == t2.totalImportance &&
 		    		 t1.distance > t2.distance) {
 		    	return -1;
 		    }
-		    else if (t1.probability == t2.probability &&
+		    else if (t1.totalImportance == t2.totalImportance &&
 		    		t1.distance == t2.distance && t1.id < t2.id)
 		    {
 		    	return -1;
 		    }
-		    else if (t1.probability == t2.probability &&
+		    else if (t1.totalImportance == t2.totalImportance &&
 		    		t1.distance == t2.distance && t1.id > t2.id)
 		    {
 		    	return 1;

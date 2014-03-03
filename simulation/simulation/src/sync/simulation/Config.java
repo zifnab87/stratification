@@ -6,11 +6,11 @@ import sync.simulation.monitor.Distribution;
 public class Config {
 	
 	public static boolean DEBUG = false;
-	public  static int RUNS = 50;
+	public  static int RUNS = 20;
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================
-	public static int THINK_TIME = 1024;
+	public static int THINK_TIME = 256;
 	public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
 	//public static Distribution DISTRIBUTION = new Distribution(0.01,0.33,0.33,0.33);
 	//public static Distribution DISTRIBUTION = new Distribution(0.1,0.5,0.1,0.3);
@@ -20,7 +20,7 @@ public class Config {
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,0.9,0.0,0.1);
 	//public static Distribution DISTRIBUTION = new Distribution(0.0,1,0.0,0.0);
 	public static String USER_THINK_DISTR = "NegativeExponential";
-	public static boolean FRAGMENT = false; 
+	public static boolean FRAGMENT = false ; 
 	public  static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
 	public static  int CACHE_SIZE = 2048;
@@ -54,9 +54,9 @@ public class Config {
 	
 	
 	//========== TILE ======================================================
-	public  static int TILE_WIDTH = 32; //256
-	public  static int TILE_HEIGHT = 32; //256
-	public  static int FRAGMENTS_PER_TILE = 8;
+	public  static int TILE_WIDTH = 256; //256
+	public  static int TILE_HEIGHT = 256; //256
+	public  static int FRAGMENTS_PER_TILE = 16;
 	public  static int COLORS = 3;
 	
 	//========== FRAGMENT ===================================================

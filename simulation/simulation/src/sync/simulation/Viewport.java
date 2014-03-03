@@ -34,11 +34,11 @@ public class Viewport {
 		this.width = width;
 		this.upperLeft = upperLeft;
 
-		this.upperRight = new Point(upperLeft.y, upperLeft.x + width-1);
-		this.lowerRight = new Point(upperRight.y + height-1, upperRight.x);
-		this.lowerLeft = new Point(upperLeft.y + height-1, upperLeft.x);
+		//this.upperRight = new Point(upperLeft.y, upperLeft.x + width-1);
+		//this.lowerRight = new Point(upperRight.y + height-1, upperRight.x);
+		//this.lowerLeft = new Point(upperLeft.y + height-1, upperLeft.x);
 		//previousCenter = this.center;
-		this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
+		//this.center = new Point(Integer.valueOf((int) (upperLeft.y+height/2.0)),Integer.valueOf((int) (upperLeft.x+width/2.0)) );
 		 
 		this.resultOfMovement = resultOfMovement;
 		//System.out.println("upperLeft:"+upperLeft);

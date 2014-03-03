@@ -6,13 +6,14 @@ import util.Util;
 import sync.simulation.Database;
 import sync.simulation.Point;
 import static sync.simulation.Config.JUMP_REGION_WIDTH;
+import static sync.simulation.Config.DATABASE_WIDTH;
 
 public class JumpRegion extends Region {
 	public int width = JUMP_REGION_WIDTH;
 	public int height = JUMP_REGION_WIDTH;
 
 	
-	private TreeSet<TileOverall> queue = new TreeSet<TileOverall>(TileOverall.jumpComparator);
+	private TreeSet<TileOverall> queue;
 	
 	
 	//public Point[][] points = new Point[height][width];
@@ -34,4 +35,17 @@ public class JumpRegion extends Region {
 		
 	}
 	
+	
+	
+	public TreeSet<TileOverall> tree(Point current){
+		queue = new TreeSet<TileOverall>(TileOverall.comparator);
+		for (int y=upperLeft.y; y<Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
+			for (int x=upperLeft.x; x<Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
+				UserStudiesCombined.tiles[y][x].updateDistance(current);
+				queue.add(UserStudiesCombined.tiles[y][x]);
+			}
+		}
+		return queue;
+		
+	}
 }

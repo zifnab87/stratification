@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.util.Random;
 
 import sync.simulation.events.UserMove;
 import sync.simulation.regions.Region;
@@ -23,6 +24,7 @@ public class Database extends Region {
 	public static Connection conn;
 	public Viewport viewport;
 	public static Point[][] points = new Point[DATABASE_WIDTH][DATABASE_WIDTH];
+	public static Tile[][] tiles = new Tile[DATABASE_WIDTH][DATABASE_WIDTH];
 	
 	public int width = DATABASE_WIDTH;
 	public int height = DATABASE_WIDTH;
@@ -34,8 +36,10 @@ public class Database extends Region {
 		for (int y=0; y<points.length; y++){
 			for (int x=0; x<points[0].length; x++){
 				points[y][x] = new Point(y,x);
+				tiles[y][x] = new Tile(points[y][x]);
 			}
 		}
+		
 
 		this.upperLeft = points(0,0);
 
@@ -87,7 +91,7 @@ public class Database extends Region {
 	}
 	
 	
-	public void init(int numTiles){
+	public void init(){
 		/*for (int i=0; i<numTiles; i++){
 			Tile tile = Tile.randomizer();
 			putTile(tile);
@@ -106,7 +110,7 @@ public class Database extends Region {
                      "user=root");
 				System.err.println("2ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
-			/*for (int y=0; y<DATABASE_WIDTH; y++){
+			for (int y=0; y<DATABASE_WIDTH; y++){
 				for (int x=0; x<DATABASE_WIDTH; x++){
 					for (int i=1; i<=FRAGMENTS_PER_TILE; i++){
 						String data = "[";
@@ -122,7 +126,7 @@ public class Database extends Region {
 						 stmt.executeUpdate("INSERT INTO fragment " + "VALUES ("+y+","+x+","+i+",'"+data+"')");
 					}
 				}
-			}*/
+			}
 			 
 			
 			
@@ -201,7 +205,7 @@ public class Database extends Region {
 	
 	
 	public Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
-		
+		double start = System.nanoTime();
 		//Connection conn = null;
 		ResultSet results = null;
 		Tile tile = null;
@@ -219,28 +223,31 @@ public class Database extends Region {
 				System.err.println("3ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			
-			double start = System.nanoTime();
+			
 			Statement stmt = conn.createStatement();
-			double latency1 = (System.nanoTime() - start)/1000000;
+			//double latency1 = (System.nanoTime() - start)/1000000;
 			
 			String query = "SELECT * FROM fragment WHERE y="+index.y+" AND x="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment;
-			double latency2 = (System.nanoTime() - start)/1000000;
+			//double latency2 = (System.nanoTime() - start)/1000000;
 			
 			results = stmt.executeQuery(query);
 			results.setFetchSize(1);
-			double latency3 = (System.nanoTime() - start)/1000000;
+			//double latency3 = (System.nanoTime() - start)/1000000;
 			
 			String[] totalData = new String[FRAGMENTS_PER_TILE];
-			int count = 0;
+			//int count = 0;
 			while (results.next()){
 				int fragment_num = results.getInt("fragment_num");
 				totalData[fragment_num-1]=results.getString("data");
-				count++;
+				//count++;
 			}
-			double latency4 = (System.nanoTime() - start)/1000000;
+			//double latency4 = (System.nanoTime() - start)/1000000;
 			
+			
+			tile = tiles(index.y,index.x);
+			tile.setData(totalData);
+			//new Tile(index,totalData);
 			double latency = (System.nanoTime() - start)/1000000;
-			tile = new Tile(index,totalData);
 
 //			if (latency>600d){
 //				System.out.println("~~~~~~~~~~~~~~~~");
@@ -323,6 +330,23 @@ public class Database extends Region {
 		return points[y][x];
 	}
 	
+	
+	public static Tile tiles(int y,int x){
+		if (x < 0) {
+			x = 0;
+		}
+		else if(x > DATABASE_WIDTH-1){
+			x = DATABASE_WIDTH-1;
+		}
+		if (y < 0) {
+			y = 0;
+		}
+		else if(y > DATABASE_WIDTH-1){
+			y = DATABASE_WIDTH-1;
+		}
+
+		return tiles[y][x];
+	}
 	
 	
 	

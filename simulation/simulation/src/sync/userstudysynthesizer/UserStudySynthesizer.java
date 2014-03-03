@@ -17,9 +17,9 @@ import static sync.simulation.Config.JUMP_REGION_WIDTH;
 
 public class UserStudySynthesizer {
 	static HashMap<Integer,TileOverall> map = new HashMap<Integer,TileOverall>();
-	static double jumpProbability = 0.10;
-	static double panProbability = 0.5;
-	static double zoomProbability = 0.40;
+	static double jumpProbability = 0.1; //0.1
+	static double panProbability = 0.5; // 0.5
+	static double zoomProbability = 0.4; // 0.4
 	
 	static double upProbability = 0.25;
 	static double downProbability = 0.25;
@@ -59,12 +59,12 @@ public class UserStudySynthesizer {
 	
 	public static void updateCounts(UserMove current){
 		TileOverall currentTile = map.get(current.point.id);
-		if (currentTile.visitsCounts<numOfUserStudies){
+		//if (currentTile.visitsCounts<numOfUserStudies){
 			currentTile.visitsCounts++;
-		}
-		if (currentTile.visitResolutions[UserMove.currentZoomLevel]<numOfUserStudies){
+		//}
+		//if (currentTile.visitResolutions[UserMove.currentZoomLevel]<numOfUserStudies){
 			currentTile.visitResolutions[UserMove.currentZoomLevel]++;
-		}
+		//}
 		
 	}
 	
@@ -128,12 +128,12 @@ public class UserStudySynthesizer {
 			
 			//TileOverall currentTile = map.get(current.point.id);
 			//System.out.println("bgika"+map.get(jumpPoint.id).jumpToCounts);
-			if (currentTile.jumpToCounts<60){
+			//if (currentTile.jumpToCounts<60){
 				currentTile.jumpToCounts++;
-			}
-			else {
-				current = previous;
-			}
+			//}
+			//else {
+			//	current = previous;
+			//}
 			
 		
 		}

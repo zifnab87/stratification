@@ -17,15 +17,19 @@ public class TileOverall {
 	
 	
 	
+	public double distance;
 	
 	
 	
+	public void updateDistance(Point current){
+		this.distance = Point.distance(this.point, current);
+	}
 	
 	
 	
-	public double jumpImportance;
+	/*public double jumpImportance;
 	public double zoomImportance;
-	public double totalImportance;
+	public double totalImportance;*/
 	
 	
 	public TileOverall(Point point,double[] visitResolutions, int jumpToCounts,int visitsCounts){
@@ -41,7 +45,7 @@ public class TileOverall {
 		this.point = point;
 	}
 	
-	public void updateImportance(UserMove currentPosition){
+	/*public void updateImportance(UserMove currentPosition){
 		
 		double sum = DISTANCE_WEIGHT_FACTOR + IMPORTANCE_WEIGHT_FACTOR + JUMP_WEIGHT_FACTOR;
 		double distance = Point.distance(this.point, currentPosition.point);
@@ -78,34 +82,46 @@ public class TileOverall {
 		    	return 0;
 		    }
 		}
-	};
+	};*/
 	
 	
-	public static Comparator<TileOverall> jumpComparator = new Comparator<TileOverall>(){
+	public static Comparator<TileOverall> comparator = new Comparator<TileOverall>(){
 		@Override
 		public int compare(TileOverall t1, TileOverall t2) {
 			
-			//probability and distance
-		    if (t1.jumpImportance < t2.jumpImportance ){
+			
+			
+			if (t1.visitsCounts < t2.visitsCounts ){
 		    	return -1;
 		    }
-		    else if (t1.jumpImportance > t2.jumpImportance  ){
+		    else if (t1.visitsCounts > t2.visitsCounts  ){
 		    	return 1;
 		    }
-		   
-		    else if (t1.jumpImportance == t2.jumpImportance &&
-		    		t1.point.id < t2.point.id)
+		    else if (t1.visitsCounts == t2.visitsCounts &&
+		    		 t1.distance < t2.distance ) {
+		    	return 1;
+		    }
+		    else if (t1.visitsCounts == t2.visitsCounts &&
+		    		 t1.distance > t2.distance) {
+		    	return -1;
+		    }
+		    else if (t1.visitsCounts == t2.visitsCounts &&
+		    		t1.distance == t2.distance && t1.point.id < t2.point.id)
 		    {
 		    	return -1;
 		    }
-		    else if (t1.jumpImportance == t2.jumpImportance &&
-		    		t1.point.id > t2.point.id)
+		    else if (t1.visitsCounts == t2.visitsCounts &&
+		    		t1.distance == t2.distance && t1.point.id > t2.point.id)
 		    {
 		    	return 1;
 		    }
 		    else {
 		    	return 0;
 		    }
+			
+			
+			//probability and distance
+	
 		}
 	};
 	

@@ -46,9 +46,13 @@ public class Tile {
 		this.id = this.point.hashCode();
 	}
 	
-	public Tile(Point point,String[] data){
+	/*public Tile(Point point,String[] data){
 		this.point = point;
 		this.id = this.point.hashCode();
+		this.data = data;
+	}*/
+	
+	public void setData(String[] data){
 		this.data = data;
 	}
 	

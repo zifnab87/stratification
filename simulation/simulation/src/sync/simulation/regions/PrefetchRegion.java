@@ -13,7 +13,7 @@ public class PrefetchRegion extends Region{
 	public int width = PREFETCH_REGION_WIDTH;
 	public int height = PREFETCH_REGION_WIDTH;
 
-	private TreeSet<TileOverall> queue = new TreeSet<TileOverall>(TileOverall.importanceComparator);
+	private TreeSet<TileOverall> queue = new TreeSet<TileOverall>(TileOverall.comparator);
 	
 	public Point[][] points = new Point[width][height];
 
