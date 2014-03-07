@@ -29,9 +29,9 @@ public class Cache {
 	//public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	//public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	
-	private  Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
+	public  Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
 	//public volatile LinkedList<CachedTile> queue = new PriorityBlockingQueue<CachedTile>(10,Tile.probabilityComparator);
-	private TreeSet<CachedTile> queue = new TreeSet<CachedTile>(CachedTile.probabilityComparator);
+	public TreeSet<CachedTile> queue = new TreeSet<CachedTile>(CachedTile.probabilityComparator);
 	
 	
 	public TreeSet<CachedTile> getQueue(){
@@ -122,15 +122,14 @@ public class Cache {
 		if (toBeCached==null){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			this.tiles.put(index,toBeCached);
-			//increaseSpaceUsed(spaceNeeded);
+			increaseSpaceUsed(spaceNeeded);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
 		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//Util.debug(toBeCached.fragmentsToString());
-			toBeCached.totalImportance = tile.carryingProbability;
-			//this.queue.add(toBeCached);
-			queueAdd(toBeCached);
+			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].visitsCounts;
+			this.queue.add(toBeCached);
 		}
 		else {
 		
@@ -141,12 +140,11 @@ public class Cache {
 			//Util.debug(this.queue.size());
 			Util.debug(cTile.fragmentsToString());
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			toBeCached.totalImportance = tile.carryingProbability;
+			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].visitsCounts;
 			Util.debug(toBeCached.fragmentsToString());
-//			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
-//				this.queue.add(toBeCached);
-//			}
-			queueAdd(toBeCached);
+			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
+				this.queue.add(toBeCached);
+			}
 		}
 		
 	
@@ -155,13 +153,6 @@ public class Cache {
 		return toBeCached;
 		
 	}
-	private void queueAdd(CachedTile tobeAdded){
-		if (!queueContains(tobeAdded) && tiles.containsKey(tobeAdded.point.hashCode())){
-			this.queue.add(tobeAdded);
-		}
-	}
-	
-	
 	private CachedTile queueFind(int hashCode) {
 		boolean found = false;
 		Iterator<CachedTile> iter = this.queue.iterator();
@@ -239,13 +230,13 @@ public class Cache {
 		return total;
 	}
 	
-	/*public synchronized void increaseSpaceUsed(int numOfFragments){
+	public synchronized void increaseSpaceUsed(int numOfFragments){
 		this.SpaceBeingUsed = this.SpaceBeingUsed + numOfFragments;
 	}
 	
 	public synchronized void decreaseSpaceUsed(int numOfFragments){
 		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
-	}*/
+	}
 	
 	/*public void declareOccupied(Point point){
 		if (tileExists(point)){
@@ -346,20 +337,32 @@ public class Cache {
 		//Util.debug("I need"+fragmentsNeeded);
 		Iterator<CachedTile> iter = this.queue.iterator();
 		int evictedFragments = 0;
-		while(iter.hasNext() && evictedFragments<fragmentsNeeded){
-			CachedTile lessLikelyTile = iter.next();
+		boolean prob1 = false;
+		boolean prob2 = false;
+		while(/*iter.hasNext() &&*/ evictedFragments<fragmentsNeeded){
+			CachedTile lessLikelyTile = this.getWorst();// iter.next();
 			//if it is the same that we are currentlyPrefetching 
 			if (lessLikelyTile.point.equals(currentPoint)){
-				System.err.println("ELEOS to idio");
+				//System.err.println("ELEOS to idio");
+				prob1 = true;
 			}
 			CachedTile toBeCached = queueFind(currentPoint.hashCode());
 			if (toBeCached!=null){ //if already cached 
 				if (toBeCached.totalImportance < lessLikelyTile.totalImportance){  //and has less probability than the anything in the cache
 					System.err.println("ELEOS cache degradation");
+					prob2 = true;
 				
 				}
 			}
+			
+			if (prob1 || prob2) {
+				prob1 = false;
+				prob2 = false;
+				continue;
+			}
+			
 			int fragmentsEvicted = evictTile(lessLikelyTile,iter);
+			updateImportances(currentPoint);
 			evictedFragments+=fragmentsEvicted;
 			
 			
@@ -374,10 +377,11 @@ public class Cache {
 	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
 		
 		this.tiles.remove(cTile.point.hashCode());
-		iter.remove();
+		queueRemove(cTile);
+		//iter.remove();
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
 		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
-		//decreaseSpaceUsed(numFragmentsCached);
+		decreaseSpaceUsed(numFragmentsCached);
 		return numFragmentsCached;
 	}
 	
@@ -433,10 +437,6 @@ public class Cache {
 		while (mapIter.hasNext()){
 			CachedTile cTile = queueFind(mapIter.next());
 			String[] data = cTile.data;
-			//if (currentPosition.equals(cTile.point)){
-			//	
-			//	continue;
-			//}
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
 			
@@ -444,19 +444,23 @@ public class Cache {
 			//we make probabilities zero so only the ones that will be updated by the 
 			//prediction tree will have probability less than zero
 			//if it is current we give it a probability of 1.0d
+			
 			if (currentPosition.equals(cTile.point)){
-				cTile.totalImportance = 1000000.0d;
-				
+				cTile.totalImportance = 1000000;
+				cTile.distance = 0;
+				//continue;
 			}
 			else {
-				cTile.totalImportance = UserStudiesCombined.tiles[currentPosition.y][currentPosition.x].visitsCounts;
+				cTile.totalImportance = (1/(Point.distance(cTile.point, currentPosition)+0.001))*(UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].visitsCounts +
+									UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].jumpToCounts);
+			
 			}
 			cTile.distance = Point.distance(cTile.point, currentPosition);
-			queueAdd(cTile);
-//			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
-//				this.queue.add(cTile);
-//			}
+			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
+				this.queue.add(cTile);
+			}
 		}
+		
 		int size1 = this.sizeBeingUsed();
 		
 		if (size0!=size1){
@@ -467,6 +471,10 @@ public class Cache {
 		Util.debug("Memory Size because of Prediction "+this.sizeBeingUsed());
 	}
 	
+	
+	public CachedTile getWorst(){
+		return this.queue.first();
+	}
 	
 	/*
 	

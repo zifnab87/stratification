@@ -62,7 +62,7 @@ public class Main {
 		//cache.warmUp();
 		
 		
-		Database db = new Database();
+		//Database db = new Database();
 		JumpRegion jump = new JumpRegion(Database.points(0,0));
 		UserStudiesCombined usc = new UserStudiesCombined();
 		UserStudySynthesizer uss = new UserStudySynthesizer();
@@ -70,33 +70,47 @@ public class Main {
 
 		//Random rand = new Random();
 		Vector<Run> runs = new Vector<Run>();
-		for (int i=0; i<=RUNS+5; i++){
+		for (int i=0; i<=RUNS+3; i++){
+			
 			System.gc();
-			if (i==0){
+			if (i==3){
+				
 				db.clearCache();
 				cache = new Cache();
 			}
+			
+		
 			Run run = new Run();
 			//for warmup
-			if (i>5){
+			if (i>=0){
 				runs.add(run);
 			}
 			Random rand = new Random();
 			//THINK_TIME = UserMove.nextFromDistribution(rand);
 			UserMove current = new UserMove(db.randomPoint());
+			
 			UserMove.currentZoomLevel = 1;
 			Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 			//Predictor predictor = new Predictor(run);
-			for (int j=0; j<500; j++){ //moves per run	
-		    	System.gc();
-		    	current = UserStudySynthesizer.whatHappensNext(current);
+			for (int j=0; j<300; j++){ //moves per run	
+		    	
+				System.gc();
+				
+				if (j%10==0){
+		    		
+		    		db.close();
+		    	}	
+				if (j%100==0){
+					System.out.println(j);
+				}
+		    	current = UserStudySynthesizer.whatHappensNext(current,false);
 		    	current.run = run;
 		    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 		    	current.viewport = viewport;
 		    	jump = new JumpRegion(Database.points(current.point.y - JUMP_REGION_WIDTH/2, current.point.x - JUMP_REGION_WIDTH/2));
 		    	current.run.totalMoves+=1;			
 				Util.debug("Memory before Move:"+Main.cache.getQueue());
-				Util.debug("Current Position we just moved: "+current.point);
+				Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel);
 				current.viewportFetch();
 				Main.cache.updateImportances(current.point);
 				//System.out.println(cache);
@@ -105,8 +119,9 @@ public class Main {
 		    
 			   //PREDICTOR
 				
-				System.out.println("Before:"+cache);
+				//System.out.println("Before:"+cache);
 				current.prefetch(jump, current.point);
+				cache.updateImportances(current.point);
 				//System.out.println("After:"+cache);
 			
 				Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
@@ -150,10 +165,11 @@ public class Main {
 				Util.debug("#Total Disk Fetched Fragments: "+run.totalCacheMisses);
 				Util.debug("#Total Cache Fetched Fragments: "+run.totalCacheHits);
 				Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+				
 			}
 			
 			AverageRun avgRun = new AverageRun(runs);
-			Util.debug("Runs: "+runs.size(),true);
+			Util.debug("Runs: "+runs.size());
 			//Util.debug("Think Time = "+ THINK_TIME,true);
 			Util.debug("Fragments = "+FRAGMENT,true);
 			Util.debug("#Average Moves Number: "+avgRun.totalMoves,true);

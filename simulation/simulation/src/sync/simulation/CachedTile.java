@@ -106,6 +106,20 @@ public class CachedTile extends Tile {
 	}
 	
 	
+	public boolean equals(Object o){
+		CachedTile cTile = ((CachedTile)o);
+		System.out.println("called");
+		if (cTile.id == this.id){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public int hashCode(){
+		return this.id;
+	}
+	
 	
 	public static Comparator<CachedTile> probabilityComparator = new Comparator<CachedTile>(){
 		@Override
@@ -128,35 +142,53 @@ public class CachedTile extends Tile {
 //		    else {
 //		    	return 0;
 //		    }
-//			
-			//probability and distance
-		    if (t1.totalImportance < t2.totalImportance ){
+			
+			if (t1.totalImportance < t2.totalImportance ){
 		    	return -1;
 		    }
 		    else if (t1.totalImportance > t2.totalImportance  ){
 		    	return 1;
 		    }
 		    else if (t1.totalImportance == t2.totalImportance &&
-		    		 t1.distance < t2.distance ) {
-		    	return 1;
-		    }
-		    else if (t1.totalImportance == t2.totalImportance &&
-		    		 t1.distance > t2.distance) {
+		    		 t1.id < t2.id ) {
 		    	return -1;
 		    }
 		    else if (t1.totalImportance == t2.totalImportance &&
-		    		t1.distance == t2.distance && t1.id < t2.id)
-		    {
-		    	return -1;
-		    }
-		    else if (t1.totalImportance == t2.totalImportance &&
-		    		t1.distance == t2.distance && t1.id > t2.id)
-		    {
+		    		 t1.id > t2.id) {
 		    	return 1;
 		    }
 		    else {
 		    	return 0;
 		    }
+//			
+			//probability and distance
+		   /* if (t1.distance < t2.distance ){
+		    	return 1;
+		    }
+		    else if (t1.distance > t2.distance  ){
+		    	return -1;
+		    }
+		    else if (t1.distance == t2.distance &&
+		    		 t1.totalImportance < t2.totalImportance ) {
+		    	return -1;
+		    }
+		    else if (t1.distance == t2.distance &&
+		    		 t1.totalImportance > t2.totalImportance) {
+		    	return 1;
+		    }
+		    else if (t1.distance == t2.distance &&
+		    		t1.totalImportance == t2.totalImportance && t1.id < t2.id)
+		    {
+		    	return 1;
+		    }
+		    else if (t1.distance == t2.distance &&
+		    		t1.totalImportance == t2.totalImportance && t1.id > t2.id)
+		    {
+		    	return -1;
+		    }
+		    else {
+		    	return 0;
+		    }*/
 		}
 	};
 	

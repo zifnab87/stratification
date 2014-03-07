@@ -31,6 +31,16 @@ public class Database extends Region {
 	
 	
 	
+	
+	public void close(){
+		try {
+			this.conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public Database(){
 		
 		for (int y=0; y<points.length; y++){
@@ -77,7 +87,7 @@ public class Database extends Region {
 			if (conn==null || conn.isClosed()){
 				conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
                      "user=root");
-				System.err.println("1ELEOEEEEEEEEEEEEEEEEEEEEOSS");
+				//System.err.println("1ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			Statement stmt = conn.createStatement();
 			 stmt = conn.createStatement();
@@ -108,7 +118,7 @@ public class Database extends Region {
 			if (conn==null || conn.isClosed()){
 				conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
                      "user=root");
-				System.err.println("2ELEOEEEEEEEEEEEEEEEEEEEEOSS");
+				//System.err.println("2ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			for (int y=0; y<DATABASE_WIDTH; y++){
 				for (int x=0; x<DATABASE_WIDTH; x++){
@@ -220,7 +230,7 @@ public class Database extends Region {
 			if (conn==null || conn.isClosed()){
 				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/stratification?" +
                      "user=root");
-				System.err.println("3ELEOEEEEEEEEEEEEEEEEEEEEOSS");
+				//System.err.println("3ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			
 			

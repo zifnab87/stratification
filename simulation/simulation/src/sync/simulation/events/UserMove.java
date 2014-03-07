@@ -89,12 +89,12 @@ public class UserMove {
 	}
 	
 	
-	public UserMove(Viewport viewport,Run run){
+/*	public UserMove(Viewport viewport,Run run, int a){
 		this.run = run;
 		this.point = viewport.upperLeft;
 		this.viewport = viewport;
 		this.movementType = viewport.resultOfMovement;
-	}
+	}*/
 	
 	/*public void write(){
 		try {
@@ -114,17 +114,19 @@ public class UserMove {
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		//System.out.println(availThinkTime);
+		int count = 0;
 		while (iter.hasNext() && availThinkTime>0){
+			
 			boolean prefetched  = false;
 			TileOverall tileStatistic = iter.next();
 			Point point = tileStatistic.point;
 			int index = point.hashCode();
-			int fragmentsNeeded = 8;
+			int fragmentsNeeded = FRAGMENTS_PER_TILE;
 			if (FRAGMENT){
-				fragmentsNeeded = 6;
+				fragmentsNeeded = tileStatistic.howManyFragments();
 			}
 			else {
-				fragmentsNeeded = 8;//tile.fragmentsNeeded;
+				fragmentsNeeded = FRAGMENTS_PER_TILE;//tile.fragmentsNeeded;
 			}
 			//Vector<Integer> fragmentsToBePrefetched = null;
 			//index.LOD = LOD;
@@ -145,6 +147,7 @@ public class UserMove {
 			if (!Main.cache.tileExists(index)){
 				Tile tile = Main.db.getTileWithFragmentRange( point,1,fragmentsNeeded,null);
 				Main.cache.cacheTileWithFragmentRange(tile,1,fragmentsNeeded);
+				count++;
 			}
 			else {
 				CachedTile cachedPartialTile = Main.cache.getTile(point);
@@ -152,6 +155,7 @@ public class UserMove {
 				if (cachedLOD < fragmentsNeeded){
 					Tile tile = Main.db.getTileWithFragmentRange( point,cachedLOD+1,fragmentsNeeded,null);
 					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
+					count++;
 				}
 			}
 			double end = (System.currentTimeMillis() - start);
@@ -308,7 +312,7 @@ public class UserMove {
 			
 			
 		}
-		
+		Util.debug("prefetched "+count);
 		this.thinkTime = availThinkTime;
 	}
 	
@@ -334,6 +338,7 @@ public class UserMove {
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
+
 					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
 				}
 				else {
@@ -422,6 +427,7 @@ public class UserMove {
 	
 	
 	public UserMove go(String move){
+		Util.debug(move);
 		if (move.equals("up")){
 			return new UserMove(this.point.goUp());
 		}

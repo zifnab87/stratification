@@ -10,7 +10,7 @@ public class Config {
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================
-	public static int THINK_TIME = 256;
+	public static int THINK_TIME = 4096;
 	public static Distribution DISTRIBUTION = new Distribution(0.25,0.25,0.25,0.25);
 	//public static Distribution DISTRIBUTION = new Distribution(0.01,0.33,0.33,0.33);
 	//public static Distribution DISTRIBUTION = new Distribution(0.1,0.5,0.1,0.3);
@@ -23,7 +23,7 @@ public class Config {
 	public static boolean FRAGMENT = false ; 
 	public  static String WORKLOAD_FILE = "workload_4";
 	//CACHE (fragmentcount size)
-	public static  int CACHE_SIZE = 2048;
+	public static  int CACHE_SIZE = 1024;
 
 	//========== DATABASE =================================================
 	public static  int DATABASE_TILES_NUM = 625;//625;
@@ -48,7 +48,7 @@ public class Config {
 	
 	//============= JUMP REGION ===================================================
 	
-	public static int JUMP_REGION_WIDTH = 10;
+	public static int JUMP_REGION_WIDTH = 25;
 	
 	
 	
@@ -61,6 +61,7 @@ public class Config {
 	
 	//========== FRAGMENT ===================================================
 	public  static int FRAGMENT_SIZE = (TILE_HEIGHT*TILE_WIDTH)/FRAGMENTS_PER_TILE;
+	public static double COVERAGE = 0.9; // percentage of the cummulative distribution to prefetch fragments
 	
 	//========== PREDICTOR ==================================================
 	public static double JUMP_WEIGHT_FACTOR = 0.0;
