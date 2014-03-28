@@ -455,14 +455,14 @@ public class UserMove {
 			}
 			return this;
 		}
-		else if(move.equals("zoommax")){
-			currentZoomLevel = FRAGMENTS_PER_TILE;
+		else if(move.equals("zoomjump")){
+			currentZoomLevel = new Random().nextInt(FRAGMENTS_PER_TILE);
 			return this;
 		}
-		else if(move.equals("zoommin")){
+		/*else if(move.equals("zoommin")){
 			currentZoomLevel = 1;
 			return this;
-		}
+		}*/
 		else {
 			return null;
 		}

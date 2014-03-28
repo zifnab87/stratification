@@ -354,11 +354,19 @@ public class Cache {
 				
 				}
 			}
+			if (prob1){
+				System.err.println("ELEOS to idio");
+			}
+			if (prob2){
+				System.err.println("ELEOS cache degradation");
+			}
+			
 			
 			if (prob1 || prob2) {
 				prob1 = false;
 				prob2 = false;
-				continue;
+				//continue;
+				
 			}
 			
 			int fragmentsEvicted = evictTile(lessLikelyTile,iter);

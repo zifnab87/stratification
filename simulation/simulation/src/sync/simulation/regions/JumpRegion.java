@@ -45,9 +45,9 @@ public class JumpRegion extends Region {
 		for (int y=upperLeft.y; y<Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
 			for (int x=upperLeft.x; x<Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
 				UserStudiesCombined.tiles[y][x].updateImportance(current);
-				if (UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
+				//if (UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
 					queue.add(UserStudiesCombined.tiles[y][x]);
-				}
+				//}
 			}
 		}
 		return queue;

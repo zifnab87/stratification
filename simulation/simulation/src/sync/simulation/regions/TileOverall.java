@@ -32,17 +32,17 @@ public class TileOverall {
 	}
 	
 	public int howManyFragments(){
-		int i=1;
-		while (COVERAGE>=this.visitResolutions[i] && i<FRAGMENTS_PER_TILE){
+		/*int i=1;
+		while (COVERAGE>this.visitResolutions[i] && i<FRAGMENTS_PER_TILE){
+			
 			i++;
 			if (COVERAGE<this.visitResolutions[i]){
 				return i-1;
 				
 			}
-			
-			
 		}
-		return FRAGMENTS_PER_TILE;
+		return i;*/
+		return UserMove.currentZoomLevel;
 	}
 	
 	

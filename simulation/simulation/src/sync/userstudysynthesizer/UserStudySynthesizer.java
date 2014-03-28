@@ -32,19 +32,18 @@ public class UserStudySynthesizer {
 	};
 	
 	static HashMap<Integer,TileOverall> map = new HashMap<Integer,TileOverall>();
-	static double jumpProbability = 0.1; //0.1
+	static double jumpProbability = 0.5; //0.1
 	static double panProbability = 0.5; // 0.5
-	static double zoomProbability = 0.4; // 0.4
+	static double zoomProbability = 0.0; // 0.4
 	
 	static double upProbability = 0.25;
 	static double downProbability = 0.25;
 	static double leftProbability = 0.25;
 	static double rightProbability = 0.25;
 	
-	static double zoomMinProbability = 0.05;
-	static double zoomMaxProbability = 0.05;
-	static double zoomInProbability = 0.60;
-	static double zoomOutProbability = 0.30;
+	static double zoomJumpProbability = 0.0;
+	static double zoomInProbability = 0.0;
+	static double zoomOutProbability = 0.0;
 	
 	
 	
@@ -67,8 +66,10 @@ public class UserStudySynthesizer {
 				
 				zoomInProbability = zoomProbability * zoomInProbability;
 				zoomOutProbability = zoomProbability * zoomOutProbability;
-				zoomMaxProbability =  zoomProbability * zoomMaxProbability;
-				zoomMinProbability =  zoomProbability * zoomMinProbability;
+				zoomJumpProbability = zoomProbability * zoomJumpProbability;
+				/*zoomMaxProbability =  zoomProbability * zoomMaxProbability;
+				zoomMinProbability =  zoomProbability * zoomMinProbability;*/
+				
 	}
 	
 	
@@ -136,7 +137,7 @@ public class UserStudySynthesizer {
 				TileOverall currentTile = null;
 				
 				//find which of the jump points are contained in the jumpRegion
-				Vector<Point> contained = new Vector<Point>();
+				/*Vector<Point> contained = new Vector<Point>();
 				for (int i=0; i<jumpPoints.length; i++){
 					
 					if(jump.contains(jumpPoints[i])){
@@ -148,7 +149,9 @@ public class UserStudySynthesizer {
 				}
 				else {
 					jumpPoint = jump.randomPoint(); // remove the jumps from the boundaries of db
-				}
+				}*/
+				
+				jumpPoint = jump.randomPoint();
 				
 				UserMove previous = current;
 				current = current.jumpTo(jumpPoint);
@@ -207,20 +210,20 @@ public class UserStudySynthesizer {
 				possiblyNotPermitted = true;
 				
 			}
-			else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability
-					&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability){
-				//zoom in max;
-				current = current.go("zoommax");
-				possiblyNotPermitted = true;
-				
-			}
+//			else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability
+//					&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability){
+//				//zoom in max;
+//				current = current.go("zoomjump");
+//				possiblyNotPermitted = true;
+//				
+//			}
 			else {
 				
-				current = current.go("zoommin");
+				current = current.go("zoomjump");
 				possiblyNotPermitted = true;
 			}
 		}
-		while(/*possiblyNotPermitted && !FRAGMENT*/ 1!=1);
+		while(possiblyNotPermitted && !FRAGMENT);
 			
 		/*else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability
 				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability+zoomMinProbability){
@@ -256,12 +259,17 @@ public class UserStudySynthesizer {
 	public static void printUserStudies(){
 		process();
 		Iterator<Integer> iter = map.keySet().iterator();
+		System.out.println("public UserStudiesCombined(){\n\tinit1();\n\tinit2();\n}");
+		System.out.println("public void init1(){");
+		int total = map.keySet().size();
+		boolean flag = false;
+		int count  = 0;
 		while(iter.hasNext()){
 			Integer key = iter.next();
 			TileOverall tile = map.get(key);
 			int y = tile.point.y;
 			int x = tile.point.x;
-			System.out.print("tiles["+y+"]["+x+"] = new TileOverall(Database.points("+y+","+x+"),new double[]{0,");
+			System.out.print("\ttiles["+y+"]["+x+"] = new TileOverall(Database.points("+y+","+x+"),new double[]{0,");
 			for(int i=1; i<tile.visitResolutions.length; i++){
 				System.out.print(tile.visitResolutions[i]);
 				if (i!=tile.visitResolutions.length-1){//not last
@@ -270,7 +278,16 @@ public class UserStudySynthesizer {
 				
 			}
 			System.out.println("},"+tile.jumpToCounts+","+tile.visitsCounts+");");
+		
+			if (!flag && count>total/2.0 ){
+				System.out.println("}");
+				System.out.println("public void init2(){");
+				flag = true;
+			}
+			count++;
 		}
+	
+		System.out.println("}");
 		
 		
 	}
