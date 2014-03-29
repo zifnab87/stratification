@@ -78,10 +78,10 @@ public class TileOverall {
 	public TileOverall(Point point){
 		this.point = point;
 		
-		if (IMPORTANCE_METRIC==-100){
+		if (IMPORTANCE_METRIC==-1){
 			this.importanceNormalizer = distNormalizer; //maximum value when distance is 1
 		}
-		else if (IMPORTANCE_METRIC==100){
+		else if (IMPORTANCE_METRIC==1){
 			this.importanceNormalizer = 1.0d; 
 		}
 		else if (IMPORTANCE_METRIC==0){
