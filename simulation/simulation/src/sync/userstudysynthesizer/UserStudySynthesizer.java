@@ -108,22 +108,22 @@ public class UserStudySynthesizer {
 			double rand2 = Math.random();
 			if (rand2<=randomZoomProbability){ //ZOOM -> RANDOM ZOOM
 				double rand3 = Math.random();
-				 if(rand3<=zoomInProbability){
+				 if(rand3 <= zoomInProbability){
 					//zoom in 
 					current = current.go("zoomin");
 					possiblyNotPermitted = true;
 					
 				}
-				else if(rand3>zoomInProbability 
-						&& rand3<=zoomInProbability+zoomOutProbability){
+				else if(rand3 > zoomInProbability 
+						&& rand3 <= zoomInProbability+zoomOutProbability){
 					//zoom out; 
 					current = current.go("zoomout");
 					possiblyNotPermitted = true;
 					
 				}
 				else if(rand3 > zoomInProbability+zoomOutProbability
-						&& rand3 <= zoomInProbability+zoomOutProbability){
-					//zoom in max;
+						&& rand3 <= zoomInProbability+zoomOutProbability+zoomJumpProbability){
+					//zoom jump;
 					current = current.go("zoomjump");
 					possiblyNotPermitted = true;
 					
@@ -137,6 +137,9 @@ public class UserStudySynthesizer {
 				else if (fragments>FRAGMENTS_PER_TILE){
 					UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
 				}
+				
+				UserMove.currentZoomLevel = fragments;
+				
 				possiblyNotPermitted = true;
 			}
 		}
@@ -161,7 +164,7 @@ public class UserStudySynthesizer {
 		else if (possiblyNotPermitted && !FRAGMENT){
 			current = null; //if a zoom happened and we are on Tiles mode
 		}
-		
+		System.out.println("current"+current.point+" "+rand);
 		return current;
 	}
 }

@@ -74,13 +74,13 @@ public class Main {
 			CACHE_SIZE = m;
 			for (int f=0; f<=1; f++){
 				for (int w=-1; w<=1; w++){
-					System.out.println("EVICTION METRIC"+w);
+					System.out.println("EVICTION METRIC:"+w);
 					Vector<Run> runs = new Vector<Run>();
 					if (f==0){
-						FRAGMENT = false;
+						FRAGMENT = true;
 					}
 					else {
-						FRAGMENT = true;
+						FRAGMENT = false;
 					}
 					
 					for (int i=0; i<=RUNS+1; i++){
@@ -125,19 +125,20 @@ public class Main {
 					    	current.viewport = viewport;
 					    	jump = new JumpRegion(Database.points(0,0));
 					    	current.run.totalMoves+=1;			
-							Util.debug("Memory before Move:"+Main.cache.getQueue());
+							Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
 							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel);
 							current.viewportFetch();
+							Util.debug("Memory after Move:"+Main.cache.getQueue(),true);
 							Main.cache.updateImportances(current.point);
 							//System.out.println(cache);
-							Util.debug("Memory after Fetch:"+Main.cache.getQueue());
+							Util.debug("Memory after Fetch:"+Main.cache.getQueue(),true);
 							Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 					    
 						   //PREDICTOR
 							
 							//System.out.println("Before:"+cache);
 							current.prefetch(jump, current.point);
-							cache.updateImportances(current.point);
+							Main.cache.updateImportances(current.point);
 							//System.out.println("After:"+cache);
 						
 							Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);

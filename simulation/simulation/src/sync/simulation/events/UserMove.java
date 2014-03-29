@@ -124,6 +124,7 @@ public class UserMove {
 			int fragmentsNeeded = FRAGMENTS_PER_TILE;
 			if (FRAGMENT){
 				fragmentsNeeded = tileStatistic.howManyFragments();
+				System.out.println("fraaaag"+fragmentsNeeded);
 			}
 			else {
 				fragmentsNeeded = FRAGMENTS_PER_TILE;//tile.fragmentsNeeded;
@@ -336,7 +337,7 @@ public class UserMove {
 				if (!Main.cache.tileExists(index)){
 					Tile tile = Main.db.fetchTile(index, this);
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
-					Main.cache.cacheTileWithFragmentRange(tile,upperLeft, 1, fragmentsNeeded);
+					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
 
 					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
@@ -350,7 +351,7 @@ public class UserMove {
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
-					Main.cache.cacheTileWithFragmentRange(tile, upperLeft,cachedLOD+1,fragmentsNeeded);
+					Main.cache.cacheTileWithFragmentRange(tile, this.point,cachedLOD+1,fragmentsNeeded);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;

@@ -27,37 +27,41 @@ public class TileOverall {
 		double distNormalized = Point.distance(this.point, current)/(1.0d*distNormalizer);
 		double popularity = UserStudiesCombined.popularities[this.point.y][this.point.x];
 		
-		
-		if (IMPORTANCE_METRIC==-1){
-			this.totalImportance = (1/distNormalized);	
+		if (current.equals(this.point)){
+			this.totalImportance = 1000000;
 		}
-		else if (IMPORTANCE_METRIC==1){
-			this.totalImportance = popularity;
+		else {
+			if (IMPORTANCE_METRIC==-1){
+				this.totalImportance = (1/distNormalized);	
+			}
+			else if (IMPORTANCE_METRIC==1){
+				this.totalImportance = popularity;
+			}
+			else if (IMPORTANCE_METRIC==0){
+				this.totalImportance = popularity + 1/distNormalized + (1/distNormalized)*popularity;	
+			}
+			else if (IMPORTANCE_METRIC>0){ 
+				this.totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + 1/distNormalized + (1/distNormalized)*popularity;	
+			}
+			else if (IMPORTANCE_METRIC<0){ 
+				this.totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)/distNormalized + (1/distNormalized)*popularity;	
+			}
 		}
-		else if (IMPORTANCE_METRIC==0){
-			this.totalImportance = popularity + 1/distNormalized + (1/distNormalized)*popularity;	
-		}
-		else if (IMPORTANCE_METRIC>0){ 
-			this.totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + 1/distNormalized + (1/distNormalized)*popularity;	
-		}
-		else if (IMPORTANCE_METRIC<0){ 
-			this.totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)/distNormalized + (1/distNormalized)*popularity;	
-		}
-		
 		
 	}
 	
 	public int howManyFragments(){
 	
 		int fragments = (int)Math.floor((this.totalImportance/this.importanceNormalizer)*FRAGMENTS_PER_TILE);
-		if (fragments<0){
-			return 0;
+		
+		if (fragments<1){
+			return 1;
 		}
 		else if(fragments>FRAGMENTS_PER_TILE){
 			return FRAGMENTS_PER_TILE;
 		}
 		else {
-			return -1;
+			return fragments;
 		}
 		//return UserMove.currentZoomLevel;
 	}

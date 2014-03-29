@@ -210,8 +210,9 @@ public class Cache {
 	}
 	
 	public int sizeBeingUsed() {
+		
 		if (this.tiles.size()!=this.queue.size()){
-			System.err.println("memory inconsistency");
+			System.err.println("tiles:"+this.tiles.size()+" queue:"+this.queue.size()+" memory inconsistency");
 		}
 		/*Iterator<Integer> iterKeys = this.tiles.keySet().iterator();
 		int total = 0;
@@ -385,7 +386,6 @@ public class Cache {
 	
 	
 	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
-		
 		this.tiles.remove(cTile.point.hashCode());
 		queueRemove(cTile);
 		//iter.remove();
@@ -446,6 +446,7 @@ public class Cache {
 		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
 		while (mapIter.hasNext()){
 			CachedTile cTile = queueFind(mapIter.next());
+			
 			String[] data = cTile.data;
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
@@ -463,9 +464,10 @@ public class Cache {
 			else {
 				UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].updateImportance(currentPosition);
 				cTile.totalImportance = UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].totalImportance;
+				cTile.distance = Point.distance(cTile.point, currentPosition);
 			
 			}
-			cTile.distance = Point.distance(cTile.point, currentPosition);
+			
 			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
 				this.queue.add(cTile);
 			}
