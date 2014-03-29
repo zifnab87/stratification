@@ -89,7 +89,7 @@ public class Cache {
 	
 	
 	
-	public CachedTile cacheTileWithFragmentRange(Tile tile,int firstFragment, int lastFragment){
+	public CachedTile cacheTileWithFragmentRange(Tile tile,Point current,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
 		while(!this.hasAvailableSpace(spaceNeeded)){
 			Util.debug("space still Needed "+spaceNeeded);
@@ -128,7 +128,8 @@ public class Cache {
 		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//Util.debug(toBeCached.fragmentsToString());
-			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].visitsCounts;
+			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
+			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].totalImportance;
 			this.queue.add(toBeCached);
 		}
 		else {
@@ -140,7 +141,8 @@ public class Cache {
 			//Util.debug(this.queue.size());
 			Util.debug(cTile.fragmentsToString());
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].visitsCounts;
+			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
+			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].totalImportance;
 			Util.debug(toBeCached.fragmentsToString());
 			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
 				this.queue.add(toBeCached);
@@ -459,8 +461,8 @@ public class Cache {
 				//continue;
 			}
 			else {
-				cTile.totalImportance = (1/(Point.distance(cTile.point, currentPosition)+0.001))*(UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].visitsCounts +
-									UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].jumpToCounts);
+				UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].updateImportance(currentPosition);
+				cTile.totalImportance = UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].totalImportance;
 			
 			}
 			cTile.distance = Point.distance(cTile.point, currentPosition);

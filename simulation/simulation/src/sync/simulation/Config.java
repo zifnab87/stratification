@@ -6,7 +6,7 @@ import sync.simulation.monitor.Distribution;
 public class Config {
 	
 	public static boolean DEBUG = false;
-	public  static int RUNS = 4;
+	public  static int RUNS = 1;
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================
@@ -66,7 +66,7 @@ public class Config {
 	//========== PREDICTOR ==================================================
 	public static double JUMP_WEIGHT_FACTOR = 0.0;
 	public static double DISTANCE_WEIGHT_FACTOR = 0.0;
-	public static double IMPORTANCE_WEIGHT_FACTOR = 0.0;
+	public static int IMPORTANCE_METRIC = 0;
 	
 	public static boolean SKIP_PREDICTIONS = false;
 	public static double CUTOFF = 30; // take the first CUTTOFF nodes with the highest probability in each predictor expansion 

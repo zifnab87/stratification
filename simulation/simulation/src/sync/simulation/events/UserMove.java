@@ -146,7 +146,7 @@ public class UserMove {
 			
 			if (!Main.cache.tileExists(index)){
 				Tile tile = Main.db.getTileWithFragmentRange( point,1,fragmentsNeeded,null);
-				Main.cache.cacheTileWithFragmentRange(tile,1,fragmentsNeeded);
+				Main.cache.cacheTileWithFragmentRange(tile,current,1,fragmentsNeeded);
 				count++;
 			}
 			else {
@@ -154,7 +154,7 @@ public class UserMove {
 				int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 				if (cachedLOD < fragmentsNeeded){
 					Tile tile = Main.db.getTileWithFragmentRange( point,cachedLOD+1,fragmentsNeeded,null);
-					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
+					Main.cache.cacheTileWithFragmentRange(tile,current,cachedLOD+1,fragmentsNeeded);
 					count++;
 				}
 			}
@@ -336,7 +336,7 @@ public class UserMove {
 				if (!Main.cache.tileExists(index)){
 					Tile tile = Main.db.fetchTile(index, this);
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
-					Main.cache.cacheTileWithFragmentRange(tile, 1, fragmentsNeeded);
+					Main.cache.cacheTileWithFragmentRange(tile,upperLeft, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
 
 					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
@@ -350,7 +350,7 @@ public class UserMove {
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
-					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
+					Main.cache.cacheTileWithFragmentRange(tile, upperLeft,cachedLOD+1,fragmentsNeeded);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;
@@ -459,10 +459,6 @@ public class UserMove {
 			currentZoomLevel = new Random().nextInt(FRAGMENTS_PER_TILE);
 			return this;
 		}
-		/*else if(move.equals("zoommin")){
-			currentZoomLevel = 1;
-			return this;
-		}*/
 		else {
 			return null;
 		}

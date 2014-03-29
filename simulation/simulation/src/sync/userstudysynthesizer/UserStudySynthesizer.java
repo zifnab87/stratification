@@ -15,6 +15,7 @@ import util.Util;
 import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.JUMP_REGION_WIDTH;
 import static sync.simulation.Config.FRAGMENT;
+import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 
 
 public class UserStudySynthesizer {
@@ -31,264 +32,136 @@ public class UserStudySynthesizer {
 											new Point(15,20),new Point(14,20),new Point(16,20),new Point(15,19),new Point(15,21),		
 	};
 	
-	static HashMap<Integer,TileOverall> map = new HashMap<Integer,TileOverall>();
-	static double jumpProbability = 0.5; //0.1
+	
+	static double jumpProbability = 0.1; //0.1
 	static double panProbability = 0.5; // 0.5
-	static double zoomProbability = 0.0; // 0.4
+	static double zoomProbability = 0.4; // 0.4
+	
+	
+	
+	static double deterministicPanProbability = 0.75;
+	static double randomPanProbability = 0.25;
 	
 	static double upProbability = 0.25;
 	static double downProbability = 0.25;
 	static double leftProbability = 0.25;
 	static double rightProbability = 0.25;
 	
-	static double zoomJumpProbability = 0.0;
-	static double zoomInProbability = 0.0;
-	static double zoomOutProbability = 0.0;
+	
+	static double deterministicZoomProbability = 0.75;
+	static double randomZoomProbability = 0.25;
+	
+	static double zoomInProbability = 0.45;
+	static double zoomOutProbability = 0.45;
+	static double zoomJumpProbability = 0.10;
 	
 	
 	
-	static double numOfUserStudies = 600;
-	static double numOfMovesPerStudy = 1000;
-	
-	
-	public UserStudySynthesizer(){
-		for (int j=0; j<DATABASE_WIDTH; j++){
-			for (int i=0; i<DATABASE_WIDTH; i++){
-				Point point = Database.points(j,i);
-				map.put(point.id, new TileOverall(point));
-			}
-		}
-		// Prepare probabilities
-				upProbability = panProbability * upProbability;
-				downProbability = panProbability * downProbability;
-				leftProbability = panProbability * leftProbability;
-				rightProbability = panProbability * rightProbability;
-				
-				zoomInProbability = zoomProbability * zoomInProbability;
-				zoomOutProbability = zoomProbability * zoomOutProbability;
-				zoomJumpProbability = zoomProbability * zoomJumpProbability;
-				/*zoomMaxProbability =  zoomProbability * zoomMaxProbability;
-				zoomMinProbability =  zoomProbability * zoomMinProbability;*/
-				
-	}
-	
-	
-	public static void updateCounts(UserMove current){
-		TileOverall currentTile = map.get(current.point.id);
-		//if (currentTile.visitsCounts<numOfUserStudies){
-			currentTile.visitsCounts++;
-		//}
-		//if (currentTile.visitResolutions[UserMove.currentZoomLevel]<numOfUserStudies){
-			currentTile.visitResolutions[UserMove.currentZoomLevel]++;
-		//}
-		
-	}
-	
-	
-	public static void main(String args[]){
-		
-		//initialize all objects in map
-		Database db = new Database();
-		JumpRegion jump = new JumpRegion(Database.points(0,0));
-		UserStudiesCombined usc = new UserStudiesCombined();
-		
-		
-		UserStudySynthesizer uss = new UserStudySynthesizer();
-		
-		
-		
-		// Starting point
-		//System.out.println(db.upperLeft);
-		//Viewport viewport = new Viewport(Database.points(0,0));
-		
-		
-		
-		for (int i=0; i<numOfUserStudies; i++){
-			UserMove current = new UserMove(db.randomPoint());
-			//System.out.println(current.point+"");
-			for (int j=0; j<numOfMovesPerStudy; j++){
-				current = whatHappensNext(current,true);
-				updateCounts(current);
-				//System.out.println(current.point);
-			}
-		}
-		
-		
-		printUserStudies();
-		
-		
-		
-		
-		
-	}
-	
-	
-	public static UserMove whatHappensNext(UserMove current,boolean jumpCount){
+	public static UserMove whatHappensNext(UserMove current){
 		boolean possiblyNotPermitted = false;
-		do{
-			double rand = Math.random();
-			possiblyNotPermitted = false;
-			if (rand<=jumpProbability){
-				//jump
-				Util.debug("jump");
-				JumpRegion jump = new JumpRegion(Database.points(current.point.y-JUMP_REGION_WIDTH/2,current.point.x-JUMP_REGION_WIDTH/2));
-				//System.out.println(Database.points(current.point.y-JUMP_REGION_WIDTH/2,current.point.x-JUMP_REGION_WIDTH/2)+"!!!");
-				Point jumpPoint = null;
-				TileOverall currentTile = null;
-				
-				//find which of the jump points are contained in the jumpRegion
-				/*Vector<Point> contained = new Vector<Point>();
-				for (int i=0; i<jumpPoints.length; i++){
+		possiblyNotPermitted = false;
+		double rand = Math.random();
+		if (rand<=panProbability){ //PAN
+			double rand2 = Math.random();
+			if (rand2<=randomPanProbability){ //PAN -> RANDOM PAN
+				double rand3 = Math.random();
+				if(rand3 <= upProbability){
+					//up
+					current = current.go("up");
+
+				}
+				else if(rand3 > upProbability && rand3 <= upProbability+downProbability){
+					//down
+					current = current.go("down");
 					
-					if(jump.contains(jumpPoints[i])){
-						contained.add(jumpPoints[i]);
+				}
+				else if(rand3 > upProbability+downProbability && rand3 <= upProbability+downProbability+leftProbability){
+					//left
+					current = current.go("left");
+					
+				}
+				else if(rand3 > upProbability+downProbability+leftProbability && rand3 <= upProbability+downProbability+leftProbability+rightProbability){
+					//right
+					current = current.go("right");
+					
+				}
+			}
+			else { // PAN -> DETERMINISTIC PAN (choose based on which has the most popularity)
+				String[] moves = new String[]{"up","down","left","right"};
+				double max = -10;
+				String maximizingMove = "";
+				for(int i=0; i<moves.length; i++){
+					current = current.go(moves[i]);
+					//current.point.y
+					double newVal = UserStudiesCombined.popularities[current.point.y][current.point.x];
+					if (newVal>max){
+						max = newVal;
+						maximizingMove = moves[i];
 					}
 				}
-				if (contained.size()>0){
-					 jumpPoint = contained.get(new Random().nextInt(contained.size()));
-				}
-				else {
-					jumpPoint = jump.randomPoint(); // remove the jumps from the boundaries of db
-				}*/
 				
-				jumpPoint = jump.randomPoint();
-				
-				UserMove previous = current;
-				current = current.jumpTo(jumpPoint);
-				currentTile = map.get(current.point.id);
+				current = current.go(maximizingMove);
+			
+			}
+		}
+		else if(rand>panProbability && rand<=panProbability+zoomProbability){ //ZOOM
+			double rand2 = Math.random();
+			if (rand2<=randomZoomProbability){ //ZOOM -> RANDOM ZOOM
+				double rand3 = Math.random();
+				 if(rand3<=zoomInProbability){
+					//zoom in 
+					current = current.go("zoomin");
+					possiblyNotPermitted = true;
 					
-				
-				
-				
-				//current = current.jumpTo(jumpPoint);
-				
-				//TileOverall currentTile = map.get(current.point.id);
-				//System.out.println("bgika"+map.get(jumpPoint.id).jumpToCounts);
-				//if (currentTile.jumpToCounts<60){
-				if (jumpCount){
-					currentTile.jumpToCounts++;
 				}
-				//}
-				//else {
-				//	current = previous;
-				//}
-				
-			
+				else if(rand3>zoomInProbability 
+						&& rand3<=zoomInProbability+zoomOutProbability){
+					//zoom out; 
+					current = current.go("zoomout");
+					possiblyNotPermitted = true;
+					
+				}
+				else if(rand3 > zoomInProbability+zoomOutProbability
+						&& rand3 <= zoomInProbability+zoomOutProbability){
+					//zoom in max;
+					current = current.go("zoomjump");
+					possiblyNotPermitted = true;
+					
+				}
 			}
-			else if(rand>jumpProbability && rand<=jumpProbability+upProbability){
-				//up
-				//System.out.println(current+"@@");
-				current = current.go("up");
-				
-			}
-			else if(rand>jumpProbability+upProbability && rand<=jumpProbability+upProbability+downProbability){
-				//down
-				current = current.go("down");
-				
-			}
-			else if(rand>jumpProbability+upProbability+downProbability && rand<=jumpProbability+upProbability+downProbability+leftProbability){
-				//left
-				current = current.go("left");
-				
-			}
-			else if(rand>jumpProbability+upProbability+downProbability+leftProbability && rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability){
-				//right
-				current = current.go("right");
-				
-			}
-			else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability 
-					&& rand<=jumpProbability+upProbability+downProbability+leftProbability+zoomInProbability){
-				//zoom in 
-				current = current.go("zoomin");
-				possiblyNotPermitted = true;
-				
-			}
-			else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability 
-					&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability){
-				//zoom out; 
-				current = current.go("zoomout");
-				possiblyNotPermitted = true;
-				
-			}
-//			else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability
-//					&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability){
-//				//zoom in max;
-//				current = current.go("zoomjump");
-//				possiblyNotPermitted = true;
-//				
-//			}
-			else {
-				
-				current = current.go("zoomjump");
+			else { //ZOOM -> DETERMINISTIC ZOOM
+				int fragments = (int)Math.floor(FRAGMENTS_PER_TILE*UserStudiesCombined.popularities[current.point.y][current.point.x]);
+				if (fragments < 0 ){
+					UserMove.currentZoomLevel = 0;
+				}
+				else if (fragments>FRAGMENTS_PER_TILE){
+					UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
+				}
 				possiblyNotPermitted = true;
 			}
 		}
-		while(possiblyNotPermitted && !FRAGMENT);
+		else if(rand>panProbability+zoomProbability && rand <=1.0d){ //JUMP
+			// take 40 random jump points
+			// get the one that maximizes the popularity
+			JumpRegion jump = new JumpRegion(Database.points(0,0));
+			Point maximizingJumpPoint = null;
+			double max = -10;
+			for (int i=0; i<40; i++){
+				Point point = Database.points(Util.randInt(0, DATABASE_WIDTH-1),Util.randInt(0, DATABASE_WIDTH-1));
+				current = current.jumpTo(point);
+				double newVal = UserStudiesCombined.popularities[current.point.y][current.point.x];
+				if (newVal>max){
+					max = newVal;
+					maximizingJumpPoint = point;
+				}
+			}
 			
-		/*else if(rand>jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability
-				&& rand<=jumpProbability+upProbability+downProbability+leftProbability+rightProbability+zoomInProbability+zoomOutProbability+zoomMaxProbability+zoomMinProbability){
-			//zoom out min;
-			current = current.go("zoommin");
-			
-		}*/
+			current = current.jumpTo(maximizingJumpPoint);
+		}
+		else if (possiblyNotPermitted && !FRAGMENT){
+			current = null; //if a zoom happened and we are on Tiles mode
+		}
+		
 		return current;
-	}
-	//process the resolutions to be cumulative percentiles
-	public static void process(){
-		Iterator<Integer> iter = map.keySet().iterator();
-		while (iter.hasNext()){
-			Integer key = iter.next();
-			TileOverall tile = map.get(key);
-			int sum=0;
-			for(int i=1; i<tile.visitResolutions.length; i++){
-				sum+=tile.visitResolutions[i];
-			}
-			if (sum!=0){
-				for(int i=1; i<tile.visitResolutions.length; i++){
-					tile.visitResolutions[i] = tile.visitResolutions[i]/(1.0*sum);
-				}
-				for(int i=2; i<tile.visitResolutions.length; i++){
-					tile.visitResolutions[i] = tile.visitResolutions[i-1]+tile.visitResolutions[i];
-				}
-			
-			}
-			
-		}
-	}
-	
-	public static void printUserStudies(){
-		process();
-		Iterator<Integer> iter = map.keySet().iterator();
-		System.out.println("public UserStudiesCombined(){\n\tinit1();\n\tinit2();\n}");
-		System.out.println("public void init1(){");
-		int total = map.keySet().size();
-		boolean flag = false;
-		int count  = 0;
-		while(iter.hasNext()){
-			Integer key = iter.next();
-			TileOverall tile = map.get(key);
-			int y = tile.point.y;
-			int x = tile.point.x;
-			System.out.print("\ttiles["+y+"]["+x+"] = new TileOverall(Database.points("+y+","+x+"),new double[]{0,");
-			for(int i=1; i<tile.visitResolutions.length; i++){
-				System.out.print(tile.visitResolutions[i]);
-				if (i!=tile.visitResolutions.length-1){//not last
-					System.out.print(",");
-				}
-				
-			}
-			System.out.println("},"+tile.jumpToCounts+","+tile.visitsCounts+");");
-		
-			if (!flag && count>total/2.0 ){
-				System.out.println("}");
-				System.out.println("public void init2(){");
-				flag = true;
-			}
-			count++;
-		}
-	
-		System.out.println("}");
-		
-		
 	}
 }
