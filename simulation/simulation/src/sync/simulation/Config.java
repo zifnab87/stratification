@@ -6,7 +6,7 @@ import sync.simulation.monitor.Distribution;
 public class Config {
 	
 	public static boolean DEBUG = false;
-	public  static int RUNS = 1;
+	public  static int RUNS = 10;
 	public static boolean PREFETCH = true;
 	
 	//=============== USER =================================================

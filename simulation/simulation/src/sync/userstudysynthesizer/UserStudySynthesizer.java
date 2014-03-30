@@ -33,9 +33,9 @@ public class UserStudySynthesizer {
 	};
 	
 	
-	static double jumpProbability = 0.4; //0.1
-	static double panProbability = 0.2; // 0.5
-	static double zoomProbability = 0.4; // 0.4
+	static double jumpProbability = 0.8; //0.1
+	static double panProbability = 0.1; // 0.5
+	static double zoomProbability = 0.1; // 0.4
 	
 	
 	

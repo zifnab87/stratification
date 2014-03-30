@@ -46,7 +46,8 @@ public class JumpRegion extends Region {
 		for (int y=upperLeft.y; y<Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
 			for (int x=upperLeft.x; x<Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
 				UserStudiesCombined.tiles[y][x].updateImportance(current);
-				if (UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
+				// while the cache is getting fuller we still need things that are worse than the worst tile..
+				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
 					if (current.y!=y && current.x!=x || 
 						!Main.cache.tileExists(Database.points(y,x)) 
 						||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments())

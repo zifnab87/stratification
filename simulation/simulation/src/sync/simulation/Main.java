@@ -8,6 +8,7 @@ import static sync.simulation.Config.VIEWPORT_WIDTH;
 import static sync.simulation.Config.WAVES;
 import static sync.simulation.Config.CACHE_SIZE;
 import static sync.simulation.Config.THINK_TIME;
+import static sync.simulation.Config.IMPORTANCE_METRIC;
 import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.RUNS;
 import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
@@ -73,8 +74,9 @@ public class Main {
 		for (int m=512; m<=512; m=m*2){
 			CACHE_SIZE = m;
 			for (int f=0; f<=1; f++){
-				for (int w=-1; w<=1; w++){
+				for (int w=-1; w<=1; w=w+1){
 					System.out.println("EVICTION METRIC:"+w);
+					IMPORTANCE_METRIC = w;
 					Vector<Run> runs = new Vector<Run>();
 					if (f==0){
 						FRAGMENT = false;

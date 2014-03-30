@@ -29,10 +29,12 @@ public class TileOverall {
 		
 		if (current.equals(this.point)){
 			this.totalImportance = 1000000;
+			
 		}
 		else {
 			if (IMPORTANCE_METRIC==-1){
 				this.totalImportance = (1/distNormalized);	
+				//System.out.println("~~~current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
 			}
 			else if (IMPORTANCE_METRIC==1){
 				this.totalImportance = popularity;
@@ -46,6 +48,7 @@ public class TileOverall {
 			else if (IMPORTANCE_METRIC<0){ 
 				this.totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)/distNormalized + (1/distNormalized)*popularity;	
 			}
+			//System.out.println("current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
 		}
 		
 	}
