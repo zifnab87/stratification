@@ -111,6 +111,7 @@ public class UserMove {
 		}*/
 		double start = System.currentTimeMillis();
 		TreeSet<TileOverall> toPrefetch = region.tree(current);
+		System.out.println("Prefetch Queue"+toPrefetch);
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		//System.out.println(availThinkTime);
@@ -124,7 +125,6 @@ public class UserMove {
 			int fragmentsNeeded = FRAGMENTS_PER_TILE;
 			if (FRAGMENT){
 				fragmentsNeeded = tileStatistic.howManyFragments();
-				System.out.println("fraaaag"+fragmentsNeeded);
 			}
 			else {
 				fragmentsNeeded = FRAGMENTS_PER_TILE;//tile.fragmentsNeeded;

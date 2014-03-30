@@ -33,8 +33,8 @@ public class UserStudySynthesizer {
 	};
 	
 	
-	static double jumpProbability = 0.1; //0.1
-	static double panProbability = 0.5; // 0.5
+	static double jumpProbability = 0.4; //0.1
+	static double panProbability = 0.2; // 0.5
 	static double zoomProbability = 0.4; // 0.4
 	
 	
@@ -164,7 +164,7 @@ public class UserStudySynthesizer {
 		else if (possiblyNotPermitted && !FRAGMENT){
 			current = null; //if a zoom happened and we are on Tiles mode
 		}
-		System.out.println("current"+current.point+" "+rand);
+		//System.out.println("current"+current.point+" "+rand);
 		return current;
 	}
 }

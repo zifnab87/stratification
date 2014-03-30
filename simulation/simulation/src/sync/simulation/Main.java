@@ -105,7 +105,7 @@ public class Main {
 						UserMove.currentZoomLevel = 1;
 						Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 						//Predictor predictor = new Predictor(run);
-						for (int j=0; j<400	; j++){ //moves per run	
+						for (int j=0; j<40; j++){ //moves per run	
 					    	
 							System.gc();
 							
@@ -126,9 +126,9 @@ public class Main {
 					    	jump = new JumpRegion(Database.points(0,0));
 					    	current.run.totalMoves+=1;			
 							Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
-							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel);
+							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel,true);
 							current.viewportFetch();
-							Util.debug("Memory after Move:"+Main.cache.getQueue(),true);
+							Util.debug("Memory after Move:"+Main.cache.getQueue());
 							Main.cache.updateImportances(current.point);
 							//System.out.println(cache);
 							Util.debug("Memory after Fetch:"+Main.cache.getQueue(),true);
