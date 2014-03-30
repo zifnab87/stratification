@@ -70,17 +70,17 @@ public class Main {
 		
 
 		//Random rand = new Random();
-		for (int m=256; m<=256; m=m*2){
+		for (int m=512; m<=512; m=m*2){
 			CACHE_SIZE = m;
 			for (int f=0; f<=1; f++){
 				for (int w=-1; w<=1; w++){
 					System.out.println("EVICTION METRIC:"+w);
 					Vector<Run> runs = new Vector<Run>();
 					if (f==0){
-						FRAGMENT = true;
+						FRAGMENT = false;
 					}
 					else {
-						FRAGMENT = false;
+						FRAGMENT = true;
 					}
 					
 					for (int i=0; i<=RUNS+1; i++){
@@ -105,7 +105,7 @@ public class Main {
 						UserMove.currentZoomLevel = 1;
 						Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 						//Predictor predictor = new Predictor(run);
-						for (int j=0; j<40; j++){ //moves per run	
+						for (int j=0; j<400; j++){ //moves per run	
 					    	
 							System.gc();
 							
@@ -118,6 +118,7 @@ public class Main {
 							}
 					    	current = UserStudySynthesizer.whatHappensNext(current);
 					    	if (current==null){//Tiles and Zoom Happened
+					    		//System.out.println("bika");
 					    		continue;
 					    	}
 					    	current.run = run;
@@ -125,13 +126,13 @@ public class Main {
 					    	current.viewport = viewport;
 					    	jump = new JumpRegion(Database.points(0,0));
 					    	current.run.totalMoves+=1;			
-							Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
-							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel,true);
+							Util.debug("Memory before Move:"+Main.cache.getQueue());
+							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel);
 							current.viewportFetch();
 							Util.debug("Memory after Move:"+Main.cache.getQueue());
 							Main.cache.updateImportances(current.point);
 							//System.out.println(cache);
-							Util.debug("Memory after Fetch:"+Main.cache.getQueue(),true);
+							Util.debug("Memory after Fetch:"+Main.cache.getQueue());
 							Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 					    
 						   //PREDICTOR

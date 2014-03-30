@@ -111,7 +111,7 @@ public class UserMove {
 		}*/
 		double start = System.currentTimeMillis();
 		TreeSet<TileOverall> toPrefetch = region.tree(current);
-		System.out.println("Prefetch Queue"+toPrefetch);
+		Util.debug("Prefetch Queue"+toPrefetch);
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		//System.out.println(availThinkTime);
@@ -457,7 +457,7 @@ public class UserMove {
 			return this;
 		}
 		else if(move.equals("zoomjump")){
-			currentZoomLevel = new Random().nextInt(FRAGMENTS_PER_TILE);
+			currentZoomLevel = Util.randInt(1,FRAGMENTS_PER_TILE);
 			return this;
 		}
 		else {

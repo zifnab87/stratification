@@ -29,7 +29,7 @@ public class Cache {
 	//public volatile Map<Integer,Tile> tiles = new HashMap<Integer, Tile>();
 	//public volatile PriorityBlockingQueue<Tile> queue= new PriorityBlockingQueue<Tile>(10,Tile.likelihoodComparator);
 	
-	public  Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
+	//public  Map<Integer,CachedTile> tiles = new HashMap<Integer, CachedTile>();
 	//public volatile LinkedList<CachedTile> queue = new PriorityBlockingQueue<CachedTile>(10,Tile.probabilityComparator);
 	public TreeSet<CachedTile> queue = new TreeSet<CachedTile>(CachedTile.probabilityComparator);
 	
@@ -39,9 +39,9 @@ public class Cache {
 	}
 	
 	
-	public int getTilesOccupied(){
+	/*public int getTilesOccupied(){
 		return tiles.size();
-	}
+	}*/
 	
 	public int getQueueSize(){
 		return queue.size();
@@ -98,7 +98,7 @@ public class Cache {
 			
 		}
 		int index = tile.point.hashCode();
-		CachedTile toBeCached = this.tiles.get(index);
+		CachedTile toBeCached = queueFind(index);
 	
 		String[] fragments = new String[FRAGMENTS_PER_TILE];
 		for (int i=firstFragment-1; i<=lastFragment-1;i++){
@@ -121,11 +121,11 @@ public class Cache {
 		
 		if (toBeCached==null){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			this.tiles.put(index,toBeCached);
-			increaseSpaceUsed(spaceNeeded);
+			//this.tiles.put(index,toBeCached);
+			//increaseSpaceUsed(spaceNeeded);
 		}
 		//it cannot be done with just contains due to equality constraint (it has to be both x,y and probability same) ... :/
-		if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
+		if (!queueContains(toBeCached) /*&& tiles.containsKey(toBeCached.point.hashCode())*/){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//Util.debug(toBeCached.fragmentsToString());
 			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
@@ -144,7 +144,7 @@ public class Cache {
 			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
 			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].totalImportance;
 			Util.debug(toBeCached.fragmentsToString());
-			if (!queueContains(toBeCached) && tiles.containsKey(toBeCached.point.hashCode())){
+			if (!queueContains(toBeCached) /*&& tiles.containsKey(toBeCached.point.hashCode())*/){
 				this.queue.add(toBeCached);
 			}
 		}
@@ -155,7 +155,7 @@ public class Cache {
 		return toBeCached;
 		
 	}
-	private CachedTile queueFind(int hashCode) {
+	public CachedTile queueFind(int hashCode) {
 		boolean found = false;
 		Iterator<CachedTile> iter = this.queue.iterator();
 		while(iter.hasNext()){
@@ -205,15 +205,15 @@ public class Cache {
 		}
 	}
 	
-	public int howManyTiles(){
-		return tiles.size();
-	}
+//	public int howManyTiles(){
+//		return tiles.size();
+//	}
 	
 	public int sizeBeingUsed() {
 		
-		if (this.tiles.size()!=this.queue.size()){
+		/*if (this.tiles.size()!=this.queue.size()){
 			System.err.println("tiles:"+this.tiles.size()+" queue:"+this.queue.size()+" memory inconsistency");
-		}
+		}*/
 		/*Iterator<Integer> iterKeys = this.tiles.keySet().iterator();
 		int total = 0;
 		while(iterKeys.hasNext()){
@@ -233,13 +233,13 @@ public class Cache {
 		return total;
 	}
 	
-	public synchronized void increaseSpaceUsed(int numOfFragments){
-		this.SpaceBeingUsed = this.SpaceBeingUsed + numOfFragments;
-	}
-	
-	public synchronized void decreaseSpaceUsed(int numOfFragments){
-		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
-	}
+//	public synchronized void increaseSpaceUsed(int numOfFragments){
+//		this.SpaceBeingUsed = this.SpaceBeingUsed + numOfFragments;
+//	}
+//	
+//	public synchronized void decreaseSpaceUsed(int numOfFragments){
+//		this.SpaceBeingUsed = this.SpaceBeingUsed - numOfFragments;
+//	}
 	
 	/*public void declareOccupied(Point point){
 		if (tileExists(point)){
@@ -307,7 +307,8 @@ public class Cache {
 	
 	
 	public boolean tileExists(int tileId){
-		return tiles.containsKey(tileId);
+		//return tiles.containsKey(tileId);
+		return queueFind(tileId)!=null;
 	}
 	
 	public boolean tileExists(Point index){
@@ -386,12 +387,12 @@ public class Cache {
 	
 	
 	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
-		this.tiles.remove(cTile.point.hashCode());
+		//this.tiles.remove(cTile.point.hashCode());
 		queueRemove(cTile);
 		//iter.remove();
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
 		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
-		decreaseSpaceUsed(numFragmentsCached);
+		//decreaseSpaceUsed(numFragmentsCached);
 		return numFragmentsCached;
 	}
 	
@@ -443,15 +444,16 @@ public class Cache {
 	
 	public void updateImportances(Point currentPosition){
 		int size0 = this.sizeBeingUsed();
-		Iterator<Integer> mapIter = this.tiles.keySet().iterator();
+		Iterator<CachedTile> mapIter = this.queue.iterator();
+		TreeSet<CachedTile> queueNew = new TreeSet<CachedTile>(CachedTile.probabilityComparator);
 		while (mapIter.hasNext()){
-			CachedTile cTile = queueFind(mapIter.next());
+			CachedTile cTile = queueFind(mapIter.next().id);
 			
 			String[] data = cTile.data;
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
 			
-			queueRemove(cTile);
+			//queueRemove(cTile);
 			//we make probabilities zero so only the ones that will be updated by the 
 			//prediction tree will have probability less than zero
 			//if it is current we give it a probability of 1.0d
@@ -468,10 +470,12 @@ public class Cache {
 			
 			}
 			
-			if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
-				this.queue.add(cTile);
-			}
+			/*if (!queueContains(cTile) && this.tiles.containsKey(cTile.point.hashCode())){
+				/this.queue.add(cTile);
+			}*/
+			queueNew.add(cTile);
 		}
+		queue = queueNew;
 		
 		int size1 = this.sizeBeingUsed();
 		

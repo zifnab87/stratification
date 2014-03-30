@@ -54,12 +54,17 @@ public class UserStudySynthesizer {
 	static double zoomInProbability = 0.45;
 	static double zoomOutProbability = 0.45;
 	static double zoomJumpProbability = 0.10;
-	
+	static UserMove oldCurrent = null;
 	
 	
 	public static UserMove whatHappensNext(UserMove current){
 		boolean possiblyNotPermitted = false;
 		possiblyNotPermitted = false;
+		
+		if (current == null){
+			current = oldCurrent;
+		}
+		oldCurrent = current;
 		double rand = Math.random();
 		if (rand<=panProbability){ //PAN
 			double rand2 = Math.random();
@@ -161,7 +166,7 @@ public class UserStudySynthesizer {
 			
 			current = current.jumpTo(maximizingJumpPoint);
 		}
-		else if (possiblyNotPermitted && !FRAGMENT){
+		if (possiblyNotPermitted && !FRAGMENT){
 			current = null; //if a zoom happened and we are on Tiles mode
 		}
 		//System.out.println("current"+current.point+" "+rand);

@@ -96,6 +96,12 @@ public class TileOverall {
 		
 	}
 	
+	
+	public String toString(){
+		String str;
+		str = "OverallTile("+this.point.y+","+this.point.x+", fragmentsToBeNeed="+howManyFragments()+", Total Importance="+this.totalImportance+",Distance="+this.distance+")";
+		return str;
+	}
 
 	
 	
