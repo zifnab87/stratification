@@ -111,7 +111,7 @@ public class UserMove {
 		}*/
 		double start = System.currentTimeMillis();
 		TreeSet<TileOverall> toPrefetch = region.tree(current);
-		Util.debug("Prefetch Queue"+toPrefetch);
+		Util.debug("Prefetch Queue"+toPrefetch,true);
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		//System.out.println(availThinkTime);
@@ -327,7 +327,7 @@ public class UserMove {
 				if (!Main.cache.tileExists(index)){
 					System.out.println("bika1");
 					Tile tile = Main.db.getTileWithFragmentRange(index,1,fragmentsNeeded, this);
-					tile.carryingProbability = 1000000.0d; // carry it to the cache
+					//tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
 					
@@ -337,12 +337,15 @@ public class UserMove {
 					CachedTile cachedPartialTile = Main.cache.getTile(index);
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					//what was actually fetched to be viewed
-					Main.cache.getTile(index);
+					//Main.cache.getTile(index);
 					if (cachedLOD<fragmentsNeeded){
 						Tile tile = Main.db.getTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
-						tile.carryingProbability = 1000000.0d; // carry it to the cache
+						//tile.carryingProbability = 1000000.0d; // carry it to the cache
 						Main.cache.cacheTileWithFragmentRange(tile, this.point,cachedLOD+1,fragmentsNeeded);
 					}
+					//if (cachedPartialTile.point.equals(upperLeft)){	
+					//	cachedPartialTile.carryingProbability = 1000000.0d;
+					//}
 					
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);

@@ -67,6 +67,11 @@ public class UserStudySynthesizer {
 			panProbability = 0.5d;
 			zoomProbability = 0.4d; 	
 		}
+		else if(workloadNum==7){
+			panProbability = 0.1d;
+			zoomProbability = 0.9d;
+			jumpProbability = 0.0d;
+		}
 		
 	}
 	
@@ -174,8 +179,8 @@ public class UserStudySynthesizer {
 			}
 			else { //ZOOM -> DETERMINISTIC ZOOM
 				int fragments = (int)Math.floor(FRAGMENTS_PER_TILE*UserStudiesCombined.popularities[current.point.y][current.point.x]);
-				if (fragments < 0 ){
-					UserMove.currentZoomLevel = 0;
+				if (fragments < 1 ){
+					UserMove.currentZoomLevel = 1;
 				}
 				else if (fragments>FRAGMENTS_PER_TILE){
 					UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;

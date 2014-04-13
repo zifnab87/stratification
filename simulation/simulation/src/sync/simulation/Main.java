@@ -65,14 +65,14 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=4; w<=4; w++){
+		for (int w=7; w<=7; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
 			cache = new Cache();
 			for (int m=512; m<=512; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=0; f<=1; f++){
+				for (int f=1; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -140,7 +140,7 @@ public class Main {
 						    	jump = new JumpRegion(Database.points(0,0));
 						    	current.run.totalMoves+=1;			
 								Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
-								Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel,true);
+								Util.debug("Current Position we just moved: "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel,true);
 								current.viewportFetch();
 								Util.debug("Memory after Move:"+Main.cache.getQueue());
 								Main.cache.updateImportances(current.point);
