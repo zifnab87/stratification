@@ -341,20 +341,24 @@ public class UserMove {
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
+					System.out.println("cached "+cached);
+					System.out.println("fragmentsNeeded "+fragmentsNeeded);
+					System.out.println("missdes "+misses);
 					Main.cache.cacheTileWithFragmentRange(tile, this.point,cachedLOD+1,fragmentsNeeded);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;
 					}
-					if (cached < fragmentsNeeded){
+					if (cached <= fragmentsNeeded){
 						this.cacheHitsDuringFetch += cached;
 						this.run.totalCacheHitsDuringFetch += cached;
 					}
-					else {
-						this.cacheHitsDuringFetch += fragmentsNeeded;
-						this.run.totalCacheHitsDuringFetch += fragmentsNeeded;
-					}
 				}
+				
+				System.out.println("cache misses "+this.cacheMissesDuringFetch);
+				System.out.println("cache hits "+this.cacheHitsDuringFetch);
+				System.out.println("cache misses on run "+this.run.totalCacheMissesDuringFetch);
+				System.out.println("cache hits on run "+this.run.totalCacheHitsDuringFetch);
 		
 			}
 		}
@@ -399,44 +403,45 @@ public class UserMove {
 	}
 	
 	
-	public String toString(){
-		return this.viewport.upperLeft.toString();
-	}
+//	public String toString(){
+//		//return this.viewport.upperLeft.toString();
+//	}
 	
 	
 	
 	
-	public UserMove(Point point){
+	public UserMove(Point point,Run run){
 		this.point = point;
+		this.run = run;
 	}
 	
 	
 	
-	public UserMove jumpTo(Point point){
-		return new UserMove(point);
+	public UserMove jumpTo(Point point,Run run){
+		return new UserMove(point,run);
 	}
 	
 	
-	public UserMove go(String move){
+	public UserMove go(String move,Run run){
 		Util.debug(move);
 		if (move.equals("up")){
-			return new UserMove(this.point.goUp());
+			return new UserMove(this.point.goUp(),run);
 		}
 		else if (move.equals("right")){
-			return new UserMove(this.point.goRight());
+			return new UserMove(this.point.goRight(),run);
 		}
 		else if (move.equals("down")){
-			return new UserMove(this.point.goDown());
+			return new UserMove(this.point.goDown(),run);
 		}
 		else if (move.equals("left")){
-			return new UserMove(this.point.goLeft());
+			return new UserMove(this.point.goLeft(),run);
 		}
 		else if (move.equals("zoomin")){
 			currentZoomLevel+=1;
 			if (currentZoomLevel>FRAGMENTS_PER_TILE){
 				currentZoomLevel = FRAGMENTS_PER_TILE;
 			}
-			return this;
+			return new UserMove(this.point,run);
 		}
 		else if (move.equals("zoomout")){
 			currentZoomLevel-=1;
@@ -444,11 +449,14 @@ public class UserMove {
 			if (currentZoomLevel<1){
 				currentZoomLevel = 1;
 			}
-			return this;
+			return new UserMove(this.point,run);
 		}
 		else if(move.equals("zoomjump")){
 			currentZoomLevel = Util.randInt(1,FRAGMENTS_PER_TILE);
-			return this;
+			return new UserMove(this.point,run);
+		}
+		else if (move.equals("stay")){
+			return new UserMove(this.point,run);
 		}
 		else {
 			return null;

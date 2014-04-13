@@ -50,9 +50,7 @@ public class TileOverall {
 			else if (IMPORTANCE_METRIC<0){ 
 				totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)*(1-distNormalized) + (1-distNormalized)*popularity;	
 			}
-			System.out.println("@@@"+totalImportance+"dist"+distNormalized+"popularity"+popularity);
-			this.totalImportance = totalImportance/this.importanceNormalizer;
-			System.out.println("####"+this.totalImportance+"used "+this.importanceNormalizer);
+			this.totalImportance = totalImportance/importanceNormalizer;
 			//System.out.println("current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
 		}
 		

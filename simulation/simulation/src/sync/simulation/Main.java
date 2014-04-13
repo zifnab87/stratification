@@ -113,7 +113,7 @@ public class Main {
 							Random rand = new Random();
 							//THINK_TIME = UserMove.nextFromDistribution(rand);
 							if (current==null || i<=WARMUP){
-								current = new UserMove(db.randomPoint());
+								current = new UserMove(db.randomPoint(),run);
 							}
 							//System.out.println("Run"+i);
 							UserMove.currentZoomLevel = 1;
@@ -153,7 +153,7 @@ public class Main {
 							    //PREDICTOR
 								
 								//System.out.println("Before:"+cache);
-								current.prefetch(jump, current.point);
+								//current.prefetch(jump, current.point);
 								Main.cache.updateImportances(current.point);
 								//System.out.println("After:"+cache);
 							
