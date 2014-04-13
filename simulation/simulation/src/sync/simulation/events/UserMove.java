@@ -325,11 +325,12 @@ public class UserMove {
 			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
 				Point index = Database.points(y,x);
 				if (!Main.cache.tileExists(index)){
-					Tile tile = Main.db.fetchTileWithFragmentRange(index,1,fragmentsNeeded, this);
+					System.out.println("bika1");
+					Tile tile = Main.db.getTileWithFragmentRange(index,1,fragmentsNeeded, this);
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
-
+					
 					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
 				}
 				else {
@@ -337,14 +338,17 @@ public class UserMove {
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					//what was actually fetched to be viewed
 					Main.cache.getTile(index);
-					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
-					tile.carryingProbability = 1000000.0d; // carry it to the cache
+					if (cachedLOD<fragmentsNeeded){
+						Tile tile = Main.db.getTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
+						tile.carryingProbability = 1000000.0d; // carry it to the cache
+						Main.cache.cacheTileWithFragmentRange(tile, this.point,cachedLOD+1,fragmentsNeeded);
+					}
+					
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
-					System.out.println("cached "+cached);
-					System.out.println("fragmentsNeeded "+fragmentsNeeded);
-					System.out.println("missdes "+misses);
-					Main.cache.cacheTileWithFragmentRange(tile, this.point,cachedLOD+1,fragmentsNeeded);
+					Util.debug("cached "+cached);
+					Util.debug("fragmentsNeeded "+fragmentsNeeded);
+					Util.debug("misses "+misses);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;
@@ -353,12 +357,16 @@ public class UserMove {
 						this.cacheHitsDuringFetch += cached;
 						this.run.totalCacheHitsDuringFetch += cached;
 					}
+					else {
+						this.cacheHitsDuringFetch += fragmentsNeeded;
+						this.run.totalCacheHitsDuringFetch += fragmentsNeeded;
+					}
 				}
 				
-				System.out.println("cache misses "+this.cacheMissesDuringFetch);
-				System.out.println("cache hits "+this.cacheHitsDuringFetch);
-				System.out.println("cache misses on run "+this.run.totalCacheMissesDuringFetch);
-				System.out.println("cache hits on run "+this.run.totalCacheHitsDuringFetch);
+				Util.debug("cache misses "+this.cacheMissesDuringFetch);
+				Util.debug("cache hits "+this.cacheHitsDuringFetch);
+				Util.debug("cache misses on run "+this.run.totalCacheMissesDuringFetch);
+				Util.debug("cache hits on run "+this.run.totalCacheHitsDuringFetch);
 		
 			}
 		}
@@ -410,56 +418,60 @@ public class UserMove {
 	
 	
 	
-	public UserMove(Point point,Run run){
+	public UserMove(Point point,Run run,String movementType){
 		this.point = point;
 		this.run = run;
+		this.movementType = movementType;
 	}
 	
 	
 	
 	public UserMove jumpTo(Point point,Run run){
-		return new UserMove(point,run);
+		return new UserMove(point,run,"jump");
 	}
 	
 	
-	public UserMove go(String move,Run run){
-		Util.debug(move);
-		if (move.equals("up")){
-			return new UserMove(this.point.goUp(),run);
+	public UserMove go(String movementType,Run run){
+		Util.debug(movementType);
+		if (movementType.equals("up")){
+			return new UserMove(this.point.goUp(),run,movementType);
 		}
-		else if (move.equals("right")){
-			return new UserMove(this.point.goRight(),run);
+		else if (movementType.equals("right")){
+			return new UserMove(this.point.goRight(),run,movementType);
 		}
-		else if (move.equals("down")){
-			return new UserMove(this.point.goDown(),run);
+		else if (movementType.equals("down")){
+			return new UserMove(this.point.goDown(),run,movementType);
 		}
-		else if (move.equals("left")){
-			return new UserMove(this.point.goLeft(),run);
+		else if (movementType.equals("left")){
+			return new UserMove(this.point.goLeft(),run,movementType);
 		}
-		else if (move.equals("zoomin")){
+		else if (movementType.equals("zoomin")){
 			currentZoomLevel+=1;
 			if (currentZoomLevel>FRAGMENTS_PER_TILE){
 				currentZoomLevel = FRAGMENTS_PER_TILE;
 			}
-			return new UserMove(this.point,run);
+			return new UserMove(this.point,run,movementType);
 		}
-		else if (move.equals("zoomout")){
+		else if (movementType.equals("zoomout")){
 			currentZoomLevel-=1;
 			
 			if (currentZoomLevel<1){
 				currentZoomLevel = 1;
 			}
-			return new UserMove(this.point,run);
+			return new UserMove(this.point,run,movementType);
 		}
-		else if(move.equals("zoomjump")){
+		else if(movementType.equals("zoomjump")){
 			currentZoomLevel = Util.randInt(1,FRAGMENTS_PER_TILE);
-			return new UserMove(this.point,run);
+			return new UserMove(this.point,run,movementType);
 		}
-		else if (move.equals("stay")){
-			return new UserMove(this.point,run);
+		else if (movementType.equals("stay")){
+			return new UserMove(this.point,run,movementType);
+		}
+		else if (movementType.equals("ignore")){
+			return new UserMove(this.point,run,movementType);
 		}
 		else {
-			return null;
+			return new UserMove(this.point,run,"ignore");
 		}
 	}
 	

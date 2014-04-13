@@ -221,7 +221,10 @@ public class Database extends Region {
 	
 	
 	public Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
-		double start = System.nanoTime();
+		if (userMove!=null){
+		System.out.println("userMove"+ userMove.movementType);
+		}
+		
 		//Connection conn = null;
 		ResultSet results = null;
 		Tile tile = null;
@@ -239,13 +242,12 @@ public class Database extends Region {
 				//System.err.println("3ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			
-			
+			double start = System.nanoTime();
 			Statement stmt = conn.createStatement();
 			//double latency1 = (System.nanoTime() - start)/1000000;
 			
 			String query = "SELECT * FROM fragment WHERE y="+index.y+" AND x="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment;
 			//double latency2 = (System.nanoTime() - start)/1000000;
-			
 			results = stmt.executeQuery(query);
 			results.setFetchSize(1);
 			//double latency3 = (System.nanoTime() - start)/1000000;
@@ -276,34 +278,34 @@ public class Database extends Region {
 		return tile;
 	}
 	
-	public Tile fetchTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
-		//fragments fetched
-		int num = lastFragment-firstFragment+1;
-		
-		for (int i=0; i<num; i++){
-			userMove.cacheMisses+=1;
-			userMove.run.totalCacheMisses+=1;
-		}
-		if (!CONTIG_FRAGM_IN_SINGLE_QUERY){
-			boolean first = true;
-			Tile firstTile = null;
-			for (int i=firstFragment; i<=lastFragment; i++){
-				Tile partialTile = getTileWithFragmentRange(index, i, i, userMove);
-				if (first){
-					firstTile = partialTile;
-				}
-				else {
-					firstTile.data[i-1]= partialTile.data[i-1];
-				}
-				first = false;
-				//System.out.println("$$$"+firstTile.dataToString());
-			}
-			return firstTile;
-		}
-		else {
-			return getTileWithFragmentRange(index, firstFragment, lastFragment,userMove);
-		}
-	}
+//	public Tile fetchTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
+//		//fragments fetched
+//		int num = lastFragment-firstFragment+1;
+//		
+//		for (int i=0; i<num; i++){
+//			userMove.cacheMisses+=1;
+//			userMove.run.totalCacheMisses+=1;
+//		}
+//		if (!CONTIG_FRAGM_IN_SINGLE_QUERY){
+//			boolean first = true;
+//			Tile firstTile = null;
+//			for (int i=firstFragment; i<=lastFragment; i++){
+//				Tile partialTile = getTileWithFragmentRange(index, i, i, userMove);
+//				if (first){
+//					firstTile = partialTile;
+//				}
+//				else {
+//					firstTile.data[i-1]= partialTile.data[i-1];
+//				}
+//				first = false;
+//				//System.out.println("$$$"+firstTile.dataToString());
+//			}
+//			return firstTile;
+//		}
+//		else {
+//			return getTileWithFragmentRange(index, firstFragment, lastFragment,userMove);
+//		}
+//	}
 	
 	
 	public static Point points(int y,int x){

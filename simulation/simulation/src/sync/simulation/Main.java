@@ -1,21 +1,14 @@
 package sync.simulation;
 
-import static sync.simulation.Config.DATABASE_WIDTH;
-import static sync.simulation.Config.DATABASE_TILES_NUM;
-import static sync.simulation.Config.UPPER_LEFT_STARTING_POINT;
 import static sync.simulation.Config.VIEWPORT_HEIGHT;
 import static sync.simulation.Config.VIEWPORT_WIDTH;
-import static sync.simulation.Config.WAVES;
 import static sync.simulation.Config.CACHE_SIZE;
 import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.IMPORTANCE_METRIC;
 import static sync.simulation.Config.FRAGMENT;
+import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.RUNS;
-import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
-import static sync.simulation.Config.JUMP_REGION_WIDTH;
-import static sync.simulation.Config.COVERAGE;
 import static sync.simulation.Config.WARMUP;
-import java.sql.SQLException;
 import java.util.Random;
 import java.util.Vector;
 
@@ -28,11 +21,6 @@ import sync.simulation.Cache;
 import sync.simulation.Database;
 import sync.simulation.Viewport;
 import sync.simulation.events.UserMove;
-import sync.simulation.monitor.Workload;
-import sync.simulation.predictor.Node;
-import sync.simulation.predictor.Predictor;
-import sync.simulation.predictor.PredictorOld;
-import sync.simulation.predictor.Tuple;
 import sync.simulation.regions.JumpRegion;
 import sync.simulation.regions.UserStudiesCombined;
 import sync.userstudysynthesizer.UserStudySynthesizer;
@@ -62,10 +50,14 @@ public class Main {
 		//db.init();
 		db.clearCache();
 		Util.debug("Starting Experiment");
-		//cache.warmUp();
 		
 		
-		//Database db = new Database();
+		if (!FRAGMENT){
+			UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
+		}
+		else{
+			UserMove.currentZoomLevel = 1;
+		}
 		JumpRegion jump = new JumpRegion(Database.points(0,0));
 		UserStudiesCombined usc = new UserStudiesCombined();
 		UserStudySynthesizer uss = new UserStudySynthesizer();
@@ -73,14 +65,14 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=1; w<=4; w++){
+		for (int w=4; w<=4; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
 			cache = new Cache();
 			for (int m=512; m<=512; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=1; f<=1; f++){
+				for (int f=0; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -89,7 +81,7 @@ public class Main {
 					}
 					db.clearCache();
 					cache = new Cache();
-					for (int weight=-5; weight<=-1; weight++){
+					for (int weight=-1; weight<=-1; weight++){
 	//					if (w>=-1 && w<=1){
 	//						continue;
 	//					}
@@ -104,7 +96,7 @@ public class Main {
 						for (int i=0; i<=RUNS+WARMUP; i++){
 							
 														
-						
+							Util.debug("Run: "+i,true);
 							Run run = new Run();
 							//for warmup
 							if (i>WARMUP){
@@ -112,14 +104,20 @@ public class Main {
 							}
 							Random rand = new Random();
 							//THINK_TIME = UserMove.nextFromDistribution(rand);
-							if (current==null || i<=WARMUP){
-								current = new UserMove(db.randomPoint(),run);
+							if (!FRAGMENT){
+								UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
 							}
-							//System.out.println("Run"+i);
-							UserMove.currentZoomLevel = 1;
+							else{
+								UserMove.currentZoomLevel = 1;
+							}
+							if (current==null || i<=WARMUP){
+								current = new UserMove(db.randomPoint(),run,"pan");
+							}
+						
+							
 							Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-							//Predictor predictor = new Predictor(run);
-							for (int j=0; j<20; j++){ //moves per run	
+
+							for (int j=0; j<100; j++){ //moves per run	
 								//System.out.println("Run"+i+" Move "+j);
 								System.gc();
 								
@@ -131,7 +129,7 @@ public class Main {
 									//System.out.println("~~~~~~~~~~~~~~~~");
 								}
 						    	current = UserStudySynthesizer.whatHappensNext(current);
-						    	if (current==null){//Tiles and Zoom Happened
+						    	if (current.movementType.equals("ignore")){//Tiles and Zoom Happened
 						    		//System.out.println("bika");
 						    		continue;
 						    	}
@@ -153,13 +151,15 @@ public class Main {
 							    //PREDICTOR
 								
 								//System.out.println("Before:"+cache);
-								//current.prefetch(jump, current.point);
+								current.prefetch(jump, current.point);
 								Main.cache.updateImportances(current.point);
 								//System.out.println("After:"+cache);
 							
-								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch,true);
-								current.run.misses.add(current.cacheMissesDuringFetch);
-								Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
+								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
+								Util.debug("#Cache Hits during Fetch in a Move: "+current.cacheHitsDuringFetch);
+								Util.debug("#Latency during Fetch in a Move: "+current.latencyDuringFetch);
+								//current.run.misses.add(current.cacheMissesDuringFetch);
+								//Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
 								
 								//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
 								

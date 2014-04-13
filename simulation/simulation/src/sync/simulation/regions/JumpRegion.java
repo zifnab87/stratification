@@ -43,8 +43,8 @@ public class JumpRegion extends Region {
 	public TreeSet<TileOverall> tree(Point current){
 		CachedTile worstCachedTile = Main.cache.getWorst();
 		queue = new TreeSet<TileOverall>(TileOverall.comparator);
-		for (int y=upperLeft.y; y<Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
-			for (int x=upperLeft.x; x<Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
+		for (int y=upperLeft.y; y<=Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
+			for (int x=upperLeft.x; x<=Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
 				UserStudiesCombined.tiles[y][x].updateImportance(current);
 				// while the cache is getting fuller we still need things that are worse than the worst tile..
 				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
