@@ -33,9 +33,45 @@ public class UserStudySynthesizer {
 	};
 	
 	
-	static double jumpProbability = 0.8; //0.1
-	static double panProbability = 0.1; // 0.5
-	static double zoomProbability = 0.1; // 0.4
+	
+	
+	public void setWorkload(int workloadNum){
+		if (workloadNum==1){ //pan intense
+			jumpProbability = 0.1d; 
+			panProbability = 0.8d;
+			zoomProbability = 0.1d; 
+		}
+		else if(workloadNum==2){//jump intense
+			jumpProbability = 0.8d; 
+			panProbability = 0.1d;
+			zoomProbability = 0.1d; 
+		}
+		else if(workloadNum==3){//zoom intense
+			jumpProbability = 0.1d; 
+			panProbability = 0.1d;
+			zoomProbability = 0.8d; 
+		}
+		else if(workloadNum==4){ //pan only
+			jumpProbability = 0.0d; 
+			panProbability = 1.0d;
+			zoomProbability = 0.0d; 
+		}
+		else if(workloadNum==5){ //jump only
+			jumpProbability = 1.0d; 
+			panProbability = 0.0d;
+			zoomProbability = 0.0d; 
+		}
+		else if(workloadNum==6){ //mixed
+			jumpProbability = 0.1d; 
+			panProbability = 0.5d;
+			zoomProbability = 0.4d; 	
+		}
+		
+	}
+	
+	static double jumpProbability = 0.0; //0.1
+	static double panProbability = 0.0; // 0.5
+	static double zoomProbability = 0.0; // 0.4
 	
 	
 	

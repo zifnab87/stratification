@@ -14,6 +14,7 @@ import static sync.simulation.Config.RUNS;
 import static sync.simulation.Config.CONTIG_FRAGM_IN_SINGLE_QUERY;
 import static sync.simulation.Config.JUMP_REGION_WIDTH;
 import static sync.simulation.Config.COVERAGE;
+import static sync.simulation.Config.WARMUP;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.Vector;
@@ -58,7 +59,7 @@ public class Main {
 		//db.init();
 		//System.exit(9);
 		Util.debug("Initializing  Sync Database");
-		//db.init(DATABASE_TILES_NUM);
+		//db.init();
 		db.clearCache();
 		Util.debug("Starting Experiment");
 		//cache.warmUp();
@@ -69,142 +70,157 @@ public class Main {
 		UserStudiesCombined usc = new UserStudiesCombined();
 		UserStudySynthesizer uss = new UserStudySynthesizer();
 		
+		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int m=512; m<=512; m=m*2){
-			CACHE_SIZE = m;
-			for (int f=0; f<=1; f++){
-				for (int w=-1; w<=1; w=w+1){
-					System.out.println("EVICTION METRIC:"+w);
-					IMPORTANCE_METRIC = w;
-					Vector<Run> runs = new Vector<Run>();
+		for (int w=1; w<=4; w++){
+			uss.setWorkload(w);
+			System.out.println("workload: "+w);
+			db.clearCache();
+			cache = new Cache();
+			for (int m=512; m<=512; m=m*2){
+				CACHE_SIZE = m;
+				for (int f=1; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
 					else {
 						FRAGMENT = true;
 					}
-					
-					for (int i=0; i<=RUNS+1; i++){
+					db.clearCache();
+					cache = new Cache();
+					for (int weight=-5; weight<=-1; weight++){
+	//					if (w>=-1 && w<=1){
+	//						continue;
+	//					}
+						IMPORTANCE_METRIC = weight;
+						System.out.println("EVICTION METRIC:"+weight);
 						
+						Vector<Run> runs = new Vector<Run>();
+						db.clearCache();
+						cache = new Cache();
 						System.gc();
-						if (i==0){
-							
-							db.clearCache();
-							cache = new Cache();
-						}
 						
-					
-						Run run = new Run();
-						//for warmup
-						if (i>0){
-							runs.add(run);
-						}
-						Random rand = new Random();
-						//THINK_TIME = UserMove.nextFromDistribution(rand);
-						UserMove current = new UserMove(db.randomPoint());
-						System.out.println("Run"+i);
-						UserMove.currentZoomLevel = 1;
-						Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-						//Predictor predictor = new Predictor(run);
-						for (int j=0; j<400; j++){ //moves per run	
-					    	
-							System.gc();
+						for (int i=0; i<=RUNS+WARMUP; i++){
 							
-							if (j%10==0){
-					    		
-					    		db.close();
-					    	}	
-							if (j%100==0){
-								System.out.println("~~~~~~~~~~~~~~~~");
+														
+						
+							Run run = new Run();
+							//for warmup
+							if (i>WARMUP){
+								runs.add(run);
 							}
-					    	current = UserStudySynthesizer.whatHappensNext(current);
-					    	if (current==null){//Tiles and Zoom Happened
-					    		//System.out.println("bika");
-					    		continue;
-					    	}
-					    	current.run = run;
-					    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-					    	current.viewport = viewport;
-					    	jump = new JumpRegion(Database.points(0,0));
-					    	current.run.totalMoves+=1;			
-							Util.debug("Memory before Move:"+Main.cache.getQueue());
-							Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel);
-							current.viewportFetch();
-							Util.debug("Memory after Move:"+Main.cache.getQueue());
-							Main.cache.updateImportances(current.point);
-							//System.out.println(cache);
-							Util.debug("Memory after Fetch:"+Main.cache.getQueue());
-							Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
-					    
-						   //PREDICTOR
-							
-							//System.out.println("Before:"+cache);
-							current.prefetch(jump, current.point);
-							Main.cache.updateImportances(current.point);
-							//System.out.println("After:"+cache);
-						
-							Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
-							current.run.misses.add(current.cacheMissesDuringFetch);
-							Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
-							
-							//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
-							
-							//Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
-							/*if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
-								System.err.println(Main.cache.sizeBeingUsed()+" "+Main.cache.getTilesOccupied()+" "+Main.cache.getQueueSize()+" "+CACHE_SIZE);
-								System.err.println("Memory Inconsistency Error");
-								break;
-							}*/
-							Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			//					
-						
-							/*Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
-							current.run.misses.add(current.cacheMissesDuringFetch);
-							Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
-							
-							//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
-							
-							Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
-							if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
-								System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
-								System.err.println("Memory Inconsistency Error");
-								break;
+							Random rand = new Random();
+							//THINK_TIME = UserMove.nextFromDistribution(rand);
+							if (current==null || i<=WARMUP){
+								current = new UserMove(db.randomPoint());
 							}
-							Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");*/
+							//System.out.println("Run"+i);
+							UserMove.currentZoomLevel = 1;
+							Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
+							//Predictor predictor = new Predictor(run);
+							for (int j=0; j<20; j++){ //moves per run	
+								//System.out.println("Run"+i+" Move "+j);
+								System.gc();
+								
+								if (j%10==0){
+						    		
+						    		db.close();
+						    	}	
+								if (j%100==0){
+									//System.out.println("~~~~~~~~~~~~~~~~");
+								}
+						    	current = UserStudySynthesizer.whatHappensNext(current);
+						    	if (current==null){//Tiles and Zoom Happened
+						    		//System.out.println("bika");
+						    		continue;
+						    	}
+						    	
+						    	current.run = run;
+						    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
+						    	current.viewport = viewport;
+						    	jump = new JumpRegion(Database.points(0,0));
+						    	current.run.totalMoves+=1;			
+								Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
+								Util.debug("Current Position we just moved: "+current.point+ " Zoom: "+UserMove.currentZoomLevel,true);
+								current.viewportFetch();
+								Util.debug("Memory after Move:"+Main.cache.getQueue());
+								Main.cache.updateImportances(current.point);
+								//System.out.println(cache);
+								Util.debug("Memory after Fetch:"+Main.cache.getQueue());
+								Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
+						    
+							    //PREDICTOR
+								
+								//System.out.println("Before:"+cache);
+								current.prefetch(jump, current.point);
+								Main.cache.updateImportances(current.point);
+								//System.out.println("After:"+cache);
 							
-							
-							
-							//Util.debug("Space Being Used: "+cache.sizeBeingUsed(),true);
-							//Util.debug("Run: "+runs.size(),true);
-							Util.debug("All Misses Mean: "+ Util.average(run.misses));
-							Util.debug("All Misses Variance: "+ Util.variance(run.misses));
-							Util.debug("#Total Moves: "+run.totalMoves);
-							Util.debug("#Total Cache Misses during Fetches: "+run.totalCacheMissesDuringFetch);
-							Util.debug("#Total Latency during Fetches: "+run.totalLatencyDuringFetch+" msec");
-							Util.debug("#Total Disk Fetched Fragments: "+run.totalCacheMisses);
-							Util.debug("#Total Cache Fetched Fragments: "+run.totalCacheHits);
-							Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-							
+								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch,true);
+								current.run.misses.add(current.cacheMissesDuringFetch);
+								Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
+								
+								//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
+								
+								//Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
+								/*if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
+									System.err.println(Main.cache.sizeBeingUsed()+" "+Main.cache.getTilesOccupied()+" "+Main.cache.getQueueSize()+" "+CACHE_SIZE);
+									System.err.println("Memory Inconsistency Error");
+									break;
+								}*/
+								Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+				//					
+								
+								/*Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
+								current.run.misses.add(current.cacheMissesDuringFetch);
+								Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
+								
+								//Util.debug("Memory "+Main.cache.SpaceBeingUsed);
+								
+								Util.debug("Memory Space Used after Move "+Main.cache.sizeBeingUsed());
+								if (Main.cache.getTilesOccupied()!=Main.cache.getQueueSize() ||  Main.cache.sizeBeingUsed()>CACHE_SIZE){
+									System.err.println(Main.cache.sizeBeingUsed()+" "+CACHE_SIZE);
+									System.err.println("Memory Inconsistency Error");
+									break;
+								}
+								Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");*/
+								
+								
+								
+								//Util.debug("Space Being Used: "+cache.sizeBeingUsed(),true);
+								//Util.debug("Run: "+runs.size(),true);
+								Util.debug("All Misses Mean: "+ Util.average(run.misses));
+								Util.debug("All Misses Variance: "+ Util.variance(run.misses));
+								Util.debug("#Total Moves: "+run.totalMoves);
+								Util.debug("#Total Cache Misses during Fetches: "+run.totalCacheMissesDuringFetch);
+								Util.debug("#Total Latency during Fetches: "+run.totalLatencyDuringFetch+" msec");
+								Util.debug("#Total Disk Fetched Fragments: "+run.totalCacheMisses);
+								Util.debug("#Total Cache Fetched Fragments: "+run.totalCacheHits);
+								Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+								
+							}
+								
 						}
-							
+						AverageRun avgRun = new AverageRun(runs);
+						Util.debug("Runs: "+runs.size(),true);
+						Util.debug("Cache: "+CACHE_SIZE,true);
+						//Util.debug("Think Time = "+ THINK_TIME,true);
+						Util.debug("Fragments = "+FRAGMENT,true);
+						//if (FRAGMENT){
+						//	Util.debug("Coverage = "+COVERAGE,true);
+						//}
+						Util.debug("#Average Moves Number: "+avgRun.totalMoves);
+						//Util.debug("#Average Total Cache Misses during Fetches: "+avgRun.totalCacheMissesDuringFetch,true);
+						//Util.debug("#Average Total Cache Hits during Fetches: "+avgRun.totalCacheHitsDuringFetch,true);
+						Util.debug("#Average Total Cache Misses/(Total CH+Total CM) during Fetches: "+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%",true);
+						Util.debug("#Average Total Latency during Fetches: "+avgRun.totalLatencyDuringFetch+" msec ("+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+")",true);
+						//Util.debug("#Average Total Disk Fetched Fragments: "+avgRun.totalCacheMisses,true);
+						//Util.debug("#Average Total Cache Fetched Fragments: "+avgRun.totalCacheHits,true);
+						Util.debug(" ",true);
+						Util.debug("data(workload="+w+", cache="+CACHE_SIZE+", fragments="+FRAGMENT+", metric="+weight+", missratio="+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%, movelatency="+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+" msec",true);
+						Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",true);   	
 					}
-					AverageRun avgRun = new AverageRun(runs);
-					Util.debug("Runs: "+runs.size(),true);
-					Util.debug("Cache: "+CACHE_SIZE,true);
-					//Util.debug("Think Time = "+ THINK_TIME,true);
-					Util.debug("Fragments = "+FRAGMENT,true);
-					if (FRAGMENT){
-						Util.debug("Coverage = "+COVERAGE,true);
-					}
-					Util.debug("#Average Moves Number: "+avgRun.totalMoves,true);
-					Util.debug("#Average Total Cache Misses during Fetches: "+avgRun.totalCacheMissesDuringFetch,true);
-					Util.debug("#Average Total Cache Hits during Fetches: "+avgRun.totalCacheHitsDuringFetch,true);
-					Util.debug("#Average Total Cache Misses/(Total CH+Total CM) during Fetches: "+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%",true);
-					Util.debug("#Average Total Latency during Fetches: "+avgRun.totalLatencyDuringFetch+" msec",true);
-					//Util.debug("#Average Total Disk Fetched Fragments: "+avgRun.totalCacheMisses,true);
-					//Util.debug("#Average Total Cache Fetched Fragments: "+avgRun.totalCacheHits,true);
-					Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~",true);   	
 				}
 			}
 		}

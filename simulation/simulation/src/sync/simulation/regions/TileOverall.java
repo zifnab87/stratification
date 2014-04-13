@@ -3,6 +3,7 @@ package sync.simulation.regions;
 import java.util.Comparator;
 
 import sync.simulation.Point;
+import sync.simulation.events.UserMove;
 import static sync.simulation.Config.IMPORTANCE_METRIC;
 
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
@@ -15,7 +16,7 @@ public class TileOverall {
 	//public int jumpToCounts;
 	//public double[] visitResolutions = new double[FRAGMENTS_PER_TILE+1];
 	//public int visitsCounts;
-	public double importanceNormalizer;
+	public static double importanceNormalizer;
 	
 	
 	public double distance;
@@ -26,36 +27,44 @@ public class TileOverall {
 		this.distance = Point.distance(this.point, current);
 		double distNormalized = Point.distance(this.point, current)/(1.0d*distNormalizer);
 		double popularity = UserStudiesCombined.popularities[this.point.y][this.point.x];
-		
+		syncNormalizers();
 		if (current.equals(this.point)){
 			this.totalImportance = 1000000;
 			
 		}
 		else {
+			double totalImportance = 0;
 			if (IMPORTANCE_METRIC==-1){
-				this.totalImportance = (1/distNormalized);	
+				totalImportance = (1-distNormalized);	
 				//System.out.println("~~~current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
 			}
 			else if (IMPORTANCE_METRIC==1){
-				this.totalImportance = popularity;
+				totalImportance = popularity;
 			}
 			else if (IMPORTANCE_METRIC==0){
-				this.totalImportance = popularity + 1/distNormalized + (1/distNormalized)*popularity;	
+				totalImportance = popularity + (1-distNormalized) + (1-distNormalized)*popularity;	
 			}
 			else if (IMPORTANCE_METRIC>0){ 
-				this.totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + 1/distNormalized + (1/distNormalized)*popularity;	
+				totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + (1-distNormalized) + (1-distNormalized)*popularity;	
 			}
 			else if (IMPORTANCE_METRIC<0){ 
-				this.totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)/distNormalized + (1/distNormalized)*popularity;	
+				totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)*(1-distNormalized) + (1-distNormalized)*popularity;	
 			}
+			System.out.println("@@@"+totalImportance+"dist"+distNormalized+"popularity"+popularity);
+			this.totalImportance = totalImportance/this.importanceNormalizer;
+			System.out.println("####"+this.totalImportance+"used "+this.importanceNormalizer);
 			//System.out.println("current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
 		}
 		
 	}
 	
-	public int howManyFragments(){
-	
-		int fragments = (int)Math.floor((this.totalImportance/this.importanceNormalizer)*FRAGMENTS_PER_TILE);
+	public int howManyFragments(Point current){
+		syncNormalizers();
+		if(this.point.equals(current)){
+			return UserMove.currentZoomLevel;
+		}
+		
+		int fragments = (int)Math.floor((this.totalImportance)*FRAGMENTS_PER_TILE);
 		
 		if (fragments<1){
 			return 1;
@@ -80,29 +89,32 @@ public class TileOverall {
 	
 	public TileOverall(Point point){
 		this.point = point;
-		
+		syncNormalizers();
+	}
+	
+	public void syncNormalizers(){
 		if (IMPORTANCE_METRIC==-1){
-			this.importanceNormalizer = distNormalizer; //maximum value when distance is 1
+			importanceNormalizer = 1.0d; //maximum value when distance is 0
 		}
 		else if (IMPORTANCE_METRIC==1){
-			this.importanceNormalizer = 1.0d; 
+			importanceNormalizer = 1.0d; 
 		}
 		else if (IMPORTANCE_METRIC==0){
-			this.importanceNormalizer = 1.0 + distNormalizer + distNormalizer;
+			importanceNormalizer = 3.0d;
 		}
 		else if (IMPORTANCE_METRIC>0){ 
-			this.importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + distNormalizer + distNormalizer;	//distance = 1 (min), popularity 1.0
+			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 2.0d;
 		}
 		else if (IMPORTANCE_METRIC<0){ 
-			this.importanceNormalizer = 1.0 + Math.abs(IMPORTANCE_METRIC)*distNormalizer + distNormalizer;	//distance = 1 (min), popularity 1.0
+			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 2.0d;	//distance = 1 (min), popularity 1.0
+			
 		}
-		
 	}
 	
 	
 	public String toString(){
 		String str;
-		str = "OverallTile("+this.point.y+","+this.point.x+", fragmentsToBeNeed="+howManyFragments()+", Total Importance="+this.totalImportance+",Distance="+this.distance+")";
+		str = "OverallTile("+this.point.y+","+this.point.x+", fragmentsToBeNeed="+howManyFragments(null)+", Total Importance="+this.totalImportance+",Distance="+this.distance+")";
 		return str;
 	}
 

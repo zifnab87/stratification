@@ -47,6 +47,21 @@ public class Cache {
 		return queue.size();
 	}
 	
+
+	public CachedTile getTile(Point point){
+		//double start = System.currentTimeMillis();
+		CachedTile cTile = this.getTile(point.hashCode());
+		//double total = System.currentTimeMillis() - start;
+		//Util.debug("Cache: "+total+" msecs");
+		return cTile;
+	}
+	
+	private CachedTile getTile(int hash){
+		return queueFind(hash);
+	}
+	
+	
+	
 	
 	public int SpaceBeingUsed = 0;
 	
@@ -276,31 +291,20 @@ public class Cache {
 	
 	
 
-	public CachedTile fetchTile(Point point,UserMove caller){
-		return this.fetchTile(point.hashCode(),caller);
+	
+	
+	/*public CachedTile getTileWithCacheHit(Point point,UserMove caller){
+		return this.getTileWithCacheHit(point.hashCode(),caller);
 	}
 	
-	
-	public CachedTile getTile(Point point){
-		double start = System.currentTimeMillis();
-		CachedTile cTile = this.getTile(point.hashCode());
-		double total = System.currentTimeMillis() - start;
-		Util.debug("Cache: "+total+" msecs");
-		return cTile;
-	}
-	
-	public CachedTile fetchTile(int hash,UserMove caller){
+	public CachedTile getTileWithCacheHit(int hash,UserMove caller){
 		CachedTile cachedTile = queueFind(hash);
 		if (cachedTile!=null){
 			caller.cacheHits += cachedTile.getCachedFragmentsNum();
 			caller.run.totalCacheHits+=cachedTile.getCachedFragmentsNum();
 		}
 		return getTile(hash);
-	}
-	
-	private CachedTile getTile(int hash){
-		return queueFind(hash);
-	}
+	}*/
 	
 	
 	

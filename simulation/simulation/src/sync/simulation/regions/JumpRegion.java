@@ -50,7 +50,7 @@ public class JumpRegion extends Region {
 				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
 					if (current.y!=y && current.x!=x || 
 						!Main.cache.tileExists(Database.points(y,x)) 
-						||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments())
+						||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments(current))
 					   ){ 
 						//don't prefetch current,
 						//prefetch what is not in the cache or is in the cache with less fragments

@@ -124,22 +124,12 @@ public class UserMove {
 			int index = point.hashCode();
 			int fragmentsNeeded = FRAGMENTS_PER_TILE;
 			if (FRAGMENT){
-				fragmentsNeeded = tileStatistic.howManyFragments();
+				fragmentsNeeded = tileStatistic.howManyFragments(current);
 			}
 			else {
 				fragmentsNeeded = FRAGMENTS_PER_TILE;//tile.fragmentsNeeded;
 			}
-			//Vector<Integer> fragmentsToBePrefetched = null;
-			//index.LOD = LOD;
-			//System.out.println(LOD);
-			//if tile doesn't exist in cache
-			//if (index.equals(new Point(5,2)) ){
-				//System.out.println("!!!!!"+index.carriedLikeliood+" "+index);
-				//System.out.println(Main.cache.tileExistsAndNotFull(index));
-				//System.out.println(Main.cache.tileExists(index));
-				//System.out.println(Main.cache.getTile(index).getFragmentNumber());
-			//}
-			//System.out.println("bika"+point);
+		
 			
 			
 			
@@ -335,7 +325,7 @@ public class UserMove {
 			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
 				Point index = Database.points(y,x);
 				if (!Main.cache.tileExists(index)){
-					Tile tile = Main.db.fetchTile(index, this);
+					Tile tile = Main.db.fetchTileWithFragmentRange(index,1,fragmentsNeeded, this);
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
 					this.cacheMissesDuringFetch+=fragmentsNeeded;
@@ -346,7 +336,7 @@ public class UserMove {
 					CachedTile cachedPartialTile = Main.cache.getTile(index);
 					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
 					//what was actually fetched to be viewed
-					Main.cache.fetchTile(index, this);
+					Main.cache.getTile(index);
 					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
 					tile.carryingProbability = 1000000.0d; // carry it to the cache
 					int cached = cachedPartialTile.getCachedFragmentsNum();

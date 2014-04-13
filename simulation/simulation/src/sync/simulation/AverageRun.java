@@ -27,8 +27,8 @@ public class AverageRun {
 			totalCacheHitsDuringFetch+=runs.get(i).totalCacheHitsDuringFetch;
 			totalCacheMissesDuringFetch+=runs.get(i).totalCacheMissesDuringFetch;
 			totalLatencyDuringFetch+=runs.get(i).totalLatencyDuringFetch;
-			totalCacheMisses+=runs.get(i).totalCacheMisses;
-			totalCacheHits+=runs.get(i).totalCacheHits;
+			//totalCacheMisses+=runs.get(i).totalCacheMisses;
+			//totalCacheHits+=runs.get(i).totalCacheHits;
 			totalMoves+=runs.get(i).totalMoves;
 			
 			
@@ -36,8 +36,8 @@ public class AverageRun {
 		totalCacheHitsDuringFetch = totalCacheHitsDuringFetch/size*1.0d;
 		totalCacheMissesDuringFetch = totalCacheMissesDuringFetch/size*1.0d;
 		totalLatencyDuringFetch = totalLatencyDuringFetch/size*1.0d;
-		totalCacheMisses = totalCacheMisses/size*1.0d;
-		totalCacheHits = totalCacheHits/size*1.0d;
+		//totalCacheMisses = totalCacheMisses/size*1.0d;
+		//totalCacheHits = totalCacheHits/size*1.0d;
 		totalMoves = totalMoves/size*1.0d;
 	}
 }

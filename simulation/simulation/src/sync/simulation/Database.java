@@ -30,7 +30,11 @@ public class Database extends Region {
 	public int height = DATABASE_WIDTH;
 	
 	
+//	public static String connectionStr = "jdbc:mysql://10.116.70.173:3306/stratification?" +
+//        "user=root&password=password";
 	
+	public static String connectionStr = "jdbc:mysql://localhost:3306/stratification?" +
+	        "user=root";
 	
 	public void close(){
 		try {
@@ -76,17 +80,18 @@ public class Database extends Region {
 	
 	public void clearCache(){
 		//Connection conn = null;
+		
 		try {
 		    // The newInstance() call is a work around for some
 		    // broken Java implementations
 		    Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (Exception ex) {
 		    // handle the error
+			System.err.println("clear cache");
 		}
 		 try {
 			if (conn==null || conn.isClosed()){
-				conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
-                     "user=root");
+				conn = DriverManager.getConnection(connectionStr);
 				//System.err.println("1ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			Statement stmt = conn.createStatement();
@@ -98,6 +103,7 @@ public class Database extends Region {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		 
 	}
 	
 	
@@ -113,11 +119,11 @@ public class Database extends Region {
 		    Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (Exception ex) {
 		    // handle the error
+			System.err.println("init error");
 		}
 		 try {
 			if (conn==null || conn.isClosed()){
-				conn = DriverManager.getConnection("jdbc:mysql://localhost/stratification?" +
-                     "user=root");
+				conn = DriverManager.getConnection(connectionStr);
 				//System.err.println("2ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			for (int y=0; y<DATABASE_WIDTH; y++){
@@ -169,7 +175,7 @@ public class Database extends Region {
 		}
 	}
 	
-	public Tile fetchTile(Point index,UserMove userMove){
+	/*public Tile fetchTile(Point index,UserMove userMove){
 		
 		userMove.cacheMisses+=FRAGMENTS_PER_TILE;
 		userMove.run.totalCacheMisses+=FRAGMENTS_PER_TILE;
@@ -198,7 +204,7 @@ public class Database extends Region {
 			Tile tile = getTileWithFragmentRange(index, 1, FRAGMENTS_PER_TILE, userMove);
 			return tile;
 		}
-	}
+	}*/
 	
 	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
 		userMove.cacheMisses+=1;
@@ -224,12 +230,12 @@ public class Database extends Region {
 		    // broken Java implementations
 		    Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (Exception ex) {
+			System.err.println("gettilewithfragm error");
 		    // handle the error
 		}
 		 try {
 			if (conn==null || conn.isClosed()){
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/stratification?" +
-                     "user=root");
+				conn = DriverManager.getConnection(connectionStr);
 				//System.err.println("3ELEOEEEEEEEEEEEEEEEEEEEEOSS");
 			}
 			
@@ -258,24 +264,7 @@ public class Database extends Region {
 			tile.setData(totalData);
 			//new Tile(index,totalData);
 			double latency = (System.nanoTime() - start)/1000000;
-
-//			if (latency>600d){
-//				System.out.println("~~~~~~~~~~~~~~~~");
-//				System.out.println(latency1+" msecs");
-//				System.out.println(latency2+" msecs");
-//				System.out.println(latency3+" msecs");
-//				System.out.println(latency4+" msecs");
-//				System.out.println("TRALALO "+latency+" msecs");
-//				for (int i=0; i<totalData.length; i++){
-//					System.out.println(totalData[i]);
-//				}
-//				System.out.println(query);
-//				System.out.println("~~~~~~~~~~~~~~~~");
-//			}
 			
-			/*else {
-				System.out.println(latency+" msecs");
-			}*/
 			if (userMove!=null){ //if null don't count latencies
 				userMove.latencyDuringFetch+=latency;
 				userMove.run.totalLatencyDuringFetch+=latency;
@@ -284,12 +273,6 @@ public class Database extends Region {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-//		try {
-//			//conn.close();
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		return tile;
 	}
 	
