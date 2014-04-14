@@ -42,7 +42,8 @@ public class Main {
 //		vec.add(0.0);
 //		vec.add(0.0);
 //		System.out.println(Util.variance(vec));
-		
+	
+
 		
 		//db.init();
 		//System.exit(9);
@@ -65,7 +66,7 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=4; w<=4; w++){
+		for (int w=3; w<=4; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
@@ -128,7 +129,9 @@ public class Main {
 								if (j%100==0){
 									//System.out.println("~~~~~~~~~~~~~~~~");
 								}
-						    	current = UserStudySynthesizer.whatHappensNext(current);
+								//System.out.println("%%before"+current.point);
+								current = UserStudySynthesizer.whatHappensNext(current);
+						    	//System.out.println("%%"+current.movementType+" "+current.point);
 						    	if (current.movementType.equals("ignore") || current.movementType.equals("stay")){//Tiles and Zoom Happened
 						    		//System.out.println("bika");
 						    		
@@ -138,11 +141,11 @@ public class Main {
 						    	
 						    	current.run = run;
 						    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-						    	current.viewport = viewport;
+						    	//current.viewport = viewport;
 						    	jump = new JumpRegion(Database.points(0,0));
 						    	current.run.totalMoves+=1;			
 								Util.debug("Memory before Move:"+Main.cache.getQueue());
-								Util.debug("Current Position we just moved: "+j+" "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel,true);
+								Util.debug("Current Position we just moved: "+j+" "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel);
 								current.viewportFetch();
 								Main.updateStatisticsAndCache(current.point);
 								Util.debug("Memory after Move:"+Main.cache.getQueue());

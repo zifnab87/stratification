@@ -135,12 +135,13 @@ public class UserStudySynthesizer {
 			}
 			else { // PAN -> DETERMINISTIC PAN (choose based on which has the most popularity)
 				String[] moves = new String[]{"up","down","left","right"};
+				UserMove temp = null;
 				double max = -10;
 				String maximizingMove = "";
 				for(int i=0; i<moves.length; i++){
-					current = current.go(moves[i],run,current.point);
+					temp = current.go(moves[i],run,current.point);
 					//current.point.y
-					double newVal = UserStudiesCombined.popularities[current.point.y][current.point.x];
+					double newVal = UserStudiesCombined.popularities[temp.point.y][temp.point.x];
 					if (newVal>max){
 						max = newVal;
 						maximizingMove = moves[i];

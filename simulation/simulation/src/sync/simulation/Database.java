@@ -221,9 +221,9 @@ public class Database extends Region {
 	
 	
 	public Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
-		if (userMove!=null){
-		System.out.println("userMove"+ userMove.movementType);
-		}
+//		if (userMove!=null){
+//		System.out.println("userMove"+ userMove.movementType);
+//		}
 		
 		//Connection conn = null;
 		ResultSet results = null;
@@ -248,9 +248,9 @@ public class Database extends Region {
 			
 			String query = "SELECT * FROM fragment WHERE y="+index.y+" AND x="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment;
 			//double latency2 = (System.nanoTime() - start)/1000000;
-			if (userMove!=null){
-				System.out.println("query"+ query);
-				}
+//			if (userMove!=null){
+//				System.out.println("query"+ query);
+//				}
 			results = stmt.executeQuery(query);
 			results.setFetchSize(1);
 			//double latency3 = (System.nanoTime() - start)/1000000;

@@ -35,7 +35,7 @@ import static sync.simulation.Config.THINK_TIME;
 public class UserMove {
 	
 	public Point  point;
-	public Viewport viewport;
+	//public Viewport viewport;
 	public String movementType;
 	
 	public int cacheHits = 0;
@@ -154,20 +154,18 @@ public class UserMove {
 	
 	
 	public void viewportFetch(){
-		Viewport viewport = this.viewport;
-		Point upperLeft = viewport.upperLeft;
+		//Viewport viewport = this.viewport;
+		Point index = this.point;
 		//Point lowerRight = viewport.lowerRight;
 		int fragmentsNeeded  = FRAGMENTS_PER_TILE;
 		if (FRAGMENT){
 			fragmentsNeeded = UserMove.currentZoomLevel;
 		}
 		
-		for (int y=upperLeft.y; y<=upperLeft.y+(viewport.height-1); y++){
-			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
-				Point index = Database.points(y,x);
+				
 				if (!Main.cache.tileExists(index)){
-					System.out.println("bika1  "+y+" "+x+" "+Main.cache.queueFind(index.hashCode()));
-					System.err.println(Main.cache);
+					//System.out.println("bika1  "+index.y+" "+index.x+" "+Main.cache.queueFind(index.hashCode()));
+					//System.err.println(Main.cache);
 					Tile tile = Main.db.getTileWithFragmentRange(index,1,fragmentsNeeded, this);
 					//tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
@@ -191,9 +189,9 @@ public class UserMove {
 					
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
-					Util.debug("cached "+cached,true);
+					Util.debug("cached "+cached);
 					Util.debug("fragmentsNeeded "+fragmentsNeeded);
-					Util.debug("misses "+misses,true);
+					Util.debug("misses "+misses);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;
@@ -213,10 +211,8 @@ public class UserMove {
 				Util.debug("cache misses on run "+this.run.totalCacheMissesDuringFetch);
 				Util.debug("cache hits on run "+this.run.totalCacheHitsDuringFetch);
 		
-			}
-		}
-		
 	}
+
 
 	
 	
