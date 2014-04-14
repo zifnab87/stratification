@@ -405,11 +405,9 @@ public class Cache {
 		
 		
 		//iter.remove();
-		System.err.println("oeo1"+ this+" "+current);
 		queueRemove(cTile);
-		System.err.println("oeo"+UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].totalImportance);
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
-		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+",imp="+cTile.totalImportance+"current Worst="+this.queue.first()+"-------------",true);
+		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+",imp="+cTile.totalImportance+"current Worst="+this.queue.first()+"-------------");
 		//decreaseSpaceUsed(numFragmentsCached);
 		//System.out.println("Cache after eviction"+Main.cache);
 		return numFragmentsCached;

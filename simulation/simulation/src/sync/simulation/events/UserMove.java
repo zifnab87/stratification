@@ -2,14 +2,10 @@ package sync.simulation.events;
 
 import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
-import static sync.simulation.Config.DATABASE_WIDTH;
-import static sync.simulation.Config.SKIP_PREDICTIONS;
-import static sync.simulation.Config.DEBUG;
+
 import static sync.simulation.Config.USER_THINK_DISTR;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeSet;
@@ -85,9 +81,9 @@ public class UserMove {
 		TreeSet<TileOverall> toPrefetch = region.tree(current);
 		Main.updateStatisticsAndCache(current);
 		
-		Util.debug("Worst Tile"+ Main.cache.getWorst(current),true);
+		Util.debug("Worst Tile"+ Main.cache.getWorst(current));
 		Util.debug("Cache before prefetch@@"+Main.cache);
-		Util.debug("Prefetch Queue"+toPrefetch,true);
+		Util.debug("Prefetch Queue"+toPrefetch);
 		Util.debug("Prefetch Queue Size"+toPrefetch.size());
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
@@ -238,19 +234,43 @@ public class UserMove {
 	}
 	
 	
-	public UserMove go(String movementType,Run run){
+	public UserMove go(String movementType,Run run,Point current){
 		Util.debug(movementType);
 		if (movementType.equals("up")){
-			return new UserMove(this.point.goUp(),run,movementType);
+			Point point = this.point.goUp();
+			if (point.equals(current)){
+				return new UserMove(current,run,"stay");
+			}
+			else {
+				return new UserMove(point,run,movementType);
+			}
 		}
 		else if (movementType.equals("right")){
-			return new UserMove(this.point.goRight(),run,movementType);
+			Point point = this.point.goRight();
+			if (point.equals(current)){
+				return new UserMove(current,run,"stay");
+			}
+			else {
+				return new UserMove(point,run,movementType);
+			}
 		}
 		else if (movementType.equals("down")){
-			return new UserMove(this.point.goDown(),run,movementType);
+			Point point = this.point.goDown();
+			if (point.equals(current)){
+				return new UserMove(current,run,"stay");
+			}
+			else {
+				return new UserMove(point,run,movementType);
+			}
 		}
 		else if (movementType.equals("left")){
-			return new UserMove(this.point.goLeft(),run,movementType);
+			Point point = this.point.goLeft();
+			if (point.equals(current)){
+				return new UserMove(current,run,"stay");
+			}
+			else {
+				return new UserMove(point,run,movementType);
+			}
 		}
 		else if (movementType.equals("zoomin")){
 			currentZoomLevel+=1;

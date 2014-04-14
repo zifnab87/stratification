@@ -50,12 +50,12 @@ public class JumpRegion extends Region {
 				// while the cache is getting fuller we still need things that are worse than the worst tile..
 				
 				
-				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
-					
-					//if (current.y!=y && current.x!=x || 
-						//!Main.cache.tileExists(Database.points(y,x)) 
-						//||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments(current))
-					   //){ 
+//				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
+//					
+//					if (current.y!=y && current.x!=x || 
+//						!Main.cache.tileExists(Database.points(y,x)) 
+//						||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments(current))
+//					   ){ 
 						
 						
 						
@@ -66,10 +66,10 @@ public class JumpRegion extends Region {
 							System.out.println("y:"+y+" x:"+x+" "+Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()+" < "+UserStudiesCombined.tiles[y][x].howManyFragments());
 						}*/
 						queue.add(UserStudiesCombined.tiles[y][x]);
-					//}
+					}
 				}
-			}
-		}
+			//}
+	//	}
 		return queue;
 		
 	}

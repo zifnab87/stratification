@@ -103,7 +103,6 @@ public class UserStudySynthesizer {
 		boolean possiblyNotPermitted = false;
 		possiblyNotPermitted = false;
 		Run run = current.run;
-		
 //		if (current == null){
 //			current = oldCurrent;
 //		}
@@ -115,22 +114,22 @@ public class UserStudySynthesizer {
 				double rand3 = Math.random();
 				if(rand3 <= upProbability){
 					//up
-					current = current.go("up",run);
+					current = current.go("up",run,current.point);
 
 				}
 				else if(rand3 > upProbability && rand3 <= upProbability+downProbability){
 					//down
-					current = current.go("down",run);
+					current = current.go("down",run,current.point);
 					
 				}
 				else if(rand3 > upProbability+downProbability && rand3 <= upProbability+downProbability+leftProbability){
 					//left
-					current = current.go("left",run);
+					current = current.go("left",run,current.point);
 					
 				}
 				else if(rand3 > upProbability+downProbability+leftProbability && rand3 <= upProbability+downProbability+leftProbability+rightProbability){
 					//right
-					current = current.go("right",run);
+					current = current.go("right",run,current.point);
 					
 				}
 			}
@@ -139,7 +138,7 @@ public class UserStudySynthesizer {
 				double max = -10;
 				String maximizingMove = "";
 				for(int i=0; i<moves.length; i++){
-					current = current.go(moves[i],run);
+					current = current.go(moves[i],run,current.point);
 					//current.point.y
 					double newVal = UserStudiesCombined.popularities[current.point.y][current.point.x];
 					if (newVal>max){
@@ -148,7 +147,7 @@ public class UserStudySynthesizer {
 					}
 				}
 				
-				current = current.go(maximizingMove,run);
+				current = current.go(maximizingMove,run,current.point);
 			
 			}
 		}
@@ -158,21 +157,21 @@ public class UserStudySynthesizer {
 				double rand3 = Math.random();
 				 if(rand3 <= zoomInProbability){
 					//zoom in 
-					current = current.go("zoomin",run);
+					current = current.go("zoomin",run,current.point);
 					possiblyNotPermitted = true;
 					
 				}
 				else if(rand3 > zoomInProbability 
 						&& rand3 <= zoomInProbability+zoomOutProbability){
 					//zoom out; 
-					current = current.go("zoomout",run);
+					current = current.go("zoomout",run,current.point);
 					possiblyNotPermitted = true;
 					
 				}
 				else if(rand3 > zoomInProbability+zoomOutProbability
 						&& rand3 <= zoomInProbability+zoomOutProbability+zoomJumpProbability){
 					//zoom jump;
-					current = current.go("zoomjump",run);
+					current = current.go("zoomjump",run,current.point);
 					possiblyNotPermitted = true;
 					
 				}
@@ -187,7 +186,7 @@ public class UserStudySynthesizer {
 				}
 				
 				UserMove.currentZoomLevel = fragments;
-				current = current.go("stay", run);
+				current = current.go("stay", run,current.point);
 				possiblyNotPermitted = true;
 			}
 		}
@@ -211,7 +210,7 @@ public class UserStudySynthesizer {
 		}
 		if (possiblyNotPermitted && !FRAGMENT){
 			UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
-			current = current.go("ignore", run); //if a zoom happened and we are on Tiles mode
+			current = current.go("ignore", run,current.point); //if a zoom happened and we are on Tiles mode
 			
 		}
 		//System.out.println("current"+current.point+" "+rand);

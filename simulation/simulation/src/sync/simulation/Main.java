@@ -72,7 +72,7 @@ public class Main {
 			cache = new Cache();
 			for (int m=128; m<=128; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=0; f<=0; f++){
+				for (int f=1; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -129,7 +129,7 @@ public class Main {
 									//System.out.println("~~~~~~~~~~~~~~~~");
 								}
 						    	current = UserStudySynthesizer.whatHappensNext(current);
-						    	if (current.movementType.equals("ignore")){//Tiles and Zoom Happened
+						    	if (current.movementType.equals("ignore") || current.movementType.equals("stay")){//Tiles and Zoom Happened
 						    		//System.out.println("bika");
 						    		
 						    		continue;
@@ -142,10 +142,10 @@ public class Main {
 						    	jump = new JumpRegion(Database.points(0,0));
 						    	current.run.totalMoves+=1;			
 								Util.debug("Memory before Move:"+Main.cache.getQueue());
-								Util.debug("Current Position we just moved: "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel,true);
+								Util.debug("Current Position we just moved: "+j+" "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel,true);
 								current.viewportFetch();
 								Main.updateStatisticsAndCache(current.point);
-								Util.debug("Memory after Move:"+Main.cache.getQueue(),true);
+								Util.debug("Memory after Move:"+Main.cache.getQueue());
 								
 								//System.out.println(cache);
 								Util.debug("Memory after Fetch:"+Main.cache.getQueue());
