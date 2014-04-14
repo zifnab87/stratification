@@ -30,25 +30,13 @@ import sync.simulation.predictor.Tuple;
 import sync.simulation.regions.JumpRegion;
 import sync.simulation.regions.Region;
 import sync.simulation.regions.TileOverall;
+import sync.simulation.regions.UserStudiesCombined;
 import util.Util;
 import static sync.simulation.Config.THINK_TIME;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.THINK_TIME;
 
 public class UserMove {
-//	public Point  upperLeft;
-//	public Viewport viewport;
-//	public String movementType;
-//	
-//	public int cacheHits = 0;
-//	public int cacheMisses = 0;
-//	
-//
-//	public double cacheMissesDuringFetch = 0;
-//	public int cacheHitsDuringFetch = 0;
-//	public double latencyDuringFetch = 0;
-//	
-//	public int thinkTime = THINK_TIME;
 	
 	public Point  point;
 	public Viewport viewport;
@@ -89,29 +77,18 @@ public class UserMove {
 	}
 	
 	
-/*	public UserMove(Viewport viewport,Run run, int a){
-		this.run = run;
-		this.point = viewport.upperLeft;
-		this.viewport = viewport;
-		this.movementType = viewport.resultOfMovement;
-	}*/
-	
-	/*public void write(){
-		try {
-			Workload.writeMove(this);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-	
 	public void prefetch(JumpRegion region,Point current){
 		/*if (toPrefetch.size()==0){
 			return;
 		}*/
 		double start = System.currentTimeMillis();
 		TreeSet<TileOverall> toPrefetch = region.tree(current);
+		Main.updateStatisticsAndCache(current);
+		
+		Util.debug("Worst Tile"+ Main.cache.getWorst(current),true);
+		Util.debug("Cache before prefetch@@"+Main.cache);
 		Util.debug("Prefetch Queue"+toPrefetch,true);
+		Util.debug("Prefetch Queue Size"+toPrefetch.size());
 		Iterator<TileOverall> iter = toPrefetch.iterator();
 		int availThinkTime = thinkTime;
 		//System.out.println(availThinkTime);
@@ -120,20 +97,25 @@ public class UserMove {
 			
 			boolean prefetched  = false;
 			TileOverall tileStatistic = iter.next();
+			//Main.cache.updateImportances(current);
+			Main.updateStatisticsAndCache(current);
+			CachedTile worstTile = Main.cache.getWorst(current);
+			//tileStatistic.updateImportance(current);
+			if(tileStatistic.totalImportance < worstTile.totalImportance){
+				break;
+			}
 			Point point = tileStatistic.point;
+			//System.out.println("Prefetch Point"+point+UserStudiesCombined.tiles[point.y][point.x].totalImportance);
 			int index = point.hashCode();
 			int fragmentsNeeded = FRAGMENTS_PER_TILE;
 			if (FRAGMENT){
 				fragmentsNeeded = tileStatistic.howManyFragments(current);
 			}
 			else {
-				fragmentsNeeded = FRAGMENTS_PER_TILE;//tile.fragmentsNeeded;
+				fragmentsNeeded = FRAGMENTS_PER_TILE;
 			}
 		
 			
-			
-			
-			//CHECK What is in the cache
 			
 			if (!Main.cache.tileExists(index)){
 				Tile tile = Main.db.getTileWithFragmentRange( point,1,fragmentsNeeded,null);
@@ -149,151 +131,14 @@ public class UserMove {
 					count++;
 				}
 			}
+			
+			
 			double end = (System.currentTimeMillis() - start);
 			//System.out.println(end);
 			availThinkTime -= end; //msec
-			
-			
-			
-//			if (LOD == FRAGMENTS_PER_TILE) {// the tile is needed to be full
-//				
-//				if (Main.cache.tileExistsAndFull(index)){
-//					Main.cache.fetchTile(index, this);
-//				}
-//				else if(Main.cache.tileExistsAndNotFull(index)){
-//					//find what's missing
-//					CachedTile cachedPartialTile = Main.cache.getTile(point);
-//					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
-//					
-//					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(cachedLOD);
-//					if (FRAGMENT){
-//						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-//						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-//							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-//						}
-//						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-//					}
-//					
-//					//Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
-//					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-//						return ;
-//					}
-//					int fragmCount = fragmentsToBePrefetched.size();
-//					int firstFragment = fragmentsToBePrefetched.get(0);
-//					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-//					
-//					Tile tile = Main.db.fetchTileWithFragmentRange(point, firstFragment,lastFragment, this);
-//					prefetched  = true;
-//					tile.carryingProbability = node.probability; // carry it to the cache
-//					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
-//					availThinkTime -= fragmentsToBePrefetched.size();
-//					//that many were cached
-//					Main.cache.fetchTile(index, this);
-//					
-//
-//				}
-//				else { //tile doesn't exist in Cache
-//					// full Database Fetch
-//					
-//					prefetched  = true;
-//					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillFull(0);
-//					if (FRAGMENT){
-//						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-//						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-//							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-//						}
-//						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-//					}
-//					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-//						this.thinkTime = availThinkTime;
-//						return;
-//					}
-//					
-//					int fragmCount = fragmentsToBePrefetched.size();
-//					int firstFragment = fragmentsToBePrefetched.get(0);
-//					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-//					Tile tile = Main.db.fetchTileWithFragmentRange(point, firstFragment,lastFragment, this);
-//					availThinkTime-=fragmCount;
-//					tile.carryingProbability = node.probability;
-//					Main.cache.cacheTileWithFragmentRange(tile, 1, FRAGMENTS_PER_TILE);
-//				}
+//			if (availThinkTime<0){
+//			System.out.println(availThinkTime);
 //			}
-//			else if (LOD>0 && LOD<FRAGMENTS_PER_TILE){ //the tile doesn't need to be full
-//				if (Main.cache.tileExists(index)){
-//					CachedTile cachedPartialTile = Main.cache.getTile(point);
-//					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
-//					if (cachedLOD < LOD){
-//						
-//						if (FRAGMENT){
-//							fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(cachedLOD,LOD);
-//							Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-//							for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-//								fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-//							}
-//							fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-//						}
-//						int fragmCount = fragmentsToBePrefetched.size();
-//						int firstFragment = fragmentsToBePrefetched.get(0);
-//						int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-//						Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
-//						if (availThinkTime-fragmentsToBePrefetched.size()<0){
-//							this.thinkTime = availThinkTime;
-//							return ;
-//						}
-//						
-//						Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
-//						prefetched  = true;
-//						tile.carryingProbability = node.probability; // carry it to the cache
-//						Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
-//						availThinkTime -= fragmentsToBePrefetched.size();
-//						//that many were cached
-//						Main.cache.fetchTile(index, this);
-//						
-//						
-//					}
-//					else {// cachedLOD > LOD
-//						//System.err.println("hhhmmm");
-//						//that many were needed and we had even more in the cache
-//						/*for (int i=1; i<LOD; i++){
-//							Main.cache.fetchFragmentOfTile(i,  new Point(key.y,key.x), this);
-//						}*/
-//					}
-//				}
-//				else { //Tile doesn't exist and it is partially needed from Database
-//					fragmentsToBePrefetched = CachedTile.getMissingFragmentIdsTillLOD(0, LOD);
-//					if (FRAGMENT){
-//						Vector<Integer> fragmentsAfterThinkingTime = new Vector<Integer>();
-//						for (int i=1; i<=Math.min(availThinkTime,fragmentsToBePrefetched.size()); i++){
-//							fragmentsAfterThinkingTime.add(fragmentsToBePrefetched.get(i-1));
-//						}
-//						fragmentsToBePrefetched = fragmentsAfterThinkingTime;
-//					}
-//					int fragmCount = fragmentsToBePrefetched.size();
-//					int firstFragment = fragmentsToBePrefetched.get(0);
-//					int lastFragment = fragmentsToBePrefetched.get(fragmCount-1);
-//					Util.debug(availThinkTime+"-"+fragmentsToBePrefetched.size());
-//					if (availThinkTime-fragmentsToBePrefetched.size()<0){
-//						this.thinkTime = availThinkTime;
-//						return ;
-//					}
-//					Tile tile = Main.db.fetchTileWithFragmentRange( point,firstFragment,lastFragment,this);
-//					prefetched  = true;
-//					tile.carryingProbability = node.probability; // carry it to the cache
-//					Main.cache.cacheTileWithFragmentRange(tile,firstFragment,lastFragment);
-//					availThinkTime -= fragmentsToBePrefetched.size();
-//				}
-//			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			if (prefetched){
 			
 				Util.debug("prefetched!"+point);	
@@ -325,7 +170,8 @@ public class UserMove {
 			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
 				Point index = Database.points(y,x);
 				if (!Main.cache.tileExists(index)){
-					System.out.println("bika1");
+					System.out.println("bika1  "+y+" "+x+" "+Main.cache.queueFind(index.hashCode()));
+					System.err.println(Main.cache);
 					Tile tile = Main.db.getTileWithFragmentRange(index,1,fragmentsNeeded, this);
 					//tile.carryingProbability = 1000000.0d; // carry it to the cache
 					Main.cache.cacheTileWithFragmentRange(tile,this.point, 1, fragmentsNeeded);
@@ -349,9 +195,9 @@ public class UserMove {
 					
 					int cached = cachedPartialTile.getCachedFragmentsNum();
 					int misses = (fragmentsNeeded-cached);
-					Util.debug("cached "+cached);
+					Util.debug("cached "+cached,true);
 					Util.debug("fragmentsNeeded "+fragmentsNeeded);
-					Util.debug("misses "+misses);
+					Util.debug("misses "+misses,true);
 					if (misses > 0){
 						this.cacheMissesDuringFetch += misses;
 						this.run.totalCacheMissesDuringFetch += misses;
@@ -374,50 +220,8 @@ public class UserMove {
 			}
 		}
 		
-//		for (int y=upperLeft.y; y<=upperLeft.y+(viewport.height-1); y++){
-//			for (int x=upperLeft.x; x<=upperLeft.x+(viewport.width-1); x++){
-//				Point index = new Point(y,x);
-//				//if tile doesn't exist in cache
-//				if (!Main.cache.tileExists(index)){
-//					// full Database Fetch
-//					Tile tile = Main.db.fetchTile(index, this);
-//					tile.carryingProbability = 1.0d; // carry it to the cache
-//					Main.cache.cacheTileWithFragmentRange(tile, 1, fragmentsNeeded);
-//					this.cacheMissesDuringFetch+=fragmentsNeeded;
-//					this.run.totalCacheMissesDuringFetch+=fragmentsNeeded;
-//				}
-//				//if tile partially exists request missing fragments
-//				
-//				else if(Main.cache.tileExistsAndNotFull(index)){
-//					CachedTile cachedPartialTile = Main.cache.getTile(index);
-//					int cachedLOD = cachedPartialTile.getCachedFragmentsNum();
-//					//what was actually fetched to be viewed
-//					Main.cache.fetchTile(index, this);
-//					Tile tile = Main.db.fetchTileWithFragmentRange( index,cachedLOD+1,fragmentsNeeded,this);
-//					tile.carryingProbability = 1.0d; // carry it to the cache
-//					int cached = cachedPartialTile.getCachedFragmentsNum();
-//					int misses = (fragmentsNeeded-cached);
-//					Main.cache.cacheTileWithFragmentRange(tile,cachedLOD+1,fragmentsNeeded);
-//					this.cacheMissesDuringFetch += misses;
-//					this.run.totalCacheMissesDuringFetch += misses;
-//					this.cacheHitsDuringFetch += cached;
-//					this.run.totalCacheHitsDuringFetch += cached;
-//				}
-//				else { // tileExistsAndFull == true
-//					Main.cache.fetchTile(index, this);
-//					this.cacheHitsDuringFetch+=fragmentsNeeded;
-//					this.run.totalCacheHitsDuringFetch+=fragmentsNeeded;
-//				}
-//				
-//			}
-//		}
 	}
-	
-	
-//	public String toString(){
-//		//return this.viewport.upperLeft.toString();
-//	}
-	
+
 	
 	
 	
@@ -477,36 +281,5 @@ public class UserMove {
 			return new UserMove(this.point,run,"ignore");
 		}
 	}
-	
-	
-	
-	
-	/*
-	public void action() throws Exception{
-		
-		Workload.writeMove(this);
-		Main.cache.updateAllTileLikelihoods(newMove);
-		//if (debug){
-			
-		//}
-		boolean isTerminal = newMove.upperLeft.x == DATABASE_WIDTH-1 && newMove.upperLeft.y == DATABASE_WIDTH-1;
-		if (isTerminal){
-			Event.sendEvent(new StopAll(Main.startTime));
-		}
-		//if (debug){
-			System.out.println("UserMove Event"+this.newMove.upperLeft);
-		//}
-
-		Event.sendEvent(new Fetch(this.newMove));
-		//if (PREFETCH){
-		//	Event.sendEvent(new Prefetch(this.newMove));
-		//}
-		System.exit(3);
-		
-		Monitor.userMove();
-		
-		//Main.db.setViewport(newMove);
-		
-	}*/
 	
 }

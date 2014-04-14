@@ -1,5 +1,6 @@
 package sync.simulation;
 
+import static sync.simulation.Config.DATABASE_WIDTH;
 import static sync.simulation.Config.VIEWPORT_HEIGHT;
 import static sync.simulation.Config.VIEWPORT_WIDTH;
 import static sync.simulation.Config.CACHE_SIZE;
@@ -34,7 +35,6 @@ public class Main {
 	
 	
 	public static void main(String args[]){
-
 		
 //		Vector<Double> vec = new Vector<Double>();
 //		vec.add(1.0);
@@ -65,14 +65,14 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=7; w<=7; w++){
+		for (int w=4; w<=4; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
 			cache = new Cache();
-			for (int m=512; m<=512; m=m*2){
+			for (int m=128; m<=128; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=1; f<=1; f++){
+				for (int f=0; f<=0; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -131,29 +131,32 @@ public class Main {
 						    	current = UserStudySynthesizer.whatHappensNext(current);
 						    	if (current.movementType.equals("ignore")){//Tiles and Zoom Happened
 						    		//System.out.println("bika");
+						    		
 						    		continue;
 						    	}
+						    	
 						    	
 						    	current.run = run;
 						    	viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 						    	current.viewport = viewport;
 						    	jump = new JumpRegion(Database.points(0,0));
 						    	current.run.totalMoves+=1;			
-								Util.debug("Memory before Move:"+Main.cache.getQueue(),true);
+								Util.debug("Memory before Move:"+Main.cache.getQueue());
 								Util.debug("Current Position we just moved: "+current.point+ "move:"+current.movementType+" Zoom: "+UserMove.currentZoomLevel,true);
 								current.viewportFetch();
-								Util.debug("Memory after Move:"+Main.cache.getQueue());
-								Main.cache.updateImportances(current.point);
+								Main.updateStatisticsAndCache(current.point);
+								Util.debug("Memory after Move:"+Main.cache.getQueue(),true);
+								
 								//System.out.println(cache);
 								Util.debug("Memory after Fetch:"+Main.cache.getQueue());
 								Util.debug("Memory Space Used after Fetch "+Main.cache.sizeBeingUsed());
 						    
 							    //PREDICTOR
 								
-								//System.out.println("Before:"+cache);
+								Util.debug("Before Prefetch:"+cache);
 								current.prefetch(jump, current.point);
-								Main.cache.updateImportances(current.point);
-								//System.out.println("After:"+cache);
+								Main.updateStatisticsAndCache(current.point);
+								Util.debug("After Prefetch:"+cache);
 							
 								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
 								Util.debug("#Cache Hits during Fetch in a Move: "+current.cacheHitsDuringFetch);
@@ -225,6 +228,20 @@ public class Main {
 			}
 		}
 	}
+	
+	
+	
+	
+	public static void updateStatisticsAndCache(Point current){
+		
+		for (int y=0; y<DATABASE_WIDTH; y++){
+			for (int x=0; x<DATABASE_WIDTH; x++){
+					UserStudiesCombined.tiles[y][x].updateImportance(current);
+			}
+		}
+		Main.cache.updateImportances(current);
+	}
+	
 }
 		
 		

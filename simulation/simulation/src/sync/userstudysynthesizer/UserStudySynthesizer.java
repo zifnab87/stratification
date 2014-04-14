@@ -210,7 +210,9 @@ public class UserStudySynthesizer {
 			current = current.jumpTo(maximizingJumpPoint,run);
 		}
 		if (possiblyNotPermitted && !FRAGMENT){
+			UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
 			current = current.go("ignore", run); //if a zoom happened and we are on Tiles mode
+			
 		}
 		//System.out.println("current"+current.point+" "+rand);
 		return current;

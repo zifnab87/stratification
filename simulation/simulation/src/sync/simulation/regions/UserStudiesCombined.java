@@ -2,7 +2,9 @@ package sync.simulation.regions;
 
 import java.util.Vector;
 
+import sync.simulation.CachedTile;
 import sync.simulation.Database;
+import sync.simulation.Main;
 import sync.simulation.Point;
 import static sync.simulation.Config.DATABASE_WIDTH;
 
@@ -23,6 +25,9 @@ public class UserStudiesCombined {
 			}
 		}
 	}
+	
+	//update statistics and make it consistent with cache
+		
 	
 	
 	public void init(){

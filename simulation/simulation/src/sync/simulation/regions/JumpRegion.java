@@ -41,17 +41,24 @@ public class JumpRegion extends Region {
 	
 	
 	public TreeSet<TileOverall> tree(Point current){
-		CachedTile worstCachedTile = Main.cache.getWorst();
+		CachedTile worstCachedTile = Main.cache.getWorst(current);
 		queue = new TreeSet<TileOverall>(TileOverall.comparator);
+		Main.cache.updateImportances(current);
 		for (int y=upperLeft.y; y<=Math.min(upperLeft.y+(this.height-1),DATABASE_WIDTH-1); y++){
 			for (int x=upperLeft.x; x<=Math.min(upperLeft.x+(this.width-1),DATABASE_WIDTH-1); x++){
 				UserStudiesCombined.tiles[y][x].updateImportance(current);
 				// while the cache is getting fuller we still need things that are worse than the worst tile..
+				
+				
 				if (!Main.cache.isFull() || UserStudiesCombined.tiles[y][x].totalImportance>worstCachedTile.totalImportance){
-					if (current.y!=y && current.x!=x || 
-						!Main.cache.tileExists(Database.points(y,x)) 
-						||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments(current))
-					   ){ 
+					
+					//if (current.y!=y && current.x!=x || 
+						//!Main.cache.tileExists(Database.points(y,x)) 
+						//||  (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments(current))
+					   //){ 
+						
+						
+						
 						//don't prefetch current,
 						//prefetch what is not in the cache or is in the cache with less fragments
 						
@@ -59,7 +66,7 @@ public class JumpRegion extends Region {
 							System.out.println("y:"+y+" x:"+x+" "+Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()+" < "+UserStudiesCombined.tiles[y][x].howManyFragments());
 						}*/
 						queue.add(UserStudiesCombined.tiles[y][x]);
-					}
+					//}
 				}
 			}
 		}

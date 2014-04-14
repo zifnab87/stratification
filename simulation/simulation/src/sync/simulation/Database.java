@@ -166,14 +166,14 @@ public class Database extends Region {
 	}
 	
 	
-	public boolean tileExists(Point index){
-		if (index.y >= 0 && index.y< DATABASE_WIDTH && index.x >= 0 && index.x < DATABASE_WIDTH){
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+//	public boolean tileExists(Point index){
+//		if (index.y >= 0 && index.y< DATABASE_WIDTH && index.x >= 0 && index.x < DATABASE_WIDTH){
+//			return true;
+//		}
+//		else {
+//			return false;
+//		}
+//	}
 	
 	/*public Tile fetchTile(Point index,UserMove userMove){
 		
@@ -206,18 +206,18 @@ public class Database extends Region {
 		}
 	}*/
 	
-	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
-		userMove.cacheMisses+=1;
-		//userMove.run.totalCacheMisses+=1;
-		return getFragmentOfTile(index, fragmentNumber,userMove);
-	}
+//	public Tile fetchFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
+//		userMove.cacheMisses+=1;
+//		//userMove.run.totalCacheMisses+=1;
+//		return getFragmentOfTile(index, fragmentNumber,userMove);
+//	}
 
 	
 	
-	private Tile getFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
-		
-		return getTileWithFragmentRange(index, fragmentNumber, fragmentNumber,userMove);
-	}
+//	private Tile getFragmentOfTile(Point index,int fragmentNumber,UserMove userMove){
+//		
+//		return getTileWithFragmentRange(index, fragmentNumber, fragmentNumber,userMove);
+//	}
 	
 	
 	public Tile getTileWithFragmentRange(Point index,int firstFragment,int lastFragment,UserMove userMove){
@@ -248,6 +248,9 @@ public class Database extends Region {
 			
 			String query = "SELECT * FROM fragment WHERE y="+index.y+" AND x="+index.x+" AND fragment_num BETWEEN "+firstFragment+" AND "+lastFragment;
 			//double latency2 = (System.nanoTime() - start)/1000000;
+			if (userMove!=null){
+				System.out.println("query"+ query);
+				}
 			results = stmt.executeQuery(query);
 			results.setFetchSize(1);
 			//double latency3 = (System.nanoTime() - start)/1000000;

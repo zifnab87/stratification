@@ -2,6 +2,7 @@ package sync.simulation.regions;
 
 import java.util.Comparator;
 
+import sync.simulation.Main;
 import sync.simulation.Point;
 import sync.simulation.events.UserMove;
 import static sync.simulation.Config.IMPORTANCE_METRIC;
@@ -12,7 +13,7 @@ public class TileOverall {
 	
 	public final Point point;
 	public double totalImportance;
-	public static double distNormalizer = Math.sqrt((DATABASE_WIDTH-1)*(DATABASE_WIDTH-1));//diagonal
+	public static double distNormalizer = Math.sqrt(Math.pow(DATABASE_WIDTH-1,2)+Math.pow(DATABASE_WIDTH-1,2));//diagonal
 	//public int jumpToCounts;
 	//public double[] visitResolutions = new double[FRAGMENTS_PER_TILE+1];
 	//public int visitsCounts;
@@ -23,11 +24,16 @@ public class TileOverall {
 	
 	
 	
+	
+	
 	public void updateImportance(Point current){
+		
+		
 		this.distance = Point.distance(this.point, current);
+		syncNormalizers();
 		double distNormalized = Point.distance(this.point, current)/(1.0d*distNormalizer);
 		double popularity = UserStudiesCombined.popularities[this.point.y][this.point.x];
-		syncNormalizers();
+		
 		if (current.equals(this.point)){
 			this.totalImportance = 1000000;
 			

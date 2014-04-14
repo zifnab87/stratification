@@ -23,6 +23,7 @@ import sync.simulation.predictor.Predictor;
 
 import sync.simulation.predictor.Tuple;
 import sync.simulation.regions.UserStudiesCombined;
+import sync.userstudysynthesizer.UserStudySynthesizer;
 import util.Util;
 
 public class Cache {
@@ -106,9 +107,10 @@ public class Cache {
 	
 	public CachedTile cacheTileWithFragmentRange(Tile tile,Point current,int firstFragment, int lastFragment){
 		int spaceNeeded = lastFragment - firstFragment + 1;
+		Main.updateStatisticsAndCache(current);
 		while(!this.hasAvailableSpace(spaceNeeded)){
 			Util.debug("space still Needed "+spaceNeeded);
-			int diff = this.makeSpaceAvailable(spaceNeeded,tile.point);
+			int diff = this.makeSpaceAvailable(spaceNeeded,current);
 			spaceNeeded -= diff;
 			
 		}
@@ -143,7 +145,7 @@ public class Cache {
 		if (!queueContains(toBeCached) /*&& tiles.containsKey(toBeCached.point.hashCode())*/){
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
 			//Util.debug(toBeCached.fragmentsToString());
-			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
+			//UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
 			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].totalImportance;
 			this.queue.add(toBeCached);
 		}
@@ -156,16 +158,17 @@ public class Cache {
 			//Util.debug(this.queue.size());
 			Util.debug(cTile.fragmentsToString());
 			toBeCached = new CachedTile((Point)(tile.point.clone()),fragments);
-			UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
+			//UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].updateImportance(current);
 			toBeCached.totalImportance = UserStudiesCombined.tiles[toBeCached.point.y][toBeCached.point.x].totalImportance;
 			Util.debug(toBeCached.fragmentsToString());
 			if (!queueContains(toBeCached) /*&& tiles.containsKey(toBeCached.point.hashCode())*/){
 				this.queue.add(toBeCached);
 			}
 		}
-		
+		//System.out.println("cache after cached Tile "+Main.cache);
 	
-		
+		Main.cache.updateImportances(current);
+		Main.updateStatisticsAndCache(current);
 		
 		return toBeCached;
 		
@@ -341,20 +344,22 @@ public class Cache {
 		return tileExistsAndNotFull(index.hashCode());
 	}
 	
-	public int makeSpaceAvailable(int fragmentsNeeded,Point currentPoint){
+	public int makeSpaceAvailable(int fragmentsNeeded,Point current){
 		//Util.debug("I need"+fragmentsNeeded);
-		Iterator<CachedTile> iter = this.queue.iterator();
 		int evictedFragments = 0;
 		boolean prob1 = false;
 		boolean prob2 = false;
+		Main.updateStatisticsAndCache(current);
 		while(/*iter.hasNext() &&*/ evictedFragments<fragmentsNeeded){
-			CachedTile lessLikelyTile = this.getWorst();// iter.next();
+			
+			
+			CachedTile lessLikelyTile = this.getWorst(current);// iter.next();
 			//if it is the same that we are currentlyPrefetching 
-			if (lessLikelyTile.point.equals(currentPoint)){
+			if (lessLikelyTile.point.equals(current)){
 				//System.err.println("ELEOS to idio");
 				prob1 = true;
 			}
-			CachedTile toBeCached = queueFind(currentPoint.hashCode());
+			CachedTile toBeCached = queueFind(current.hashCode());
 			if (toBeCached!=null){ //if already cached 
 				if (toBeCached.totalImportance < lessLikelyTile.totalImportance){  //and has less probability than the anything in the cache
 					System.err.println("ELEOS cache degradation");
@@ -377,12 +382,14 @@ public class Cache {
 				
 			}
 			
-			int fragmentsEvicted = evictTile(lessLikelyTile,iter);
-			updateImportances(currentPoint);
+			int fragmentsEvicted = evictTile(lessLikelyTile, current);
+			
+			Main.updateStatisticsAndCache(current);
 			evictedFragments+=fragmentsEvicted;
 			
 			
 		}
+		Main.updateStatisticsAndCache(current);
 		//Util.debug(queue);
 		return evictedFragments;
 	}
@@ -390,13 +397,21 @@ public class Cache {
 	
 	
 	
-	public int evictTile(CachedTile cTile,Iterator<CachedTile> iter){
+	public int evictTile(CachedTile cTile, Point current){
+		
+		//System.out.println("Cache before eviction"+Main.cache);
+		//System.err.println("Evicted"+cTile.totalImportance+" "+cTile);
 		//this.tiles.remove(cTile.point.hashCode());
-		queueRemove(cTile);
+		
+		
 		//iter.remove();
+		System.err.println("oeo1"+ this+" "+current);
+		queueRemove(cTile);
+		System.err.println("oeo"+UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].totalImportance);
 		int numFragmentsCached = cTile.getCachedFragmentsNum();
-		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+"-------------");
+		Util.debug("----------Evicted:"+ cTile.point+" it had:"+numFragmentsCached+",imp="+cTile.totalImportance+"current Worst="+this.queue.first()+"-------------",true);
 		//decreaseSpaceUsed(numFragmentsCached);
+		//System.out.println("Cache after eviction"+Main.cache);
 		return numFragmentsCached;
 	}
 	
@@ -453,7 +468,7 @@ public class Cache {
 		while (mapIter.hasNext()){
 			CachedTile cTile = queueFind(mapIter.next().id);
 			
-			String[] data = cTile.data;
+			//String[] data = cTile.data;
 			
 			//IMPORTANT remove before the equality is busted because of change in probability
 			
@@ -468,9 +483,10 @@ public class Cache {
 				//continue;
 			}
 			else {
+				
 				UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].updateImportance(currentPosition);
 				cTile.totalImportance = UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].totalImportance;
-				cTile.distance = Point.distance(cTile.point, currentPosition);
+				cTile.distance = UserStudiesCombined.tiles[cTile.point.y][cTile.point.x].distance;
 			
 			}
 			
@@ -492,7 +508,8 @@ public class Cache {
 	}
 	
 	
-	public CachedTile getWorst(){
+	public CachedTile getWorst(Point currentPosition){
+		Main.updateStatisticsAndCache(currentPosition);
 		return this.queue.first();
 	}
 	
