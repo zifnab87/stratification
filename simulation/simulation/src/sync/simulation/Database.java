@@ -30,11 +30,11 @@ public class Database extends Region {
 	public int height = DATABASE_WIDTH;
 	
 	
-//	public static String connectionStr = "jdbc:mysql://10.116.70.173:3306/stratification?" +
-//        "user=root&password=password";
+	public static String connectionStr = "jdbc:mysql://10.116.70.173:3306/stratification?" +
+        "user=root&password=password";
 	
-	public static String connectionStr = "jdbc:mysql://localhost:3306/stratification?" +
-	        "user=root";
+//	public static String connectionStr = "jdbc:mysql://localhost:3306/stratification?" +
+	//        "user=root";
 	
 	public void close(){
 		try {

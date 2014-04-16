@@ -66,14 +66,24 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=3; w<=4; w++){
+		for (int w=1; w<=6; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
 			cache = new Cache();
-			for (int m=128; m<=128; m=m*2){
+			int memStart = 0;
+			int memEnd = 0;
+			if (w!=6){
+				memStart = 512;
+				memEnd = 512;
+			}
+			else {
+				memStart = 128;
+				memEnd = 8192;
+			}
+			for (int m=memStart; m<=memEnd; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=1; f<=1; f++){
+				for (int f=0; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -82,7 +92,7 @@ public class Main {
 					}
 					db.clearCache();
 					cache = new Cache();
-					for (int weight=-1; weight<=-1; weight++){
+					for (int weight=-5; weight<=5; weight++){
 	//					if (w>=-1 && w<=1){
 	//						continue;
 	//					}
@@ -93,11 +103,17 @@ public class Main {
 						db.clearCache();
 						cache = new Cache();
 						System.gc();
-						
+						Vector<Double> vecForLatency = new Vector<Double>();
+						//Vector<Double> vecForMissRatioVariance = new Vector<Double>();
+//						vec.add(1.0);
+//						vec.add(0.0);
+//						vec.add(0.0);
+//						vec.add(0.0);
+//						System.out.println(Util.variance(vec));
 						for (int i=0; i<=RUNS+WARMUP; i++){
 							
 														
-							Util.debug("Run: "+i,true);
+							Util.debug("Run: "+i);
 							Run run = new Run();
 							//for warmup
 							if (i>WARMUP){
@@ -118,7 +134,7 @@ public class Main {
 							
 							Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 
-							for (int j=0; j<100; j++){ //moves per run	
+							for (int j=0; j<1500; j++){ //moves per run	
 								//System.out.println("Run"+i+" Move "+j);
 								System.gc();
 								
@@ -164,6 +180,9 @@ public class Main {
 								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
 								Util.debug("#Cache Hits during Fetch in a Move: "+current.cacheHitsDuringFetch);
 								Util.debug("#Latency during Fetch in a Move: "+current.latencyDuringFetch);
+								if (i>WARMUP){
+									vecForLatency.add(current.latencyDuringFetch);
+								}
 								//current.run.misses.add(current.cacheMissesDuringFetch);
 								//Util.debug("#Disk Fetched Fragments during Move: "+current.cacheMisses);
 								
@@ -216,15 +235,17 @@ public class Main {
 						//if (FRAGMENT){
 						//	Util.debug("Coverage = "+COVERAGE,true);
 						//}
-						Util.debug("#Average Moves Number: "+avgRun.totalMoves);
+						Util.debug("#Average Moves Number: "+avgRun.totalMoves,true);
 						//Util.debug("#Average Total Cache Misses during Fetches: "+avgRun.totalCacheMissesDuringFetch,true);
 						//Util.debug("#Average Total Cache Hits during Fetches: "+avgRun.totalCacheHitsDuringFetch,true);
-						Util.debug("#Average Total Cache Misses/(Total CH+Total CM) during Fetches: "+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%",true);
-						Util.debug("#Average Total Latency during Fetches: "+avgRun.totalLatencyDuringFetch+" msec ("+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+")",true);
+						Util.debug("#Average Total Cache Misses/(Total CH+Total CM) during Fetches: "+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%");
+						Util.debug("#Average Total Latency during Fetches: "+avgRun.totalLatencyDuringFetch+" msec ("+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+")");
 						//Util.debug("#Average Total Disk Fetched Fragments: "+avgRun.totalCacheMisses,true);
 						//Util.debug("#Average Total Cache Fetched Fragments: "+avgRun.totalCacheHits,true);
 						Util.debug(" ",true);
-						Util.debug("data(workload="+w+", cache="+CACHE_SIZE+", fragments="+FRAGMENT+", metric="+weight+", missratio="+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%, movelatency="+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+" msec",true);
+						//System.out.println("!!!!"+vecForLatency);
+						Util.debug("data(workload= "+w+", cache="+CACHE_SIZE+", fragments= "+FRAGMENT+", metric="+weight+", missratio="+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+"%, movelatency = "+Util.average(vecForLatency)+" msec, Latency Variance = "+Util.variance(vecForLatency)+", Latency Stdev = "+Math.sqrt(Util.variance(vecForLatency))+")",true);
+						Util.debug("dataraw("+w+","+CACHE_SIZE+","+FRAGMENT+","+weight+","+(100d*avgRun.totalCacheMissesDuringFetch)/(avgRun.totalCacheMissesDuringFetch+avgRun.totalCacheHitsDuringFetch)+","+avgRun.totalLatencyDuringFetch/avgRun.totalMoves+","+Util.variance(vecForLatency)+","+Math.sqrt(Util.variance(vecForLatency))+")",true);
 						Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",true);   	
 					}
 				}
