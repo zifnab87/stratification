@@ -48,13 +48,13 @@ public class TileOverall {
 				totalImportance = popularity;
 			}
 			else if (IMPORTANCE_METRIC==0){
-				totalImportance = popularity + (1-distNormalized) + (1-distNormalized)*popularity;	
+				totalImportance = popularity + (1-distNormalized);// + (1-distNormalized)*popularity;	
 			}
 			else if (IMPORTANCE_METRIC>0){ 
-				totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + (1-distNormalized) + (1-distNormalized)*popularity;	
+				totalImportance = Math.abs(IMPORTANCE_METRIC)*popularity + (1-distNormalized);// + (1-distNormalized)*popularity;	
 			}
 			else if (IMPORTANCE_METRIC<0){ 
-				totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)*(1-distNormalized) + (1-distNormalized)*popularity;	
+				totalImportance = popularity + Math.abs(IMPORTANCE_METRIC)*(1-distNormalized);//+ (1-distNormalized)*popularity;	
 			}
 			this.totalImportance = totalImportance/importanceNormalizer;
 			//System.out.println("current="+current+" distance = "+this.distance+" distNormalized="+distNormalized+" importance"+ this.totalImportance +"vs "+ 1/distNormalized +" distNormalizer="+distNormalizer);
@@ -68,7 +68,7 @@ public class TileOverall {
 			return UserMove.currentZoomLevel;
 		}
 		
-		int fragments = (int)Math.floor((this.totalImportance)*FRAGMENTS_PER_TILE);
+		int fragments = (int)Math.ceil((this.totalImportance)*FRAGMENTS_PER_TILE);
 		
 		if (fragments<1){
 			return 1;
@@ -104,13 +104,13 @@ public class TileOverall {
 			importanceNormalizer = 1.0d; 
 		}
 		else if (IMPORTANCE_METRIC==0){
-			importanceNormalizer = 3.0d;
+			importanceNormalizer = 2.0d;
 		}
 		else if (IMPORTANCE_METRIC>0){ 
-			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 2.0d;
+			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 1.0d;
 		}
 		else if (IMPORTANCE_METRIC<0){ 
-			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 2.0d;	//distance = 1 (min), popularity 1.0
+			importanceNormalizer = Math.abs(IMPORTANCE_METRIC) + 1.0d;	//distance = 1 (min), popularity 1.0
 			
 		}
 	}

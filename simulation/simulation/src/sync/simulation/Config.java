@@ -6,9 +6,10 @@ import sync.simulation.monitor.Distribution;
 public class Config {
 	
 	public static boolean DEBUG = false;
-	public  static int RUNS = 2;
-	public static int WARMUP = 1;
+	public  static int RUNS =3;
+	//public static int WARMUP = 3;
 	public static boolean PREFETCH = true;
+	public static int MOVES = 200;
 	
 	//=============== USER =================================================
 	public static int THINK_TIME = 2048;

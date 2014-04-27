@@ -97,9 +97,7 @@ public class UserMove {
 			Main.updateStatisticsAndCache(current);
 			CachedTile worstTile = Main.cache.getWorst(current);
 			//tileStatistic.updateImportance(current);
-			if(tileStatistic.totalImportance < worstTile.totalImportance){
-				break;
-			}
+			
 			Point point = tileStatistic.point;
 			//System.out.println("Prefetch Point"+point+UserStudiesCombined.tiles[point.y][point.x].totalImportance);
 			int index = point.hashCode();
@@ -111,7 +109,9 @@ public class UserMove {
 				fragmentsNeeded = FRAGMENTS_PER_TILE;
 			}
 		
-			
+			if(tileStatistic.totalImportance < worstTile.totalImportance && !Main.cache.hasAvailableSpace(fragmentsNeeded)){
+				continue;
+			}
 			
 			if (!Main.cache.tileExists(index)){
 				Tile tile = Main.db.getTileWithFragmentRange( point,1,fragmentsNeeded,null);

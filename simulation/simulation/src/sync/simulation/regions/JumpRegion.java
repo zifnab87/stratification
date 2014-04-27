@@ -65,10 +65,12 @@ public class JumpRegion extends Region {
 						/*if (Main.cache.tileExists(Database.points(y,x)) && Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()<UserStudiesCombined.tiles[y][x].howManyFragments()){
 							System.out.println("y:"+y+" x:"+x+" "+Main.cache.queueFind(Database.points(y,x).id).getCachedFragmentsNum()+" < "+UserStudiesCombined.tiles[y][x].howManyFragments());
 						}*/
-						queue.add(UserStudiesCombined.tiles[y][x]);
-					}
-				}
-			//}
+				
+					queue.add(UserStudiesCombined.tiles[y][x]);
+				//}
+			}
+		}
+			
 	//	}
 		return queue;
 		

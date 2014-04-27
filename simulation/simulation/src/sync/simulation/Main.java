@@ -9,7 +9,7 @@ import static sync.simulation.Config.IMPORTANCE_METRIC;
 import static sync.simulation.Config.FRAGMENT;
 import static sync.simulation.Config.FRAGMENTS_PER_TILE;
 import static sync.simulation.Config.RUNS;
-import static sync.simulation.Config.WARMUP;
+import static sync.simulation.Config.MOVES;
 import java.util.Random;
 import java.util.Vector;
 
@@ -73,17 +73,17 @@ public class Main {
 			cache = new Cache();
 			int memStart = 0;
 			int memEnd = 0;
-			if (w!=6){
+			//if (w!=6){
 				memStart = 512;
 				memEnd = 512;
-			}
-			else {
-				memStart = 128;
-				memEnd = 8192;
-			}
+			//}
+			//else {
+			//	memStart = 128;
+			//	memEnd = 8192;
+			//}
 			for (int m=memStart; m<=memEnd; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=0; f<=1; f++){
+				for (int f=1; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -110,13 +110,15 @@ public class Main {
 //						vec.add(0.0);
 //						vec.add(0.0);
 //						System.out.println(Util.variance(vec));
-						for (int i=0; i<=RUNS+WARMUP; i++){
+						boolean warmup = true;
+						for (int i=0; i<2*RUNS; i++){
+							Util.debug("Run: "+i+ " warmup "+warmup,true);
 							
 														
-							Util.debug("Run: "+i);
+							
 							Run run = new Run();
 							//for warmup
-							if (i>WARMUP){
+							if (!warmup){
 								runs.add(run);
 							}
 							Random rand = new Random();
@@ -127,14 +129,14 @@ public class Main {
 							else{
 								UserMove.currentZoomLevel = 1;
 							}
-							if (current==null || i<=WARMUP){
+							if (current==null || warmup){
 								current = new UserMove(db.randomPoint(),run,"pan");
 							}
 						
 							
 							Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
 
-							for (int j=0; j<1500; j++){ //moves per run	
+							for (int j=0; j<MOVES; j++){ //moves per run	
 								//System.out.println("Run"+i+" Move "+j);
 								System.gc();
 								
@@ -180,7 +182,7 @@ public class Main {
 								Util.debug("#Cache Misses during Fetch in a Move: "+current.cacheMissesDuringFetch);
 								Util.debug("#Cache Hits during Fetch in a Move: "+current.cacheHitsDuringFetch);
 								Util.debug("#Latency during Fetch in a Move: "+current.latencyDuringFetch);
-								if (i>WARMUP){
+								if (!warmup){
 									vecForLatency.add(current.latencyDuringFetch);
 								}
 								//current.run.misses.add(current.cacheMissesDuringFetch);
@@ -224,6 +226,12 @@ public class Main {
 								Util.debug("#Total Cache Fetched Fragments: "+run.totalCacheHits);
 								Util.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 								
+							}
+							if (warmup){
+								warmup = false;
+							}
+							else {
+								warmup = true;
 							}
 								
 						}
