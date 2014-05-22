@@ -64,21 +64,22 @@ public class TileOverall {
 	
 	public int howManyFragments(Point current){
 		syncNormalizers();
-		if(this.point.equals(current)){
-			return UserMove.currentZoomLevel;
-		}
-		
-		int fragments = (int)Math.ceil((this.totalImportance)*FRAGMENTS_PER_TILE);
-		
-		if (fragments<1){
-			return 1;
-		}
-		else if(fragments>FRAGMENTS_PER_TILE){
-			return FRAGMENTS_PER_TILE;
-		}
-		else {
-			return fragments;
-		}
+//		if(this.point.equals(current)){
+//			return UserMove.currentZoomLevel;
+//		}
+//		
+//		int fragments = (int)Math.ceil((this.totalImportance)*FRAGMENTS_PER_TILE);
+//		
+//		if (fragments<1){
+//			return 1;
+//		}
+//		else if(fragments>FRAGMENTS_PER_TILE){
+//			return FRAGMENTS_PER_TILE;
+//		}
+//		else {
+//			return fragments;
+//		}
+		return UserMove.currentZoomLevel;
 		//return UserMove.currentZoomLevel;
 	}
 	

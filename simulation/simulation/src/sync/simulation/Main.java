@@ -66,24 +66,24 @@ public class Main {
 		UserMove current = null;
 
 		//Random rand = new Random();
-		for (int w=1; w<=6; w++){
+		for (int w=6; w<=6; w++){
 			uss.setWorkload(w);
 			System.out.println("workload: "+w);
 			db.clearCache();
 			cache = new Cache();
-			int memStart = 0;
-			int memEnd = 0;
+			int memStart = 256;
+			int memEnd = 256;
 			//if (w!=6){
-				memStart = 512;
-				memEnd = 512;
+			//	memStart = 512;
+			//	memEnd = 512;
 			//}
 			//else {
-			//	memStart = 128;
-			//	memEnd = 8192;
+		//		memStart = 128;
+		//		memEnd = 8192;
 			//}
 			for (int m=memStart; m<=memEnd; m=m*2){
 				CACHE_SIZE = m;
-				for (int f=1; f<=1; f++){
+				for (int f=0; f<=1; f++){
 					if (f==0){
 						FRAGMENT = false;
 					}
@@ -92,10 +92,34 @@ public class Main {
 					}
 					db.clearCache();
 					cache = new Cache();
-					for (int weight=-5; weight<=5; weight++){
-	//					if (w>=-1 && w<=1){
-	//						continue;
-	//					}
+					int weightStart = -5;
+					int weightEnd = 5;
+//					if (w==1){
+//						weightStart = -2;
+//						weightEnd = -2;
+//					}
+//					else if(w==4){
+//						weightStart = -1;
+//						weightEnd = -1;
+//					}
+//					else if(w==2){
+//						weightStart = 4;
+//						weightEnd = 4;
+//					}
+//					else if(w==5){
+//						weightStart = 1;
+//						weightEnd = 1;
+//					}
+//					else if(w==3){
+//						weightStart = 3;
+//						weightEnd = 3;
+//					}
+//					else if(w==6){
+//						weightStart = -3;
+//						weightEnd = -3;
+//					}
+					
+					for (int weight=weightStart; weight<=weightEnd; weight++){
 						IMPORTANCE_METRIC = weight;
 						System.out.println("EVICTION METRIC:"+weight);
 						
@@ -112,7 +136,7 @@ public class Main {
 //						System.out.println(Util.variance(vec));
 						boolean warmup = true;
 						for (int i=0; i<2*RUNS; i++){
-							Util.debug("Run: "+i+ " warmup "+warmup,true);
+							Util.debug("Run: "+i+ " warmup "+warmup);
 							
 														
 							
@@ -135,8 +159,14 @@ public class Main {
 						
 							
 							Viewport viewport = new Viewport(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  current.point,null);
-
-							for (int j=0; j<MOVES; j++){ //moves per run	
+							int moves = 0;
+							if (warmup){
+								moves = 4*MOVES;
+							}
+							else {
+								moves = MOVES;
+							}
+							for (int j=0; j<moves; j++){ //moves per run	
 								//System.out.println("Run"+i+" Move "+j);
 								System.gc();
 								

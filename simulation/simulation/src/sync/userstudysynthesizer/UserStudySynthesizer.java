@@ -140,12 +140,14 @@ public class UserStudySynthesizer {
 				String maximizingMove = "";
 				for(int i=0; i<moves.length; i++){
 					temp = current.go(moves[i],run,current.point);
+					
 					//current.point.y
 					double newVal = UserStudiesCombined.popularities[temp.point.y][temp.point.x];
 					if (newVal>max){
 						max = newVal;
 						maximizingMove = moves[i];
 					}
+					
 				}
 				
 				current = current.go(maximizingMove,run,current.point);
@@ -154,42 +156,57 @@ public class UserStudySynthesizer {
 		}
 		else if(rand>panProbability && rand<=panProbability+zoomProbability){ //ZOOM
 			double rand2 = Math.random();
-			if (rand2<=randomZoomProbability){ //ZOOM -> RANDOM ZOOM
-				double rand3 = Math.random();
-				 if(rand3 <= zoomInProbability){
-					//zoom in 
-					current = current.go("zoomin",run,current.point);
-					possiblyNotPermitted = true;
-					
-				}
-				else if(rand3 > zoomInProbability 
-						&& rand3 <= zoomInProbability+zoomOutProbability){
-					//zoom out; 
-					current = current.go("zoomout",run,current.point);
-					possiblyNotPermitted = true;
-					
-				}
-				else if(rand3 > zoomInProbability+zoomOutProbability
-						&& rand3 <= zoomInProbability+zoomOutProbability+zoomJumpProbability){
-					//zoom jump;
-					current = current.go("zoomjump",run,current.point);
-					possiblyNotPermitted = true;
-					
-				}
-			}
-			else { //ZOOM -> DETERMINISTIC ZOOM
-				int fragments = (int)Math.floor(FRAGMENTS_PER_TILE*UserStudiesCombined.popularities[current.point.y][current.point.x]);
-				if (fragments < 1 ){
-					UserMove.currentZoomLevel = 1;
-				}
-				else if (fragments>FRAGMENTS_PER_TILE){
-					UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
-				}
-				
-				UserMove.currentZoomLevel = fragments;
-				current = current.go("stay", run,current.point);
+			double popularity = UserStudiesCombined.popularities[current.point.y][current.point.x];
+			//the more popular a tile more zoom in happens and less zoom out
+			//the less popular a tile more zoom out happens and less zoom in
+			if (rand2 <= popularity){
+				//zoom in 
+				current = current.go("zoomin",run,current.point);
 				possiblyNotPermitted = true;
 			}
+			else {
+				//zoom out; 
+				current = current.go("zoomout",run,current.point);
+				possiblyNotPermitted = true;
+			}
+			
+			
+//			if (rand2<=randomZoomProbability){ //ZOOM -> RANDOM ZOOM
+//				double rand3 = Math.random();
+//				 if(rand3 <= zoomInProbability){
+//					//zoom in 
+//					current = current.go("zoomin",run,current.point);
+//					possiblyNotPermitted = true;
+//					
+//				}
+//				else if(rand3 > zoomInProbability 
+//						&& rand3 <= zoomInProbability+zoomOutProbability){
+//					//zoom out; 
+//					current = current.go("zoomout",run,current.point);
+//					possiblyNotPermitted = true;
+//					
+//				}
+//				else if(rand3 > zoomInProbability+zoomOutProbability
+//						&& rand3 <= zoomInProbability+zoomOutProbability+zoomJumpProbability){
+//					//zoom jump;
+//					current = current.go("zoomjump",run,current.point);
+//					possiblyNotPermitted = true;
+//					
+//				}
+//			}
+//			else { //ZOOM -> DETERMINISTIC ZOOM
+//				int fragments = (int)Math.floor(FRAGMENTS_PER_TILE*UserStudiesCombined.popularities[current.point.y][current.point.x]);
+//				if (fragments < 1 ){
+//					UserMove.currentZoomLevel = 1;
+//				}
+//				else if (fragments>FRAGMENTS_PER_TILE){
+//					UserMove.currentZoomLevel = FRAGMENTS_PER_TILE;
+//				}
+//				
+//				UserMove.currentZoomLevel = fragments;
+//				current = current.go("stay", run,current.point);
+//				possiblyNotPermitted = true;
+//			}
 		}
 		else if(rand>panProbability+zoomProbability && rand <=1.0d){ //JUMP
 			// take 40 random jump points
